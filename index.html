@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en"><!-- lang auto-set by JS on load -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okinawa Fishing Charter | fishing.nice.okinawa</title>
+<meta name="description" content="Book Okinawa fishing charters. GT, Tuna, Amberjack, Jigging, Live Bait — private charters from Chatan port. Contact via LINE, WhatsApp or WeChat.">
+<meta name="keywords" content="okinawa fishing, GT fishing, kanpachi, jigging okinawa, 沖縄釣り, 冲绳钓鱼, チャーター">
+<meta property="og:title" content="Okinawa Fishing Charter | fishing.nice.okinawa">
+<meta property="og:description" content="Private fishing charters in Okinawa. GT, Tuna, Amberjack and more. Book via LINE, WhatsApp or WeChat.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fishing.nice.okinawa">
+
+<!-- Critical: hide all multilingual elements until lang is set -->
+<style>
+  /* Hide ALL multilingual elements by default - zero flash */
+  [data-en],[data-zh],[data-ja]{
+    display:none !important;
+    visibility:hidden;
+  }
+  /* Show only matching language - set immediately by inline script below */
+  html[data-lang=en] [data-en]{display:revert !important; visibility:visible;}
+  html[data-lang=zh] [data-zh]{display:revert !important; visibility:visible;}
+  html[data-lang=ja] [data-ja]{display:revert !important; visibility:visible;}
+  /* i18n-text elements render via JS textContent */
+  .i18n-text,.i18n-btn{display:block !important; visibility:visible;}
+  span.i18n-text{display:inline !important;}
+</style>
+<!-- Early lang detection — prevents flash -->
+<script>
+(function(){
+  var lang = 'en';
+  try { var s = localStorage.getItem('preferred-lang'); if(s && ['en','zh','ja'].indexOf(s)>-1) lang=s; } catch(e){}
+  if(lang==='en'){
+    var nav = (navigator.languages&&navigator.languages[0])||navigator.language||'en';
+    var c = nav.toLowerCase();
+    if(c.indexOf('zh')===0) lang='zh';
+    else if(c.indexOf('ja')===0) lang='ja';
+  }
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang==='zh'?'zh-CN':lang==='ja'?'ja':'en');
+})();
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-371420585"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-371420585');
+</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+
+<!-- Data files -->
+<script src="data/photos.js"></script>
+<script src="data/logs.js"></script>
+<script src="data/guide.js"></script>
+
+<style>
+:root {
+  --deep: #060d18;
+  --navy: #0a1628;
+  --ocean: #0d2240;
+  --blue: #0e3a6b;
+  --bright: #1a5299;
+  --teal: #00b4c8;
+  --teal-dim: rgba(0,180,200,0.15);
+  --coral: #e85d3a;
+  --gold: #c8a44a;
+  --gold-lt: #e4c06a;
+  --white: #ffffff;
+  --off: #f2f5f8;
+  --muted: #7a96b0;
+  --glass: rgba(255,255,255,0.05);
+  --glass-b: rgba(255,255,255,0.1);
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:var(--font-b); background:var(--deep); color:var(--white); overflow-x:hidden; line-height:1.6; }
+html[data-lang="zh"] body { font-family:'Noto Sans SC', var(--font-b); }
+html[data-lang="ja"] body { font-family:'Noto Sans JP', var(--font-b); }
+
+/* ── NAV ── */
+.nav {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(6,13,24,0.95); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--glass-b);
+  height:58px; display:flex; align-items:center;
+  justify-content:space-between; padding:0 1.5rem; gap:1rem;
+}
+.nav-logo { font-family:var(--font-d); font-size:1.05rem; font-weight:700; color:var(--gold); text-decoration:none; white-space:nowrap; }
+.nav-logo span { color:rgba(255,255,255,0.45); }
+.nav-links { display:flex; gap:1.25rem; align-items:center; }
+.nav-links a { font-size:0.78rem; color:var(--muted); text-decoration:none; font-weight:500; letter-spacing:0.04em; transition:color .2s; white-space:nowrap; }
+.nav-links a:hover { color:var(--white); }
+.nav-right { display:flex; align-items:center; gap:0.5rem; }
+.lang-btn { padding:.28rem .6rem; border:1px solid var(--glass-b); border-radius:3px; font-size:.68rem; font-weight:700; letter-spacing:.08em; cursor:pointer; color:var(--muted); background:transparent; transition:all .2s; }
+.lang-btn:hover, .lang-btn.active { background:var(--gold); border-color:var(--gold); color:var(--deep); }
+.nav-cta { background:var(--gold); color:var(--deep); border:none; border-radius:4px; padding:.45rem 1rem; font-size:.75rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; cursor:pointer; font-family:var(--font-b); transition:all .2s; text-decoration:none; }
+.nav-cta:hover { background:var(--gold-lt); }
+
+/* ── MULTILINGUAL ── */
+[data-en],[data-zh],[data-ja] { display:none; }
+html[data-lang="en"] [data-en] { display:inherit; }
+html[data-lang="zh"] [data-zh] { display:inherit; }
+html[data-lang="ja"] [data-ja] { display:inherit; }
+/* Prevent flash before JS sets lang */
+html:not([data-lang]) [data-en],
+html:not([data-lang]) [data-zh],
+html:not([data-lang]) [data-ja] { display:none; }
+
+/* ── HERO ── */
+.hero {
+  min-height:100vh; position:relative; display:flex; align-items:center;
+  padding-top:58px; overflow:hidden;
+}
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+  background: linear-gradient(150deg, rgba(6,13,24,.95) 0%, rgba(10,22,40,.8) 45%, rgba(14,58,107,.35) 100%),
+    url('https://images.unsplash.com/photo-1504197832061-98356e3dcdcf?w=1800&q=80') center/cover no-repeat;
+}
+.hero-grain {
+  position:absolute; inset:0; z-index:1; opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+.hero-wave {
+  position:absolute; bottom:0; left:0; right:0; z-index:1;
+}
+.hero-wave svg { width:100%; display:block; }
+.hero-content { position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:3rem 2rem 5rem; width:100%; }
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:.5rem;
+  background:rgba(200,164,74,.12); border:1px solid rgba(200,164,74,.35);
+  border-radius:100px; padding:.35rem .9rem;
+  font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--gold);
+  margin-bottom:1.75rem;
+}
+.hero-eyebrow::before { content:''; width:6px; height:6px; background:var(--gold); border-radius:50%; animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.hero-title { font-family:var(--font-d); font-size:clamp(3.2rem,7.5vw,7rem); font-weight:700; line-height:1; letter-spacing:-.02em; margin-bottom:1.5rem; }
+.hero-title em { font-style:italic; color:var(--teal); display:block; }
+.hero-sub { font-size:clamp(.95rem,1.8vw,1.15rem); color:rgba(255,255,255,.62); font-weight:300; max-width:460px; margin-bottom:2.5rem; line-height:1.75; }
+.hero-btns { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:3.5rem; }
+.btn-gold { background:var(--gold); color:var(--deep); padding:.9rem 1.8rem; border-radius:4px; font-weight:700; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border:none; cursor:pointer; font-family:var(--font-b); transition:all .3s; display:inline-flex; align-items:center; gap:.5rem; }
+.btn-gold:hover { background:var(--gold-lt); transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,164,74,.35); }
+.btn-ghost { background:transparent; color:var(--white); padding:.9rem 1.8rem; border-radius:4px; font-weight:600; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border:1px solid rgba(255,255,255,.3); transition:all .3s; display:inline-flex; align-items:center; gap:.5rem; cursor:pointer; font-family:var(--font-b); }
+.btn-ghost:hover { border-color:var(--white); background:rgba(255,255,255,.06); transform:translateY(-2px); }
+.hero-stats { display:flex; gap:2.5rem; flex-wrap:wrap; }
+.stat-num { font-family:var(--font-d); font-size:2.2rem; font-weight:700; color:var(--gold); line-height:1; display:block; }
+.stat-label { font-size:.68rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:.2rem; }
+
+/* ── SECTION COMMONS ── */
+section { padding:5.5rem 0; }
+.container { max-width:1200px; margin:0 auto; padding:0 2rem; }
+.s-label { font-size:.65rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin-bottom:.75rem; }
+.s-title { font-family:var(--font-d); font-size:clamp(2rem,3.5vw,3rem); font-weight:700; line-height:1.15; margin-bottom:1rem; }
+.s-desc { font-size:1rem; color:rgba(255,255,255,.55); max-width:520px; line-height:1.75; margin-bottom:2.5rem; }
+.divider-line { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--glass-b),transparent); }
+
+/* ── PLANS ── */
+.plans-section { background:var(--navy); position:relative; }
+.plans-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--teal),transparent); }
+.plans-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1.5rem; }
+.plan-card {
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:10px;
+  overflow:hidden; transition:all .3s; position:relative;
+}
+.plan-card.featured { border-color:rgba(200,164,74,.4); }
+.plan-card:hover { transform:translateY(-4px); box-shadow:0 20px 48px rgba(0,0,0,.5); }
+.plan-badge {
+  position:absolute; top:1rem; right:1rem;
+  background:var(--gold); color:var(--deep);
+  padding:.2rem .6rem; border-radius:3px; font-size:.62rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+}
+.plan-header { padding:1.75rem 1.75rem 1rem; border-bottom:1px solid var(--glass-b); }
+.plan-num { font-size:.65rem; font-weight:700; letter-spacing:.15em; color:var(--teal); text-transform:uppercase; margin-bottom:.5rem; }
+.plan-name { font-family:var(--font-d); font-size:1.5rem; font-weight:700; margin-bottom:.5rem; }
+.plan-desc { font-size:.82rem; color:rgba(255,255,255,.5); line-height:1.65; }
+.plan-body { padding:1.5rem 1.75rem; }
+.plan-row { display:flex; justify-content:space-between; align-items:baseline; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.plan-row:last-child { border-bottom:none; }
+.plan-row-label { font-size:.78rem; color:var(--muted); }
+.plan-row-val { font-size:.88rem; font-weight:600; text-align:right; }
+.plan-price { font-family:var(--font-d); font-size:1.8rem; font-weight:700; color:var(--gold); margin:.75rem 0 .25rem; }
+.plan-price-note { font-size:.72rem; color:var(--muted); }
+.plan-footer { padding:1.25rem 1.75rem; }
+.plan-cta { display:block; text-align:center; background:var(--gold); color:var(--deep); border-radius:4px; padding:.8rem; font-weight:700; font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; transition:all .3s; }
+.plan-cta:hover { background:var(--gold-lt); }
+.plan-note { margin-top:.75rem; font-size:.72rem; color:var(--muted); line-height:1.6; padding:.75rem; background:rgba(255,255,255,.03); border-radius:4px; border-left:2px solid var(--teal); }
+
+/* ── PLAN TABS ── */
+.plan-tabs { display:flex; gap:.75rem; margin-bottom:2.5rem; flex-wrap:wrap; }
+.plan-tab-btn {
+  display:flex; align-items:center; gap:.5rem;
+  padding:.7rem 1.5rem; border-radius:6px;
+  border:1px solid var(--glass-b); background:var(--glass);
+  color:var(--muted); font-size:.82rem; font-weight:700;
+  letter-spacing:.05em; cursor:pointer; font-family:var(--font-b);
+  transition:all .25s;
+}
+.plan-tab-btn:hover { border-color:rgba(255,255,255,.2); color:var(--white); }
+.plan-tab-btn.active { background:var(--gold); border-color:var(--gold); color:var(--deep); }
+.plan-tab-btn .tab-icon { font-size:1.1rem; }
+.plan-panel { display:none; }
+.plan-panel.active { display:block; }
+
+/* Experience plan card */
+.exp-plan-card {
+  background:var(--glass); border:1px solid var(--glass-b);
+  border-radius:12px; overflow:hidden; margin-bottom:1.5rem;
+}
+.exp-card-top { display:grid; grid-template-columns:1fr 1fr; }
+.exp-card-imgs { display:grid; grid-template-columns:1fr 1fr; gap:2px; }
+.exp-card-imgs img, .exp-card-imgs .img-placeholder {
+  width:100%; height:220px; object-fit:cover; display:block;
+}
+.img-placeholder {
+  background:linear-gradient(135deg,var(--ocean),var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem; height:220px;
+}
+.exp-card-intro { padding:2rem; display:flex; flex-direction:column; justify-content:center; }
+.exp-card-badge { display:inline-flex; align-items:center; gap:.4rem; background:rgba(0,180,200,.12); border:1px solid rgba(0,180,200,.3); border-radius:100px; padding:.28rem .75rem; font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); margin-bottom:.85rem; }
+.exp-card-title { font-family:var(--font-d); font-size:1.8rem; font-weight:700; margin-bottom:.75rem; }
+.exp-card-desc { font-size:.88rem; color:rgba(255,255,255,.58); line-height:1.75; margin-bottom:1.25rem; }
+.exp-card-meta { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+.exp-meta-item { display:flex; align-items:center; gap:.4rem; font-size:.78rem; color:rgba(255,255,255,.6); }
+.exp-meta-icon { font-size:1rem; }
+.exp-cta { display:inline-flex; align-items:center; gap:.5rem; background:var(--gold); color:var(--deep); border-radius:4px; padding:.75rem 1.5rem; font-weight:700; font-size:.8rem; letter-spacing:.05em; text-transform:uppercase; text-decoration:none; transition:all .3s; }
+.exp-cta:hover { background:var(--gold-lt); transform:translateY(-2px); }
+.exp-card-details { padding:2rem; border-top:1px solid var(--glass-b); }
+.exp-details-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-bottom:1.5rem; }
+.exp-detail-box { background:rgba(255,255,255,.03); border-radius:6px; padding:1rem; }
+.exp-detail-label { font-size:.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--teal); margin-bottom:.4rem; }
+.exp-detail-val { font-size:.82rem; color:rgba(255,255,255,.7); line-height:1.55; }
+.exp-checklist { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+.exp-check-item { display:flex; align-items:flex-start; gap:.5rem; font-size:.8rem; color:rgba(255,255,255,.6); line-height:1.5; }
+.exp-check-icon { color:var(--teal); flex-shrink:0; font-size:.9rem; margin-top:.05rem; }
+.exp-warning-box { margin-top:1.25rem; padding:.85rem 1rem; background:rgba(232,93,58,.05); border:1px solid rgba(232,93,58,.18); border-radius:6px; font-size:.78rem; color:rgba(255,255,255,.5); line-height:1.7; }
+.exp-cancel-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; margin-top:1rem; }
+.exp-cancel-item { background:rgba(255,255,255,.03); border-radius:6px; padding:.85rem; text-align:center; }
+.exp-cancel-period { font-size:.7rem; color:var(--teal); font-weight:700; margin-bottom:.3rem; }
+.exp-cancel-policy { font-size:.75rem; color:rgba(255,255,255,.6); }
+
+/* Also add section activity promo */
+.also-section { margin-top:2rem; padding:1.5rem; background:rgba(0,180,200,.04); border:1px solid rgba(0,180,200,.15); border-radius:10px; }
+.also-title { font-family:var(--font-d); font-size:1.1rem; font-weight:700; margin-bottom:1rem; color:var(--teal); }
+.also-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.also-card { border-radius:8px; overflow:hidden; position:relative; cursor:pointer; text-decoration:none; display:block; }
+.also-card img, .also-card .also-placeholder { width:100%; height:160px; object-fit:cover; display:block; transition:transform .3s; }
+.also-placeholder { background:linear-gradient(135deg,var(--ocean),var(--blue)); display:flex; align-items:center; justify-content:center; font-size:2rem; }
+.also-card:hover img { transform:scale(1.04); }
+.also-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(6,13,24,.85) 0%,transparent 55%); display:flex; align-items:flex-end; padding:1rem; }
+.also-card-title { font-family:var(--font-d); font-size:1rem; font-weight:700; }
+.also-card-sub { font-size:.72rem; color:rgba(255,255,255,.6); margin-top:.1rem; }
+
+@media(max-width:860px){
+  .exp-card-top { grid-template-columns:1fr; }
+  .exp-details-grid { grid-template-columns:1fr 1fr; }
+  .exp-cancel-grid { grid-template-columns:1fr; }
+  .exp-checklist { grid-template-columns:1fr; }
+  .also-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:600px){
+  .exp-card-imgs .img-placeholder, .exp-card-imgs img { height:160px; }
+  .exp-details-grid { grid-template-columns:1fr; }
+  .also-grid { grid-template-columns:1fr; }
+}
+
+/* ── BOOKING ── */
+.booking-section { background:var(--deep); }
+.booking-section::before { content:''; display:block; width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin-bottom:0; }
+.payment-box {
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:10px;
+  padding:2rem; margin-top:2.5rem;
+}
+.payment-title { font-family:var(--font-d); font-size:1.2rem; font-weight:700; margin-bottom:1.25rem; color:var(--gold); }
+.payment-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+.payment-item { }
+.payment-item-label { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); margin-bottom:.35rem; }
+.payment-item-val { font-size:.85rem; color:rgba(255,255,255,.7); line-height:1.6; }
+.cancel-box { margin-top:1.25rem; padding:1rem 1.25rem; background:rgba(232,93,58,.06); border:1px solid rgba(232,93,58,.2); border-radius:6px; }
+.cancel-title { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#e85d3a; margin-bottom:.35rem; }
+.cancel-body { font-size:.82rem; color:rgba(255,255,255,.55); line-height:1.65; }
+
+.steps { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-top:3rem; position:relative; }
+.steps::before { content:''; position:absolute; top:2.25rem; left:12%; right:12%; height:1px; background:linear-gradient(90deg,var(--teal),var(--gold)); }
+.step { text-align:center; position:relative; z-index:1; }
+.step-n {
+  width:4.5rem; height:4.5rem; border-radius:50%; margin:0 auto 1.25rem;
+  background:var(--ocean); border:1.5px solid var(--teal);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-d); font-size:1.4rem; font-weight:700; color:var(--teal);
+  transition:all .3s;
+}
+.step:hover .step-n { background:var(--teal); color:var(--deep); transform:scale(1.08); }
+.step-title { font-family:var(--font-d); font-size:1rem; font-weight:700; margin-bottom:.4rem; }
+.step-desc { font-size:.78rem; color:var(--muted); line-height:1.6; }
+
+/* ── GALLERY ── */
+.gallery-section { background:var(--navy); position:relative; }
+.gallery-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--teal),transparent); }
+.gallery-filters { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.filter-btn { padding:.35rem .85rem; border:1px solid var(--glass-b); border-radius:100px; font-size:.72rem; font-weight:600; letter-spacing:.05em; cursor:pointer; color:var(--muted); background:transparent; transition:all .2s; font-family:var(--font-b); }
+.filter-btn:hover, .filter-btn.active { background:var(--teal); border-color:var(--teal); color:var(--deep); }
+.gallery-grid { columns:3; gap:1rem; }
+.gallery-item {
+  break-inside:avoid; margin-bottom:1rem;
+  border-radius:6px; overflow:hidden; cursor:pointer;
+  position:relative; background:var(--ocean);
+}
+.gallery-item img {
+  width:100%; display:block; transition:transform .4s;
+  aspect-ratio:3/4; object-fit:cover;
+}
+.gallery-item:hover img { transform:scale(1.04); }
+.gallery-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(6,13,24,.85) 0%, transparent 50%);
+  opacity:0; transition:opacity .3s;
+  display:flex; align-items:flex-end; padding:1rem;
+}
+.gallery-item:hover .gallery-overlay { opacity:1; }
+.gallery-caption { font-size:.75rem; line-height:1.5; }
+.gallery-fish { font-weight:700; color:var(--gold); display:block; }
+.gallery-date { color:rgba(255,255,255,.6); font-size:.68rem; }
+/* Placeholder for photos not yet uploaded */
+.gallery-placeholder {
+  width:100%; aspect-ratio:3/4;
+  background:linear-gradient(135deg,var(--ocean),var(--blue));
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem;
+  color:var(--muted); font-size:2rem;
+}
+.gallery-placeholder span { font-size:.75rem; color:var(--muted); }
+
+/* ── LOG ── */
+.log-section { background:var(--deep); position:relative; }
+.log-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.log-list { display:flex; flex-direction:column; gap:1.5rem; margin-top:2.5rem; }
+.log-entry {
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:8px;
+  overflow:hidden; transition:border-color .2s;
+}
+.log-entry:hover { border-color:rgba(0,180,200,.3); }
+.log-header {
+  padding:1.5rem; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;
+}
+.log-meta { }
+.log-date { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--teal); margin-bottom:.4rem; }
+.log-title { font-family:var(--font-d); font-size:1.2rem; font-weight:700; }
+.log-fish-tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.5rem; }
+.log-tag { background:rgba(200,164,74,.1); border:1px solid rgba(200,164,74,.2); border-radius:3px; padding:.15rem .5rem; font-size:.65rem; font-weight:600; color:var(--gold); letter-spacing:.04em; }
+.log-chevron { color:var(--muted); font-size:1.2rem; flex-shrink:0; transition:transform .3s; }
+.log-entry.open .log-chevron { transform:rotate(180deg); }
+.log-body { max-height:0; overflow:hidden; transition:max-height .4s ease; }
+.log-entry.open .log-body { max-height:500px; }
+.log-body-inner { padding:0 1.5rem 1.5rem; border-top:1px solid var(--glass-b); padding-top:1.25rem; }
+.log-text { font-size:.875rem; color:rgba(255,255,255,.6); line-height:1.75; margin-bottom:1rem; }
+.log-details { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; }
+.log-detail-item { }
+.log-detail-label { font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.2rem; }
+.log-detail-val { font-size:.8rem; color:rgba(255,255,255,.7); }
+
+/* ── GUIDE ── */
+.guide-section { background:var(--navy); position:relative; }
+.guide-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--teal),transparent); }
+.seasons-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.25rem; margin-bottom:3.5rem; }
+.season-card {
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:8px;
+  padding:1.5rem; transition:border-color .2s;
+}
+.season-card:hover { border-color:rgba(0,180,200,.3); }
+.season-icon { font-size:2rem; margin-bottom:.75rem; display:block; }
+.season-name { font-family:var(--font-d); font-size:1.1rem; font-weight:700; margin-bottom:.25rem; }
+.season-highlight { font-size:.75rem; font-weight:700; color:var(--teal); margin-bottom:.6rem; letter-spacing:.03em; }
+.season-desc { font-size:.82rem; color:rgba(255,255,255,.52); line-height:1.65; margin-bottom:.75rem; }
+.season-fish { display:flex; gap:.4rem; flex-wrap:wrap; }
+.season-tag { background:var(--teal-dim); border:1px solid rgba(0,180,200,.25); border-radius:3px; padding:.15rem .5rem; font-size:.65rem; font-weight:600; color:var(--teal); }
+
+.guide-tabs { display:flex; gap:.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+.guide-tab { padding:.4rem 1rem; border:1px solid var(--glass-b); border-radius:4px; font-size:.75rem; font-weight:600; cursor:pointer; color:var(--muted); background:transparent; transition:all .2s; font-family:var(--font-b); }
+.guide-tab.active, .guide-tab:hover { background:var(--gold); border-color:var(--gold); color:var(--deep); }
+.guide-panel { display:none; }
+.guide-panel.active { display:block; }
+.species-grid, .methods-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1.25rem; }
+.species-card, .method-card {
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:8px; padding:1.5rem;
+}
+.species-name { font-family:var(--font-d); font-size:1.1rem; font-weight:700; margin-bottom:.2rem; }
+.species-season { font-size:.7rem; color:var(--teal); font-weight:600; letter-spacing:.05em; margin-bottom:.5rem; }
+.species-desc { font-size:.82rem; color:rgba(255,255,255,.52); line-height:1.65; margin-bottom:.75rem; }
+.species-methods { display:flex; gap:.35rem; flex-wrap:wrap; }
+.species-method-tag { background:rgba(200,164,74,.1); border:1px solid rgba(200,164,74,.2); border-radius:3px; padding:.12rem .45rem; font-size:.65rem; color:var(--gold); }
+.difficulty { display:flex; gap:.25rem; margin-bottom:.5rem; align-items:center; }
+.diff-dot { width:8px; height:8px; border-radius:50%; background:var(--glass-b); }
+.diff-dot.fill { background:var(--gold); }
+.diff-label { font-size:.65rem; color:var(--muted); margin-left:.3rem; }
+.method-icon { font-size:1.75rem; margin-bottom:.6rem; }
+.method-name { font-family:var(--font-d); font-size:1.1rem; font-weight:700; margin-bottom:.5rem; }
+.method-desc { font-size:.82rem; color:rgba(255,255,255,.52); line-height:1.65; }
+
+/* ── FAQ ── */
+.faq-section { background:var(--deep); }
+.faq-section::before { content:''; display:block; width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--glass-b),transparent); }
+.faq-list { display:flex; flex-direction:column; gap:.75rem; margin-top:2.5rem; max-width:800px; }
+.faq-item { background:var(--glass); border:1px solid var(--glass-b); border-radius:6px; overflow:hidden; }
+.faq-q { width:100%; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 1.4rem; background:transparent; border:none; color:var(--white); font-size:.9rem; font-weight:600; font-family:var(--font-b); cursor:pointer; text-align:left; gap:1rem; transition:background .2s; }
+.faq-q:hover { background:rgba(255,255,255,.03); }
+.faq-icon { width:22px; height:22px; border-radius:50%; border:1px solid var(--glass-b); display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; transition:all .3s; color:var(--teal); }
+.faq-item.open .faq-icon { background:var(--teal); color:var(--deep); transform:rotate(45deg); }
+.faq-a { max-height:0; overflow:hidden; transition:max-height .35s ease; }
+.faq-item.open .faq-a { max-height:200px; }
+.faq-a-inner { padding:0 1.4rem 1.1rem; font-size:.85rem; color:rgba(255,255,255,.55); line-height:1.75; border-top:1px solid var(--glass-b); padding-top:.9rem; }
+
+/* ── CONTACT ── */
+.contact-section { background:var(--navy); position:relative; overflow:hidden; }
+.contact-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--teal),var(--gold),transparent); }
+.contact-bg { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(0,180,200,.06) 0%,transparent 70%); top:-150px; right:-150px; pointer-events:none; }
+.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start; position:relative; z-index:1; }
+.channels { display:flex; flex-direction:column; gap:.75rem; margin-bottom:1.5rem; }
+.channel {
+  display:flex; align-items:center; gap:1rem;
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:8px;
+  padding:1.1rem 1.25rem; text-decoration:none; color:var(--white); transition:all .3s;
+}
+.channel:hover { transform:translateX(6px); border-color:rgba(255,255,255,.2); }
+.ch-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+.ch-icon.line { background:#06c755; }
+.ch-icon.whatsapp { background:#25d366; }
+.ch-icon.wechat { background:#09b83e; }
+.ch-name { font-weight:700; font-size:.95rem; }
+.ch-sub { font-size:.75rem; color:var(--muted); margin-top:.05rem; }
+.ch-arrow { margin-left:auto; color:var(--muted); font-size:1.1rem; transition:transform .2s; }
+.channel:hover .ch-arrow { transform:translateX(4px); color:var(--white); }
+
+.form { display:flex; flex-direction:column; gap:.85rem; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; }
+.form-group { display:flex; flex-direction:column; gap:.35rem; }
+.form-label { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.form-input, .form-select, .form-textarea {
+  background:var(--glass); border:1px solid var(--glass-b); border-radius:5px;
+  padding:.75rem .9rem; color:var(--white); font-size:.875rem; font-family:var(--font-b);
+  transition:border-color .2s; outline:none; width:100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--teal); }
+.form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
+.form-select { appearance:none; cursor:pointer; }
+.form-textarea { resize:vertical; min-height:90px; }
+.form-submit {
+  background:linear-gradient(135deg,var(--gold),var(--gold-lt)); color:var(--deep);
+  border:none; border-radius:5px; padding:.9rem; font-size:.85rem; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase; cursor:pointer; font-family:var(--font-b);
+  transition:all .3s;
+}
+.form-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,164,74,.4); }
+
+/* ── FOOTER ── */
+footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem 0 1.75rem; }
+.footer-inner { display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:2.5rem; margin-bottom:2rem; }
+.footer-logo { font-family:var(--font-d); font-size:1.3rem; font-weight:700; color:var(--gold); margin-bottom:.4rem; }
+.footer-logo span { color:rgba(255,255,255,.35); }
+.footer-tagline { font-size:.8rem; color:var(--muted); line-height:1.65; max-width:260px; margin-top:.4rem; }
+.footer-col h4 { font-size:.62rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:.85rem; }
+.footer-links { list-style:none; display:flex; flex-direction:column; gap:.4rem; }
+.footer-links a { font-size:.82rem; color:rgba(255,255,255,.4); text-decoration:none; transition:color .2s; }
+.footer-links a:hover { color:var(--white); }
+.footer-bottom { border-top:1px solid var(--glass-b); padding-top:1.25rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+.footer-copy { font-size:.72rem; color:var(--muted); }
+.footer-family { display:flex; gap:1.25rem; flex-wrap:wrap; }
+.footer-family a { font-size:.7rem; color:var(--muted); text-decoration:none; transition:color .2s; display:flex; align-items:center; gap:.3rem; }
+.footer-family a:hover { color:var(--gold); }
+.family-dot { width:5px; height:5px; border-radius:50%; background:var(--teal); opacity:.5; }
+
+/* ── FLOAT CONTACT ── */
+.float-contact { position:fixed; bottom:1.75rem; right:1.75rem; z-index:900; display:flex; flex-direction:column; align-items:flex-end; gap:.6rem; }
+.float-toggle { width:52px; height:52px; border-radius:50%; background:var(--gold); color:var(--deep); border:none; cursor:pointer; font-size:1.3rem; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(200,164,74,.45); transition:all .3s; flex-shrink:0; }
+.float-toggle:hover { background:var(--gold-lt); transform:scale(1.08); }
+.float-toggle.open { background:rgba(255,255,255,.12); color:var(--white); box-shadow:0 4px 20px rgba(0,0,0,.4); }
+.float-channels { display:flex; flex-direction:column; gap:.5rem; align-items:flex-end; transition:all .3s; opacity:0; pointer-events:none; transform:translateY(8px); }
+.float-channels.open { opacity:1; pointer-events:auto; transform:translateY(0); }
+.float-channel { display:flex; align-items:center; gap:.65rem; background:rgba(6,13,24,.96); border:1px solid var(--glass-b); border-radius:8px; padding:.55rem .9rem; text-decoration:none; color:var(--white); font-size:.8rem; font-weight:600; box-shadow:0 4px 16px rgba(0,0,0,.4); white-space:nowrap; transition:all .2s; }
+.float-channel:hover { border-color:rgba(255,255,255,.25); transform:translateX(-3px); }
+.float-ch-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+.float-ch-icon.wechat { background:#09b83e; }
+.float-ch-icon.whatsapp { background:#25d366; }
+.float-ch-icon.email { background:#4a90d9; }
+.float-ch-name { font-size:.75rem; font-weight:700; line-height:1.2; }
+.float-ch-val { font-size:.64rem; color:var(--muted); margin-top:.1rem; }
+
+/* ── REVEAL ── */
+.reveal { opacity:0; transform:translateY(20px); transition:opacity .55s ease, transform .55s ease; }
+.reveal.visible { opacity:1; transform:none; }
+.reveal-d1 { transition-delay:.1s; }
+.reveal-d2 { transition-delay:.2s; }
+.reveal-d3 { transition-delay:.3s; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px) {
+  .seasons-grid { grid-template-columns:1fr; }
+  .contact-grid { grid-template-columns:1fr; gap:2.5rem; }
+  .footer-inner { grid-template-columns:1fr 1fr; }
+  .steps { grid-template-columns:1fr 1fr; }
+  .steps::before { display:none; }
+  .payment-grid { grid-template-columns:1fr; }
+}
+@media(max-width:700px) {
+  .nav-links { display:none; }
+  .gallery-grid { columns:2; }
+  .plans-grid { grid-template-columns:1fr; }
+  .footer-inner { grid-template-columns:1fr; gap:1.5rem; }
+  .steps { grid-template-columns:1fr 1fr; gap:1.25rem; }
+  .form-row { grid-template-columns:1fr; }
+  .log-details { grid-template-columns:1fr 1fr; }
+  .hero-stats { gap:1.5rem; }
+}
+@media(max-width:480px) {
+  .gallery-grid { columns:1; }
+  .nav-cta { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════ -->
+<nav class="nav">
+  <a href="#" class="nav-logo">fishing<span>.nice.</span>okinawa</a>
+  <div class="nav-links" id="nav-links"></div>
+  <div class="nav-right">
+    <div style="display:flex;gap:.3rem;">
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('zh')">中文</button>
+      <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+    </div>
+    <a href="#contact" class="nav-cta" id="nav-cta"></a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ════════════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,60 C360,20 720,100 1080,50 C1260,25 1350,70 1440,60 L1440,120 L0,120 Z" fill="rgba(10,22,40,0.7)"/>
+      <path d="M0,90 C300,60 600,110 900,80 C1100,60 1280,100 1440,85 L1440,120 L0,120 Z" fill="#060d18"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div id="hero-dynamic"></div>
+  </div>
+</section>
+
+<!-- ═══ PLANS ════════════════════════════════════════════════ -->
+<section class="plans-section" id="plans">
+  <div class="container">
+    <div id="plans-header"></div>
+    <!-- Plan Tabs -->
+    <div class="plan-tabs" id="plan-tabs"></div>
+    <!-- Plan Content -->
+    <div id="plans-content"></div>
+  </div>
+</section>
+
+<!-- ═══ BOOKING ════════════════════════════════════════════ -->
+<section class="booking-section" id="booking">
+  <div class="container">
+    <div class="s-label" data-en>How to Book</div>
+    <div class="s-label" data-zh>预订流程</div>
+    <div class="s-label" data-ja>ご予約の流れ</div>
+    <h2 class="s-title" data-en>Booking Process</h2>
+    <h2 class="s-title" data-zh>预订流程</h2>
+    <h2 class="s-title" data-ja>予約プロセス</h2>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-n">01</div>
+        <div class="step-title" data-en>Send Inquiry</div>
+        <div class="step-title" data-zh>发送询问</div>
+        <div class="step-title" data-ja>お問い合わせ</div>
+        <p class="step-desc" data-en>Contact via LINE, WhatsApp, WeChat or the form below.</p>
+        <p class="step-desc" data-zh>通过LINE、WhatsApp、微信或下方表格联系。</p>
+        <p class="step-desc" data-ja>LINE、WhatsApp、WeChat、またはフォームでご連絡。</p>
+      </div>
+      <div class="step reveal reveal-d1">
+        <div class="step-n">02</div>
+        <div class="step-title" data-en>Confirm Plan</div>
+        <div class="step-title" data-zh>确认方案</div>
+        <div class="step-title" data-ja>プラン確認</div>
+        <p class="step-desc" data-en>We confirm dates, group size and the best plan for you.</p>
+        <p class="step-desc" data-zh>确认日期、人数和最适合的方案。</p>
+        <p class="step-desc" data-ja>日程・人数・最適プランを確認します。</p>
+      </div>
+      <div class="step reveal reveal-d2">
+        <div class="step-n">03</div>
+        <div class="step-title" data-en>Full Payment</div>
+        <div class="step-title" data-zh>支付费用</div>
+        <div class="step-title" data-ja>全額お支払い</div>
+        <p class="step-desc" data-en>Full payment required to confirm. Multiple methods accepted.</p>
+        <p class="step-desc" data-zh>支付费用确认预订，支持多种付款方式。</p>
+        <p class="step-desc" data-ja>全額お支払いで予約確定。各種お支払い方法に対応。</p>
+      </div>
+      <div class="step reveal reveal-d3">
+        <div class="step-n">04</div>
+        <div class="step-title" data-en>Go Fishing! 🎣</div>
+        <div class="step-title" data-zh>出发钓鱼！🎣</div>
+        <div class="step-title" data-ja>出漁！🎣</div>
+        <p class="step-desc" data-en>Meet at Chatan port and enjoy your Okinawa charter.</p>
+        <p class="step-desc" data-zh>在北谷渔港集合，享受冲绳包船钓鱼。</p>
+        <p class="step-desc" data-ja>北谷漁港に集合し、沖縄チャーターフィッシングを満喫。</p>
+      </div>
+    </div>
+
+    <!-- Payment Info -->
+    <div class="payment-box reveal">
+      <div class="payment-title" data-en>Payment & Cancellation Policy</div>
+      <div class="payment-title" data-zh>付款与取消政策</div>
+      <div class="payment-title" data-ja>お支払い・キャンセルポリシー</div>
+      <div class="payment-grid">
+        <div class="payment-item">
+          <div class="payment-item-label" data-en>Payment Timing</div>
+          <div class="payment-item-label" data-zh>付款时间</div>
+          <div class="payment-item-label" data-ja>お支払いタイミング</div>
+          <div class="payment-item-val" data-en>Full payment required at first booking. Second-time guests may pay cash on the day.</div>
+          <div class="payment-item-val" data-zh>首次预约需支付全款。第二次及以后的熟客可当天支付现金。</div>
+          <div class="payment-item-val" data-ja>初回予約は全額前払い。2回目以降のリピーターは当日現金払いも可。</div>
+        </div>
+        <div class="payment-item">
+          <div class="payment-item-label" data-en>Payment Methods</div>
+          <div class="payment-item-label" data-zh>付款方式</div>
+          <div class="payment-item-label" data-ja>お支払い方法</div>
+          <div class="payment-item-val" data-en>Alipay, WeChat Pay, PayPay, Bank transfer, Credit card (via Square). Cash JPY accepted on-site.</div>
+          <div class="payment-item-val" data-zh>支付宝、微信支付、PayPay、银行转账、信用卡（Square）。现场可付日元现金。</div>
+          <div class="payment-item-val" data-ja>支付宝、WeChat Pay、PayPay、銀行振込、クレジットカード（Square）。現場での円現金も可。</div>
+        </div>
+        <div class="payment-item">
+          <div class="payment-item-label" data-en>Exchange Rate</div>
+          <div class="payment-item-label" data-zh>汇率说明</div>
+          <div class="payment-item-label" data-ja>為替レート</div>
+          <div class="payment-item-val" data-en>CNY payments calculated at cash rate (approx. ¥5 = ¥1 JPY as of 2026). Rate confirmed at time of booking.</div>
+          <div class="payment-item-val" data-zh>人民币付款按取现汇率计算（2026年约5人民币=1日元）。汇率以预约时为准。</div>
+          <div class="payment-item-val" data-ja>人民元決済は現金レートで計算（2026年目安：5元＝1円）。予約時のレートを適用。</div>
+        </div>
+        <div class="payment-item">
+          <div class="payment-item-label" data-en>Coordination Fee</div>
+          <div class="payment-item-label" data-zh>翻译协调费</div>
+          <div class="payment-item-label" data-ja>コーディネート料</div>
+          <div class="payment-item-val" data-en>10% of total charter fee. Covers translation, coordination and support throughout your trip.</div>
+          <div class="payment-item-val" data-zh>总船费的10%，含全程翻译、协调和支持服务。</div>
+          <div class="payment-item-val" data-ja>チャーター料金の10%。翻訳・コーディネート・サポートが含まれます。</div>
+        </div>
+      </div>
+      <div class="cancel-box">
+        <div class="cancel-title" data-en>Cancellation Policy</div>
+        <div class="cancel-title" data-zh>取消政策</div>
+        <div class="cancel-title" data-ja>キャンセルポリシー</div>
+        <p class="cancel-body" data-en>Cancellations 2+ weeks before departure: charter fee refunded minus processing fee. Coordination fee non-refundable. Cancellations due to typhoon or sea conditions (captain's decision): full refund including coordination fee.</p>
+        <p class="cancel-body" data-zh>出发前2周以上取消：退还船费（扣除手续费），翻译协调费不退。因台风或海况原因（船长判断）无法出海：全额退款，含协调费。</p>
+        <p class="cancel-body" data-ja>出船2週間前からのお客様キャンセル：手数料を除いた船費を返金。コーディネート料は返金不可。台風・海況等による船長判断でのキャンセル：船費・コーディネート料ともに全額返金。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GALLERY ═══════════════════════════════════════════ -->
+<section class="gallery-section" id="gallery">
+  <div class="container">
+    <div class="s-label" data-en>Real Catches</div>
+    <div class="s-label" data-zh>真实渔获</div>
+    <div class="s-label" data-ja>釣果ギャラリー</div>
+    <h2 class="s-title" data-en>Catch Gallery</h2>
+    <h2 class="s-title" data-zh>渔获画廊</h2>
+    <h2 class="s-title" data-ja>キャッチギャラリー</h2>
+    <p class="s-desc" data-en>Real catches from our charters. Updated regularly — follow us for the latest.</p>
+    <p class="s-desc" data-zh>来自我们包船的真实渔获，定期更新。</p>
+    <p class="s-desc" data-ja>実際の釣行での釣果。随時更新中。</p>
+
+    <div class="gallery-filters" id="gallery-filters">
+      <!-- JS populated -->
+    </div>
+    <div class="gallery-grid" id="gallery-grid">
+      <!-- JS populated -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LOG ═══════════════════════════════════════════════ -->
+<section class="log-section" id="log">
+  <div class="container">
+    <div class="s-label" data-en>Trip Reports</div>
+    <div class="s-label" data-zh>出行日志</div>
+    <div class="s-label" data-ja>釣行ログ</div>
+    <h2 class="s-title" data-en>Fishing Log</h2>
+    <h2 class="s-title" data-zh>钓鱼日志</h2>
+    <h2 class="s-title" data-ja>釣行ログ</h2>
+    <p class="s-desc" data-en>Detailed reports from recent charters. See what's being caught and when.</p>
+    <p class="s-desc" data-zh>近期包船的详细记录，了解近期钓况。</p>
+    <p class="s-desc" data-ja>最近の釣行レポート。釣果と状況をご確認ください。</p>
+    <div class="log-list" id="log-list">
+      <!-- JS populated -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GUIDE ══════════════════════════════════════════════ -->
+<section class="guide-section" id="guide">
+  <div class="container">
+    <div class="s-label" data-en>Okinawa Fishing</div>
+    <div class="s-label" data-zh>冲绳钓鱼</div>
+    <div class="s-label" data-ja>沖縄フィッシング</div>
+    <h2 class="s-title" data-en>Fishing Guide</h2>
+    <h2 class="s-title" data-zh>钓鱼指南</h2>
+    <h2 class="s-title" data-ja>フィッシングガイド</h2>
+    <p class="s-desc" data-en>Okinawa's waters offer world-class fishing year-round. Here's what you need to know.</p>
+    <p class="s-desc" data-zh>冲绳海域全年提供世界级钓鱼体验，这是你需要了解的一切。</p>
+    <p class="s-desc" data-ja>沖縄の海は一年中、世界レベルの釣りを提供します。知っておくべきことをご紹介。</p>
+
+    <!-- Seasons -->
+    <div class="s-label" style="margin-bottom:.75rem;" data-en>Seasonal Calendar</div>
+    <div class="s-label" style="margin-bottom:.75rem;" data-zh>四季鱼历</div>
+    <div class="s-label" style="margin-bottom:.75rem;" data-ja>シーズンカレンダー</div>
+    <div class="seasons-grid" id="seasons-grid">
+      <!-- JS populated -->
+    </div>
+
+    <!-- Species & Methods tabs -->
+    <div class="guide-tabs">
+      <button class="guide-tab active" onclick="switchGuideTab('species',this)" data-en>Fish Species</button>
+      <button class="guide-tab active" onclick="switchGuideTab('species',this)" data-zh>鱼种介绍</button>
+      <button class="guide-tab active" onclick="switchGuideTab('species',this)" data-ja>魚種</button>
+      <button class="guide-tab" onclick="switchGuideTab('methods',this)" data-en>Fishing Methods</button>
+      <button class="guide-tab" onclick="switchGuideTab('methods',this)" data-zh>钓法介绍</button>
+      <button class="guide-tab" onclick="switchGuideTab('methods',this)" data-ja>釣り方</button>
+    </div>
+    <div class="guide-panel active" id="panel-species">
+      <div class="species-grid" id="species-grid"></div>
+    </div>
+    <div class="guide-panel" id="panel-methods">
+      <div class="methods-grid" id="methods-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ════════════════════════════════════════════════ -->
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="s-label" data-en>Questions</div>
+    <div class="s-label" data-zh>常见问题</div>
+    <div class="s-label" data-ja>よくある質問</div>
+    <h2 class="s-title">FAQ</h2>
+    <div class="faq-list" id="faq-list">
+      <!-- JS populated -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ════════════════════════════════════════════ -->
+<section class="contact-section" id="contact">
+  <div class="contact-bg"></div>
+  <div class="container">
+    <div class="s-label" data-en>Get In Touch</div>
+    <div class="s-label" data-zh>联系我们</div>
+    <div class="s-label" data-ja>お問い合わせ</div>
+    <h2 class="s-title" data-en>Book Your Charter</h2>
+    <h2 class="s-title" data-zh>预约您的包船</h2>
+    <h2 class="s-title" data-ja>チャーターを予約する</h2>
+
+    <div class="contact-grid">
+      <div>
+        <p class="s-desc" data-en>Reach us instantly via LINE, WhatsApp or WeChat — or fill in the form and we'll reply within 24 hours.</p>
+        <p class="s-desc" data-zh>通过LINE、WhatsApp或微信即时联系我们，或填写表格，我们将在24小时内回复。</p>
+        <p class="s-desc" data-ja>LINE、WhatsApp、WeChatでお気軽にご連絡ください。またはフォームにご記入いただければ24時間以内にご返信します。</p>
+
+        <div class="channels">
+          <a href="https://line.me/ti/p/niceokinawa" class="channel" target="_blank" rel="noopener">
+            <div class="ch-icon line">💬</div>
+            <div><div class="ch-name">LINE</div><div class="ch-sub" data-en>Chat in Japanese / English</div><div class="ch-sub" data-zh>日语·英语</div><div class="ch-sub" data-ja>日本語・英語対応</div></div>
+            <div class="ch-arrow">→</div>
+          </a>
+          <a href="https://wa.me/message/niceokinawa" class="channel" target="_blank" rel="noopener">
+            <div class="ch-icon whatsapp">💬</div>
+            <div><div class="ch-name">WhatsApp</div><div class="ch-sub" data-en>Chat in English</div><div class="ch-sub" data-zh>英语</div><div class="ch-sub" data-ja>英語対応</div></div>
+            <div class="ch-arrow">→</div>
+          </a>
+          <a href="#" class="channel" onclick="return false;">
+            <div class="ch-icon wechat">💬</div>
+            <div><div class="ch-name">WeChat / 微信</div><div class="ch-sub" data-en>Chat in Chinese</div><div class="ch-sub" data-zh>中文服务</div><div class="ch-sub" data-ja>中国語対応</div></div>
+            <div class="ch-arrow">→</div>
+          </a>
+        </div>
+
+        <div style="padding:1rem; background:var(--glass); border:1px solid var(--glass-b); border-radius:6px; font-size:.8rem; color:var(--muted); line-height:1.7;">
+          📍 <span data-en>Departure: Chatan American Village Port, Okinawa</span>
+          <span data-zh>出发地：冲绳北谷美国村渔港</span>
+          <span data-ja>出船場所：北谷アメリカンビレッジ漁港（沖縄）</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" data-en>Name</label>
+              <label class="form-label" data-zh>姓名</label>
+              <label class="form-label" data-ja>お名前</label>
+              <input type="text" class="form-input" id="f-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-en>Contact (LINE / WhatsApp / Email)</label>
+              <label class="form-label" data-zh>联系方式</label>
+              <label class="form-label" data-ja>連絡先</label>
+              <input type="text" class="form-input" id="f-contact">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" data-en>Plan</label>
+              <label class="form-label" data-zh>方案</label>
+              <label class="form-label" data-ja>ご希望のプラン</label>
+              <select class="form-select" id="f-plan">
+                <option value="" data-en>Select plan...</option>
+                <option value="" data-zh>选择方案...</option>
+                <option value="" data-ja>プランを選択...</option>
+                <option>Amberjack Live Bait / カンパチ泳饵钓</option>
+                <option>Tuna & Multi-Species / マグロ・マルチターゲット</option>
+                <option>GT Fishing / GTフィッシング</option>
+                <option>Expedition / 遠征釣行</option>
+                <option>Jigging / ジギング</option>
+                <option>Trolling / トローリング</option>
+                <option>FAD / パヤオ</option>
+                <option data-en>Not sure — please advise</option>
+                <option data-zh>不确定，请推荐</option>
+                <option data-ja>未定・ご提案ください</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-en>Group Size</label>
+              <label class="form-label" data-zh>团队人数</label>
+              <label class="form-label" data-ja>参加人数</label>
+              <input type="text" class="form-input" id="f-size" placeholder="e.g. 3 adults">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-en>Preferred Dates</label>
+            <label class="form-label" data-zh>希望日期</label>
+            <label class="form-label" data-ja>ご希望の日程</label>
+            <input type="text" class="form-input" id="f-dates" placeholder="e.g. July 10–15, flexible">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-en>Message / Questions</label>
+            <label class="form-label" data-zh>留言/问题</label>
+            <label class="form-label" data-ja>メッセージ・ご質問</label>
+            <textarea class="form-textarea" id="f-msg"></textarea>
+          </div>
+          <button class="form-submit" onclick="submitForm()">
+            <span data-en>📩 Send Inquiry</span>
+            <span data-zh>📩 发送询问</span>
+            <span data-ja>📩 問い合わせを送る</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">fishing<span>.nice.</span>okinawa</div>
+        <div class="footer-tagline" data-en>Private fishing charters in Okinawa. GT, Tuna, Amberjack, Jigging & more. Departure from Chatan port.</div>
+        <div class="footer-tagline" data-zh>冲绳包船钓鱼服务。GT、金枪鱼、红甘鲹、铁板钓等，从北谷渔港出发。</div>
+        <div class="footer-tagline" data-ja>沖縄の完全チャーターフィッシングサービス。北谷漁港発。</div>
+      </div>
+      <div>
+        <h4 data-en>Plans</h4><h4 data-zh>方案</h4><h4 data-ja>プラン</h4>
+        <ul class="footer-links">
+          <li><a href="#plans">Amberjack Live Bait</a></li>
+          <li><a href="#plans">Tuna & Multi-Species</a></li>
+          <li><a href="#plans">GT Fishing</a></li>
+          <li><a href="#plans">Expedition</a></li>
+          <li><a href="#plans">Jigging / Trolling</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-en>Info</h4><h4 data-zh>信息</h4><h4 data-ja>情報</h4>
+        <ul class="footer-links">
+          <li><a href="#gallery" data-en>Gallery</a><a href="#gallery" data-zh>照片</a><a href="#gallery" data-ja>ギャラリー</a></li>
+          <li><a href="#log" data-en>Fishing Log</a><a href="#log" data-zh>钓鱼日志</a><a href="#log" data-ja>釣行ログ</a></li>
+          <li><a href="#guide" data-en>Fishing Guide</a><a href="#guide" data-zh>钓鱼指南</a><a href="#guide" data-ja>ガイド</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#booking" data-en>Booking Policy</a><a href="#booking" data-zh>预订政策</a><a href="#booking" data-ja>予約ポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025–2026 fishing.nice.okinawa — All rights reserved</div>
+      <div class="footer-family">
+        <a href="#"><span class="family-dot"></span>golf.nice.okinawa</a>
+        <a href="#"><span class="family-dot"></span>diving.nice.okinawa</a>
+        <a href="#"><span class="family-dot"></span>whale.nice.okinawa</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ FLOAT CONTACT ════════════════════════════════════ -->
+<div class="float-contact" id="float-contact">
+  <div class="float-channels" id="float-channels">
+    <a href="weixin://dl/chat?OkinawaOnline" class="float-channel" onclick="copyWechat(event)">
+      <div class="float-ch-icon wechat">💬</div>
+      <div><div class="float-ch-name">WeChat 微信</div><div class="float-ch-val">OkinawaOnline</div></div>
+    </a>
+    <a href="https://wa.me/818070895239680" class="float-channel" target="_blank" rel="noopener">
+      <div class="float-ch-icon whatsapp">💬</div>
+      <div><div class="float-ch-name">WhatsApp</div><div class="float-ch-val">+81 70-8952-3968</div></div>
+    </a>
+    <a href="mailto:info@nice.okinawa" class="float-channel">
+      <div class="float-ch-icon email">✉️</div>
+      <div><div class="float-ch-name">Email</div><div class="float-ch-val">info@nice.okinawa</div></div>
+    </a>
+  </div>
+  <button class="float-toggle" id="float-toggle" onclick="toggleFloat()" aria-label="Contact">✉</button>
+</div>
+
+<!-- ═══ SCRIPTS ════════════════════════════════════════════ -->
+<script>
+// ── Language ──────────────────────────────────────────────
+function setLang(lang) {
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en');
+  const map = { en:'EN', zh:'中文', ja:'日本語' };
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === map[lang]));
+  try { localStorage.setItem('preferred-lang', lang); } catch(e) {}
+  buildNav();
+  buildHero();
+  buildPlans();
+  buildI18n();
+  buildGallery(currentFilter);
+  buildLog();
+  buildGuide();
+  buildFAQ();
+}
+
+function detectLang() {
+  // 1. Check localStorage (manual override)
+  try {
+    const saved = localStorage.getItem('preferred-lang');
+    if (saved && ['en','zh','ja'].includes(saved)) return saved;
+  } catch(e) {}
+  // 2. Browser language
+  const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+  const code = nav.toLowerCase();
+  if (code.startsWith('zh')) return 'zh';
+  if (code.startsWith('ja')) return 'ja';
+  return 'en';
+}
+
+// ── Current lang helper ───────────────────────────────────
+function L() { return document.documentElement.getAttribute('data-lang') || 'en'; }
+
+
+
+// ── Plans Data ────────────────────────────────────────────
+let activePlanTab = 'experience';
+
+const PLANS_HEADER = {
+  label: { en:'Fishing Plans', zh:'钓鱼方案', ja:'フィッシングプラン' },
+  title: { en:'Plans & Pricing', zh:'方案与价格', ja:'プラン・料金表' },
+  desc:  {
+    en: 'From beginner-friendly experience fishing to full-day private pro charters — we have the right plan for every angler.',
+    zh: '从适合初学者的体验钓鱼到全天专业包船——适合每一种钓手的方案。',
+    ja: '初心者向けの体験釣りから、プロ向け1日チャーターまで、あらゆるアングラーに最適なプランをご用意。'
+  }
+};
+
+const PLAN_TABS = [
+  { id:'experience', icon:'🎣', label:{ en:'Experience Fishing', zh:'体验钓鱼', ja:'体験釣りツアー' } },
+  { id:'pro',        icon:'⚓', label:{ en:'Pro Charter',       zh:'专业包船',  ja:'プロチャーター' } },
+];
+
+const EXPERIENCE_PLAN = {
+  badge:  { en:'Beginners & Families Welcome', zh:'适合初学者与家庭', ja:'初心者・ファミリー歓迎' },
+  title:  { en:'Experience Fishing Tour', zh:'体验钓鱼之旅', ja:'体験フィッシングツアー' },
+  desc:   {
+    en: 'A 2-hour sea fishing experience perfect for first-timers, families, couples and tourists. All equipment provided. Departing from Kadena Fishing Port.',
+    zh: '2小时出海钓鱼体验，非常适合初次体验者、家庭、情侣和游客。全装备提供，从嘉手纳渔港出发。',
+    ja: '2時間の海釣り体験ツアー。初めての方、ご家族、カップル、観光客に最適。全装備提供。嘉手納漁港から出船。'
+  },
+  meta: [
+    { icon:'⏱', en:'2 hours total', zh:'全程2小时', ja:'所要時間2時間' },
+    { icon:'📍', en:'Kadena Fishing Port', zh:'嘉手纳渔港', ja:'嘉手納漁港集合' },
+    { icon:'👥', en:'Max 12 adults / boat', zh:'每船最多12名成人', ja:'1船最大12名' },
+    { icon:'👧', en:'Children welcome (age 0–10 = 0.5 person)', zh:'欢迎儿童（10岁以下按0.5名计）', ja:'お子様歓迎（10歳以下0.5名換算）' },
+  ],
+  schedule: [
+    { time:'08:30', en:'Meet at Kadena Fishing Port — paperwork & restroom', zh:'嘉手纳渔港集合——填写文件、上厕所', ja:'嘉手納漁港集合、書類記入・トイレ' },
+    { time:'09:00', en:'Depart — approx. 15 min to fishing spot', zh:'出发——约15分钟到达钓点', ja:'出船——約15分で釣り場へ' },
+    { time:'09:15', en:'Instructor briefing — tackle & technique explanation', zh:'教练讲解——钓具使用和技巧说明', ja:'インストラクター説明——道具の使い方・釣り方解説' },
+    { time:'09:20', en:'Fishing! Stunning ocean views, possible fighter jet sightings near Kadena base', zh:'开始钓鱼！欣赏冲绳美丽海景，可能看到嘉手纳基地战斗机起降', ja:'釣り開始！美しい海を眺めながら。嘉手納基地近くで戦闘機が見えることも' },
+    { time:'11:00', en:'Return to port — farewell', zh:'回港解散', ja:'帰港・解散' },
+  ],
+  includes: {
+    label: { en:'What's Included', zh:'包含项目', ja:'含まれるもの' },
+    items: {
+      en: ['Fishing rod & reel','Fishing line & bait','All tackle','Life jacket','Hand towel','Fish bag & ice'],
+      zh: ['鱼竿和渔轮','鱼线和鱼饵','全套钓具','救生衣','擦手毛巾','带鱼袋和冰块'],
+      ja: ['釣り竿・リール','仕掛け・エサ','全タックル','ライフジャケット','ハンドタオル','魚袋・氷']
+    }
+  },
+  prepare: {
+    label: { en:'What to Bring', zh:'建议携带', ja:'持ち物' },
+    items: {
+      en: ['Hat & sunscreen','Clothes that can get wet','Sunglasses (secure ones!','Bottled drinks (no toilet on board)','Seasickness medication (recommended)'],
+      zh: ['帽子和防晒霜','不怕弄湿的衣服','太阳镜（选不易被风吹走的）','瓶装饮料（船上无厕所）','晕船药（推荐大白兔，成人1天1颗）'],
+      ja: ['帽子・日焼け止め','濡れても大丈夫な服装','サングラス（風で飛ばない物）','ペットボトル飲料（船内トイレなし）','酔い止め薬（推奨）']
+    }
+  },
+  warnings: {
+    label: { en:'Important Notes', zh:'注意事项', ja:'注意事項' },
+    items: {
+      en: [
+        'Life jackets must be worn at all times on the water.',
+        'Fish caught may need to be released if undersized — not all catches can be kept.',
+        'Fish can smell strongly — if your transfer vehicle is affected, a cleaning fee may apply.',
+        'Restaurants may refuse to cook caught fish. We suggest taking a photo and gifting it to the captain.',
+        'Not suitable for: high blood pressure, coronary heart disease, pregnancy or suspected pregnancy. Please self-declare.',
+        'Losing personal items (glasses, phones, hats) at sea — no compensation possible.'
+      ],
+      zh: [
+        '出海必须全程穿着发放的救生衣。',
+        '部分鱼类若不符合大小规定无法带走。',
+        '带走的鱼处理不当会有强烈气味，如污染接送车辆可能被要求支付清洁费。',
+        '食堂很可能拒绝处理钓上来的鱼，建议拍照后送给船长。',
+        '以下人群不宜参加：高血压、冠心病等需每日服药者、孕妇或疑似怀孕者，请自行申报。',
+        '太阳镜、手机、帽子等物品在船上丢失无法赔偿，请妥善保管。'
+      ],
+      ja: [
+        '乗船中はライフジャケットを必ず着用してください。',
+        'サイズ規定を満たさない魚は持ち帰り不可の場合があります。',
+        '魚は適切に処理しないと強い臭いが出ます。送迎車を汚した場合、クリーニング代を請求することがあります。',
+        '食堂で釣った魚を調理してもらえないことが多いため、写真撮影後に船長へ贈ることをお勧めします。',
+        '高血圧・冠動脈疾患等で毎日服薬している方、妊娠中または妊娠の可能性がある方はご参加をご遠慮ください。',
+        'サングラス・スマホ・帽子等の紛失について補償はできません。'
+      ]
+    }
+  },
+  cancellation: {
+    label: { en:'Cancellation Policy', zh:'退款政策', ja:'キャンセルポリシー' },
+    note: {
+      en: 'Full refund for typhoon, sea conditions or visa refusal (force majeure). Personal reasons (illness, hangover, etc.) incur fees from 10 days prior.',
+      zh: '台风、海况、拒签等不可抗力全额退款。个人原因（感冒、喝多了等）从10天前开始产生手续费。',
+      ja: '台風・海況・ビザ不許可等の不可抗力は全額返金。個人的な理由（体調不良・二日酔い等）は10日前より手数料発生。'
+    },
+    tiers: [
+      { period:{ en:'11+ days before', zh:'11天以前', ja:'11日前以上' }, policy:{ en:'Full refund', zh:'全额退款', ja:'全額返金' }, color:'teal' },
+      { period:{ en:'10–3 days before', zh:'10天前至3天前', ja:'10〜3日前' }, policy:{ en:'80% cancellation fee', zh:'扣80%手续费', ja:'80%キャンセル料' }, color:'gold' },
+      { period:{ en:'2 days – day of', zh:'2天前至当天', ja:'前日〜当日' }, policy:{ en:'No refund', zh:'全额不退', ja:'返金不可' }, color:'coral' },
+    ]
+  },
+  price: { en:'TBD — Contact for pricing', zh:'价格待定，请联系我们', ja:'料金未定・お問い合わせください' },
+  images: ['img/exp-fishing-1.jpg','img/exp-fishing-2.jpg'],
+};
+
+const PRO_PLANS = [
+  {
+    num:'01', featured:true,
+    name:{ en:'Amberjack Live Bait', zh:'红甘鲹泳饵钓', ja:'カンパチ泳がせ釣り' },
+    desc:{ en:'Captain's top pick. Live bait fishing for Giant Amberjack — the premium Okinawa experience.', zh:'船长首推。活饵钓大型红甘鲹——冲绳顶级钓鱼体验。', ja:'船長一推し。泳がせ釣りで大型カンパチを狙うプレミアム体験。' },
+    price:'¥120,000',
+    price_note:{ en:'Charter fee / whole boat', zh:'包船费 / 整船', ja:'チャーター料金 / 1船' },
+    rows:[
+      { label:{ en:'Meeting Time', zh:'集合时间', ja:'集合時間' }, val:'06:00' },
+      { label:{ en:'Return', zh:'回港', ja:'帰港' }, val:{ en:'~18:00', zh:'约18:00', ja:'18:00頃' } },
+      { label:{ en:'Target', zh:'目标鱼', ja:'ターゲット' }, val:{ en:'Amberjack, Grouper', zh:'红甘鲹、石斑', ja:'カンパチ、ハタ類' } },
+      { label:{ en:'Tackle Rental', zh:'装备租赁', ja:'タックルレンタル' }, val:'¥10,000/人' },
+    ],
+  },
+  {
+    num:'02', featured:false,
+    name:{ en:'Tuna & Multi-Species', zh:'金枪鱼·多鱼种', ja:'マグロ・マルチターゲット' },
+    desc:{ en:'Live bait for Tuna, Grouper, Amberjack and more. Price varies by distance.', zh:'活饵钓金枪鱼、石斑、红甘鲹等多鱼种，价格因距离而异。', ja:'泳がせでマグロ・ハタ・カンパチなどをマルチターゲット。料金はポイント距離による。' },
+    price:'¥90,000〜',
+    price_note:{ en:'¥90,000–150,000 by distance', zh:'¥90,000〜150,000，根据距离', ja:'¥90,000〜150,000 距離による' },
+    rows:[
+      { label:{ en:'Standard', zh:'标准', ja:'通常' }, val:'06:00 〜 18:00' },
+      { label:{ en:'Far Ground', zh:'远距离', ja:'遠征' }, val:'04:00 〜 20:00' },
+      { label:{ en:'Target', zh:'目标', ja:'ターゲット' }, val:{ en:'Tuna, Grouper, AJ', zh:'金枪鱼、石斑、红甘', ja:'マグロ、ハタ、カンパチ' } },
+      { label:{ en:'Tackle Rental', zh:'装备租赁', ja:'タックルレンタル' }, val:'¥10,000/人' },
+    ],
+  },
+  {
+    num:'03', featured:false,
+    name:{ en:'GT Fishing', zh:'GT钓鱼', ja:'GTフィッシング' },
+    desc:{ en:'Giant Trevally casting. Max 4 casters. Experienced anglers only. Other methods by prior arrangement.', zh:'旅鲹Casting，最多4人同时进行，仅限有经验钓手。其他钓法请提前协商。', ja:'GTキャスティング。同時最大4名。経験者向け。他の釣り方は要事前相談。' },
+    price:'¥90,000〜100,000',
+    price_note:{ en:'Charter fee / whole boat', zh:'包船费', ja:'チャーター料金' },
+    rows:[
+      { label:{ en:'Max Casters', zh:'最多Casting人数', ja:'同時キャスティング' }, val:{ en:'4 persons', zh:'4人', ja:'最大4名' } },
+      { label:{ en:'Tackle Rental', zh:'装备租赁', ja:'タックルレンタル' }, val:'¥5,000/套' },
+      { label:{ en:'Level', zh:'难度', ja:'難易度' }, val:'★★★★★', coral:true },
+    ],
+    note:{ en:'⚠️ Please advise if first GT experience. Other methods & BYO tackle by prior arrangement.', zh:'⚠️ 请告知是否为GT初次体验。其他钓法和自带装备请提前协商。', ja:'⚠️ GT初挑戦の方はお知らせください。他の釣り方・持込タックルは要相談。' },
+  },
+  {
+    num:'04', featured:false,
+    name:{ en:'Overnight Expedition', zh:'远征过夜', ja:'遠征釣行（泊まり）' },
+    desc:{ en:'Multi-day offshore expeditions for monster fish. Boat sleep or island guesthouse.', zh:'多日远征钓大物，船上或离岛民宿住宿。', ja:'泊まり遠征で大物狙い。船中泊または離島民宿。' },
+    price:'¥120,000〜',
+    price_note:{ en:'Day trip from ¥120,000', zh:'日归从¥120,000起', ja:'日帰り¥120,000〜' },
+    rows:[
+      { label:{ en:'Day Trip', zh:'日归', ja:'日帰り' }, val:'¥120,000〜150,000' },
+      { label:{ en:'1 Night 2 Days', zh:'1泊2日', ja:'1泊2日' }, val:'¥240,000〜300,000' },
+      { label:{ en:'2 Nights 3 Days', zh:'2泊3日', ja:'2泊3日' }, val:'¥360,000〜450,000' },
+      { label:{ en:'Island Stay +', zh:'离岛民宿附加', ja:'離島民宿泊追加' }, val:'+¥7,000〜9,000/人' },
+    ],
+    note:{ en:'⚠️ Mobile signal may not be available during offshore expeditions.', zh:'⚠️ 远征期间可能无手机信号，请提前准备。', ja:'⚠️ 遠征中は携帯が繋がらない場合があります。' },
+  },
+  {
+    num:'05', featured:false,
+    name:{ en:'Other Methods', zh:'其他钓法', ja:'その他プラン' },
+    desc:{ en:'Jigging, Trolling, FAD (Payao), Bottom Fishing, Seasonal. Contact us to discuss.', zh:'铁板钓、拖钓、浮鱼礁、底物钓、季节鱼种等，欢迎询问。', ja:'ジギング、トローリング、パヤオ、底物釣り、季節の魚種など。お気軽にご相談を。' },
+    price:'¥80,000〜',
+    price_note:{ en:'From ¥80,000 by method', zh:'从¥80,000起，按钓法定价', ja:'¥80,000〜 釣り方による' },
+    rows:[
+      { label:{ en:'Jigging / Live Bait / GT', zh:'铁板 / 泳饵 / GT', ja:'ジギング・泳がせ・GT' }, val:'¥80,000〜130,000' },
+      { label:'パヤオ (FAD)', val:'¥100,000' },
+      { label:{ en:'Trolling (incl. tackle)', zh:'拖钓（含装备）', ja:'トローリング（機材込）' }, val:'¥140,000' },
+      { label:{ en:'Grouper / Bottom', zh:'石斑底物', ja:'グルクン・底物' }, val:'¥80,000〜90,000' },
+    ],
+  },
+];
+
+const ALSO_ACTIVITIES = [
+  {
+    title:{ en:'Sunset Kayak', zh:'夕阳皮划艇', ja:'サンセットカヤック' },
+    sub:{ en:'2 hours · Same port', zh:'2小时 · 同渔港', ja:'2時間 · 同港' },
+    img:'img/exp-kayak-1.jpg',
+    emoji:'🛶',
+  },
+  {
+    title:{ en:'Mangrove SUP', zh:'红树林SUP冲浪', ja:'マングローブSUP' },
+    sub:{ en:'2 hours · Stand-up paddleboard', zh:'2小时 · 立式桨板', ja:'2時間 · スタンドアップパドル' },
+    img:'img/exp-sup-1.jpg',
+    emoji:'🏄',
+  },
+];
+
+// ── Build Plans ────────────────────────────────────────────
+function buildPlans() {
+  const lang = L();
+
+  // Header
+  document.getElementById('plans-header').innerHTML = `
+    <div class="s-label">${PLANS_HEADER.label[lang]}</div>
+    <h2 class="s-title">${PLANS_HEADER.title[lang]}</h2>
+    <p class="s-desc">${PLANS_HEADER.desc[lang]}</p>`;
+
+  // Tabs
+  document.getElementById('plan-tabs').innerHTML = PLAN_TABS.map(t => `
+    <button class="plan-tab-btn${activePlanTab===t.id?' active':''}" onclick="switchPlanTab('${t.id}')">
+      <span class="tab-icon">${t.icon}</span>${t.label[lang]}
+    </button>`).join('');
+
+  // Panels
+  document.getElementById('plans-content').innerHTML =
+    `<div class="plan-panel${activePlanTab==='experience'?' active':''}" id="panel-experience">${buildExperiencePanel(lang)}</div>
+     <div class="plan-panel${activePlanTab==='pro'?' active':''}" id="panel-pro">${buildProPanel(lang)}</div>`;
+}
+
+function switchPlanTab(tab) {
+  activePlanTab = tab;
+  buildPlans();
+}
+
+function buildExperiencePanel(lang) {
+  const p = EXPERIENCE_PLAN;
+  const imgs = p.images.map(src => `<img src="${src}" alt="experience fishing" onerror="this.outerHTML='<div class=\'img-placeholder\'>🎣</div>'">`).join('');
+  const schedule = p.schedule.map(s => `
+    <div class="plan-row">
+      <span class="plan-row-label">${s.time}</span>
+      <span class="plan-row-val">${s[lang]||s.en}</span>
+    </div>`).join('');
+  const includes = p.includes.items[lang].map(i => `<div class="exp-check-item"><span class="exp-check-icon">✓</span>${i}</div>`).join('');
+  const prepare = p.prepare.items[lang].map(i => `<div class="exp-check-item"><span class="exp-check-icon">→</span>${i}</div>`).join('');
+  const warnings = p.warnings.items[lang].map(i => `<li>${i}</li>`).join('');
+  const cancel_tiers = p.cancellation.tiers.map(t => `
+    <div class="exp-cancel-item">
+      <div class="exp-cancel-period" style="color:${t.color==='teal'?'var(--teal)':t.color==='gold'?'var(--gold)':'#e85d3a'}">${t.period[lang]||t.period.en}</div>
+      <div class="exp-cancel-policy">${t.policy[lang]||t.policy.en}</div>
+    </div>`).join('');
+  const meta = p.meta.map(m => `<div class="exp-meta-item"><span class="exp-meta-icon">${m.icon}</span>${m[lang]||m.en}</div>`).join('');
+
+  const inquire_label = { en:'Inquire Now', zh:'立即询问', ja:'問い合わせ' };
+
+  return `
+  <div class="exp-plan-card">
+    <div class="exp-card-top">
+      <div class="exp-card-imgs">${imgs}</div>
+      <div class="exp-card-intro">
+        <div class="exp-card-badge">${p.badge[lang]||p.badge.en}</div>
+        <div class="exp-card-title">${p.title[lang]||p.title.en}</div>
+        <p class="exp-card-desc">${p.desc[lang]||p.desc.en}</p>
+        <div class="exp-card-meta">${meta}</div>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <div>
+            <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:700;color:var(--gold)">${p.price[lang]||p.price.en}</div>
+          </div>
+          <a href="#contact" class="exp-cta">📩 ${inquire_label[lang]}</a>
+        </div>
+      </div>
+    </div>
+    <div class="exp-card-details">
+      <div class="exp-details-grid">
+        <div class="exp-detail-box">
+          <div class="exp-detail-label">${{en:'Schedule',zh:'行程安排',ja:'スケジュール'}[lang]}</div>
+          <div>${schedule}</div>
+        </div>
+        <div class="exp-detail-box">
+          <div class="exp-detail-label">${p.includes.label[lang]||p.includes.label.en}</div>
+          <div class="exp-checklist">${includes}</div>
+        </div>
+        <div class="exp-detail-box">
+          <div class="exp-detail-label">${p.prepare.label[lang]||p.prepare.label.en}</div>
+          <div class="exp-checklist">${prepare}</div>
+        </div>
+      </div>
+      <div class="exp-detail-box" style="margin-bottom:1rem">
+        <div class="exp-detail-label">${p.cancellation.label[lang]||p.cancellation.label.en}</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.55);margin-bottom:.75rem;line-height:1.65">${p.cancellation.note[lang]||p.cancellation.note.en}</div>
+        <div class="exp-cancel-grid">${cancel_tiers}</div>
+      </div>
+      <div class="exp-warning-box">
+        <strong style="color:#e85d3a;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase">${p.warnings.label[lang]||p.warnings.label.en}</strong>
+        <ul style="padding-left:1.25rem;margin-top:.5rem">${warnings}</ul>
+      </div>
+    </div>
+  </div>
+  ${buildAlsoSection(lang)}`;
+}
+
+function buildAlsoSection(lang) {
+  const title = { en:'Also available at the same port', zh:'同一渔港还可以玩', ja:'同じ港から参加できるアクティビティ' };
+  const contact_note = { en:'Contact us to book together', zh:'可一起预约，联系我们', ja:'合わせてご予約可能。お気軽にご相談を' };
+  const cards = ALSO_ACTIVITIES.map(a => `
+    <a href="#contact" class="also-card">
+      <img src="${a.img}" alt="${a.title[lang]||a.title.en}" onerror="this.outerHTML='<div class=\'also-placeholder\'>${a.emoji}</div>'">
+      <div class="also-overlay">
+        <div>
+          <div class="also-card-title">${a.title[lang]||a.title.en}</div>
+          <div class="also-card-sub">${a.sub[lang]||a.sub.en}</div>
+        </div>
+      </div>
+    </a>`).join('');
+  return `
+  <div class="also-section">
+    <div class="also-title">+ ${title[lang]}</div>
+    <div class="also-grid">${cards}</div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:.85rem">📩 ${contact_note[lang]}</p>
+  </div>`;
+}
+
+function buildProPanel(lang) {
+  const inquire_label = { en:'Inquire Now', zh:'立即询问', ja:'問い合わせ' };
+  const notice = {
+    en:'⚠️ All prices include ice and insurance. Prices subject to change without notice. Tour may be altered or cancelled due to weather or sea conditions.',
+    zh:'⚠️ 所有价格含冰块费和保险费，价格可能随时变动。因天气或海况可能更改或取消行程。',
+    ja:'⚠️ 料金は氷代・保険料込み。料金は予告なく変更の場合あり。天候・海況により内容変更・中止の場合があります。'
+  };
+  const cards = PRO_PLANS.map(p => {
+    const rows = p.rows.map(r => {
+      const label = typeof r.label === 'string' ? r.label : (r.label[lang]||r.label.en);
+      const val = typeof r.val === 'string' ? r.val : (r.val[lang]||r.val.en);
+      return `<div class="plan-row"><span class="plan-row-label">${label}</span><span class="plan-row-val"${r.coral?' style="color:#e85d3a"':''}>${val}</span></div>`;
+    }).join('');
+    const note = p.note ? `<div class="plan-note">${p.note[lang]||p.note.en}</div>` : '';
+    const badge = p.featured ? `<div class="plan-badge" style="position:absolute;top:1rem;right:1rem;background:var(--gold);color:var(--deep);padding:.2rem .6rem;border-radius:3px;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase">${{en:'Recommended',zh:'推荐',ja:'おすすめ'}[lang]}</div>` : '';
+    const price_note = typeof p.price_note === 'string' ? p.price_note : (p.price_note[lang]||p.price_note.en);
+    return `
+    <div class="plan-card${p.featured?' featured':''}" style="position:relative">
+      ${badge}
+      <div class="plan-header">
+        <div class="plan-num">${{en:'Plan',zh:'方案',ja:'プラン'}[lang]} ${p.num}</div>
+        <div class="plan-name">${p.name[lang]||p.name.en}</div>
+        <p class="plan-desc">${p.desc[lang]||p.desc.en}</p>
+      </div>
+      <div class="plan-body">
+        <div class="plan-price">${p.price}</div>
+        <div class="plan-price-note">${price_note}</div>
+        ${rows}
+        ${note}
+      </div>
+      <div class="plan-footer"><a href="#contact" class="plan-cta">📩 ${inquire_label[lang]}</a></div>
+    </div>`;
+  }).join('');
+
+  return `<div class="plans-grid">${cards}</div>
+  <div style="margin-top:1.5rem;padding:1rem 1.25rem;background:rgba(232,93,58,.05);border:1px solid rgba(232,93,58,.15);border-radius:6px;font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.7">${notice[lang]}</div>`;
+}
+
+
+// ── i18n text/btn renderer ────────────────────────────────
+const I18N = {
+  inquire:    { en:'Inquire Now',  zh:'立即询问', ja:'問い合わせ' },
+  contact_us: { en:'Contact Us',   zh:'联系我们', ja:'お問い合わせ' },
+};
+
+function buildI18n() {
+  const lang = L();
+  // data-key buttons
+  document.querySelectorAll('.i18n-btn[data-key]').forEach(el => {
+    const key = el.getAttribute('data-key');
+    if (I18N[key]) el.textContent = I18N[key][lang] || I18N[key].en;
+  });
+  // i18n-text elements (data-en/zh/ja as attributes)
+  document.querySelectorAll('.i18n-text').forEach(el => {
+    const text = el.getAttribute('data-' + lang) || el.getAttribute('data-en') || '';
+    el.textContent = text;
+  });
+}
+
+// ── Nav content ───────────────────────────────────────────
+const NAV_LINKS = {
+  en: [['#plans','Plans & Pricing'],['#gallery','Gallery'],['#log','Log'],['#guide','Guide'],['#contact','Contact']],
+  zh: [['#plans','方案价格'],['#gallery','照片'],['#log','日志'],['#guide','指南'],['#contact','联系']],
+  ja: [['#plans','プラン・料金'],['#gallery','ギャラリー'],['#log','釣行ログ'],['#guide','ガイド'],['#contact','お問合せ']]
+};
+const NAV_CTA = { en:'Book Now', zh:'立即预订', ja:'予約する' };
+
+function buildNav() {
+  const lang = L();
+  document.getElementById('nav-links').innerHTML =
+    NAV_LINKS[lang].map(([href, label]) => `<a href="${href}">${label}</a>`).join('');
+  document.getElementById('nav-cta').textContent = NAV_CTA[lang];
+}
+
+// ── Hero content ──────────────────────────────────────────
+const HERO_CONTENT = {
+  eyebrow: {
+    en: '🎣 Private Charter · Chatan Port · Okinawa',
+    zh: '🎣 完全包船 · 北谷美国村渔港 · 冲绳',
+    ja: '🎣 完全チャーター · 北谷漁港 · 沖縄'
+  },
+  title: {
+    en: 'Okinawa<br><em>Fishing</em>',
+    zh: '冲绳<br><em>钓鱼包船</em>',
+    ja: '沖縄<br><em>フィッシング</em>'
+  },
+  sub: {
+    en: 'GT, Tuna, Amberjack, Jigging, Live Bait & more — private charter only. Departure from Chatan American Village port.',
+    zh: 'GT、金枪鱼、红甘鲹、铁板钓、泳饵钓等——完全包船，不拼团。从北谷美国村渔港出发。',
+    ja: 'GT、マグロ、カンパチ、ジギング、泳がせ釣りなど——完全チャーターのみ。北谷漁港から出船。'
+  },
+  btn1: {
+    en: '📩 Book a Charter',
+    zh: '📩 预约包船',
+    ja: '📩 チャーターを予約'
+  },
+  btn2: {
+    en: 'View Plans',
+    zh: '查看方案',
+    ja: 'プランを見る'
+  },
+  stats: [
+    { num: '30+',  label: { en: 'Recent Catches', zh: '近期渔获', ja: '最近の釣果' } },
+    { num: '50kg+',label: { en: 'Biggest Fish',   zh: '最大渔获', ja: '最大魚' } },
+    { num: '100%', label: { en: 'Private Charter', zh: '完全包船', ja: '完全チャーター' } },
+    { num: '365',  label: { en: 'Days Available',  zh: '全年开放', ja: '年中対応' } }
+  ]
+};
+
+function buildHero() {
+  const lang = L();
+  const h = HERO_CONTENT;
+  document.getElementById('hero-dynamic').innerHTML = `
+    <div class="hero-eyebrow">${h.eyebrow[lang]}</div>
+    <h1 class="hero-title">${h.title[lang]}</h1>
+    <p class="hero-sub">${h.sub[lang]}</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-gold">${h.btn1[lang]}</a>
+      <a href="#plans" class="btn-ghost">${h.btn2[lang]}</a>
+    </div>
+    <div class="hero-stats">
+      ${h.stats.map(s => `<div><span class="stat-num">${s.num}</span><div class="stat-label">${s.label[lang]}</div></div>`).join('')}
+    </div>`;
+}
+
+// ── Gallery ───────────────────────────────────────────────
+let currentFilter = 'all';
+
+function buildGalleryFilters() {
+  const months = getAllMonths();
+  const container = document.getElementById('gallery-filters');
+  const lang = L();
+  const allLabel = {en:'All', zh:'全部', ja:'すべて'};
+  let html = `<button class="filter-btn active" onclick="buildGallery('all',this)">${allLabel[lang]}</button>`;
+  months.forEach(m => {
+    const [y, mo] = m.split('-');
+    const d = new Date(y, parseInt(mo)-1);
+    const label = d.toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja-JP' : 'en-US', {year:'numeric', month:'short'});
+    html += `<button class="filter-btn" onclick="buildGallery('${m}',this)">${label}</button>`;
+  });
+  container.innerHTML = html;
+}
+
+function buildGallery(filter, btn) {
+  currentFilter = filter;
+  if (btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const lang = L();
+  const photos = filter === 'all' ? PHOTOS.filter(p => p.showInGallery) : getPhotosByMonth(filter).filter(p => p.showInGallery);
+  const container = document.getElementById('gallery-grid');
+  container.innerHTML = photos.map(p => `
+    <div class="gallery-item">
+      <div class="gallery-placeholder">🐟<span>${p[`fish_${lang}`] || p.fish_en}</span></div>
+      <div class="gallery-overlay">
+        <div class="gallery-caption">
+          <span class="gallery-fish">${p[`fish_${lang}`] || p.fish_en}</span>
+          <span class="gallery-date">${p.date} · ${p[`method_${lang}`] || p.method_en}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  // NOTE: Replace gallery-placeholder with actual img tags once photos are uploaded:
+  // <img src="img/gallery/${p.image}" alt="${p[`fish_${lang}`]}">
+}
+
+// ── Log ───────────────────────────────────────────────────
+function buildLog() {
+  const lang = L();
+  const container = document.getElementById('log-list');
+  container.innerHTML = LOGS.map(log => {
+    const fish = log[`fish_caught_${lang}`] || log.fish_caught_en;
+    return `
+    <div class="log-entry" id="${log.id}">
+      <div class="log-header" onclick="toggleLog('${log.id}')">
+        <div class="log-meta">
+          <div class="log-date">${log.date}</div>
+          <div class="log-title">${log[`title_${lang}`] || log.title_en}</div>
+          <div class="log-fish-tags">${fish.map(f => `<span class="log-tag">${f}</span>`).join('')}</div>
+        </div>
+        <div class="log-chevron">▼</div>
+      </div>
+      <div class="log-body">
+        <div class="log-body-inner">
+          <p class="log-text">${log[`body_${lang}`] || log.body_en}</p>
+          <div class="log-details">
+            <div class="log-detail-item">
+              <div class="log-detail-label" data-en>Method</div>
+              <div class="log-detail-label" data-zh>钓法</div>
+              <div class="log-detail-label" data-ja>釣り方</div>
+              <div class="log-detail-val">${log[`method_${lang}`] || log.method_en}</div>
+            </div>
+            <div class="log-detail-item">
+              <div class="log-detail-label" data-en>Conditions</div>
+              <div class="log-detail-label" data-zh>海况</div>
+              <div class="log-detail-label" data-ja>海況</div>
+              <div class="log-detail-val">${log[`conditions_${lang}`] || log.conditions_en}</div>
+            </div>
+            <div class="log-detail-item">
+              <div class="log-detail-label" data-en>Departure</div>
+              <div class="log-detail-label" data-zh>出发地</div>
+              <div class="log-detail-label" data-ja>出船</div>
+              <div class="log-detail-val" data-en>Chatan Port</div>
+              <div class="log-detail-val" data-zh>北谷渔港</div>
+              <div class="log-detail-val" data-ja>北谷漁港</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleLog(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── Guide ─────────────────────────────────────────────────
+function buildGuide() {
+  const lang = L();
+  // Seasons
+  document.getElementById('seasons-grid').innerHTML = GUIDE.seasons.map(s => `
+    <div class="season-card">
+      <span class="season-icon">${s.icon}</span>
+      <div class="season-name">${s[`name_${lang}`] || s.name_en}</div>
+      <div class="season-highlight">${s[`highlight_${lang}`] || s.highlight_en}</div>
+      <div class="season-desc">${s[`desc_${lang}`] || s.desc_en}</div>
+      <div class="season-fish">${(s[`target_${lang}`] || s.target_en).map(t => `<span class="season-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+  // Species
+  document.getElementById('species-grid').innerHTML = GUIDE.species.map(sp => {
+    const dots = Array.from({length:5},(_,i)=>`<div class="diff-dot${i<sp.difficulty?' fill':''}"></div>`).join('');
+    return `
+    <div class="species-card">
+      <div class="species-name">${sp[`name_${lang}`] || sp.name_en}</div>
+      <div class="difficulty">${dots}<span class="diff-label">${sp.difficulty}/5</span></div>
+      <div class="species-season">${sp[`season_${lang}`] || sp.season_en} · ${sp[`size_${lang}`] || sp.size_en}</div>
+      <div class="species-desc">${sp[`desc_${lang}`] || sp.desc_en}</div>
+      <div class="species-methods">${(sp[`method_${lang}`]||sp.method_en).map(m=>`<span class="species-method-tag">${m}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+  // Methods
+  document.getElementById('methods-grid').innerHTML = GUIDE.methods.map(m => {
+    const dots = Array.from({length:5},(_,i)=>`<div class="diff-dot${i<m.difficulty?' fill':''}"></div>`).join('');
+    return `
+    <div class="method-card">
+      <div class="method-icon">${m.icon}</div>
+      <div class="method-name">${m[`name_${lang}`] || m.name_en}</div>
+      <div class="difficulty">${dots}<span class="diff-label">${m.difficulty}/5</span></div>
+      <div class="method-desc">${m[`desc_${lang}`] || m.desc_en}</div>
+    </div>`;
+  }).join('');
+}
+
+let activeGuidePanel = 'species';
+function switchGuideTab(panel, btn) {
+  document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.guide-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
+  activeGuidePanel = panel;
+}
+
+// ── FAQ ───────────────────────────────────────────────────
+const FAQS = [
+  {
+    q_en: "Is this a private charter — no shared boats?",
+    q_zh: "是完全包船吗？不会和陌生人拼船？",
+    q_ja: "完全チャーター（貸切）ですか？",
+    a_en: "Yes — every trip is a private charter. Your group has the entire boat. We do not operate shared boats.",
+    a_zh: "是的，所有行程均为完全包船。您的团队独享整艘船，我们不提供拼团服务。",
+    a_ja: "はい、すべての釣行は完全チャーターです。あなたのグループだけの貸切で、乗合いは行っておりません。"
+  },
+  {
+    q_en: "Do I need prior fishing experience?",
+    q_zh: "需要有钓鱼经验吗？",
+    q_ja: "釣りの経験がなくても大丈夫ですか？",
+    a_en: "For most plans, no experience is needed. GT fishing is exception — it requires experience with heavy tackle and long-distance casting. Please discuss with us beforehand.",
+    a_zh: "大多数方案无需钓鱼经验。GT钓鱼是例外——需要使用重型装备和远距离抛投的经验，请提前告知。",
+    a_ja: "ほとんどのプランは未経験でも大丈夫です。GTフィッシングは例外で、重いタックルの扱いと遠投の経験が必要です。事前にご相談ください。"
+  },
+  {
+    q_en: "Do I need to bring fishing gear?",
+    q_zh: "需要自带钓鱼装备吗？",
+    q_ja: "釣り道具は持参する必要がありますか？",
+    a_en: "No. Tackle rental is available for all plans. If you want to bring your own gear, please discuss in advance.",
+    a_zh: "不需要。所有方案均可租赁装备。如希望自带装备，请提前协商。",
+    a_ja: "不要です。全プランでタックルレンタルが可能です。自前のタックルを持参する場合は事前にご相談ください。"
+  },
+  {
+    q_en: "What happens if the weather is bad?",
+    q_zh: "天气不好怎么办？",
+    q_ja: "天候が悪い場合はどうなりますか？",
+    a_en: "Safety first. If the captain judges conditions unsafe, the trip is cancelled and you receive a full refund — including the coordination fee.",
+    a_zh: "安全第一。如船长判断海况不安全，行程取消，全额退款（含协调费）。",
+    a_ja: "安全最優先。船長が危険と判断した場合は中止となり、コーディネート料を含む全額を返金いたします。"
+  },
+  {
+    q_en: "Can children join?",
+    q_zh: "孩子可以参加吗？",
+    q_ja: "子どもは参加できますか？",
+    a_en: "Yes. Please let us know ages and group composition when booking. Life jackets are provided for all ages.",
+    a_zh: "可以。预约时请告知年龄和团队组成，所有年龄均提供救生衣。",
+    a_ja: "はい。ご予約時に年齢と参加者構成をお知らせください。全員にライフジャケットをご用意します。"
+  },
+  {
+    q_en: "How do I prevent seasickness?",
+    q_zh: "如何预防晕船？",
+    q_ja: "船酔いを防ぐには？",
+    a_en: "Take seasickness medication 1–2 hours before departure, stay hydrated, eat a light meal, and focus on the horizon. Near-shore trips tend to be calmer. Our team can recommend local products.",
+    a_zh: "出发前1～2小时服用晕船药，保持水分，吃清淡食物，盯着地平线。近岸行程较平稳。我们团队可推荐当地相关产品。",
+    a_ja: "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。近海ポイントは波が穏やかです。地元でおすすめの薬もご案内できます。"
+  },
+  {
+    q_en: "What language support do you offer?",
+    q_zh: "提供哪些语言服务？",
+    q_ja: "言語サポートはどうなりますか？",
+    a_en: "We provide coordination and translation support in English, Chinese (Mandarin) and Japanese. The captain communicates primarily in Japanese but is comfortable with basic English and some Mandarin.",
+    a_zh: "我们提供中文、英语和日语的协调翻译服务。船长主要使用日语，但基本英语和部分中文没有问题。",
+    a_ja: "英語・中国語（普通話）・日本語のコーディネート・翻訳サポートを提供しています。船長は日本語メインですが、基本的な英語と多少の中国語にも対応しています。"
+  }
+];
+
+function buildFAQ() {
+  const lang = L();
+  document.getElementById('faq-list').innerHTML = FAQS.map((f,i) => `
+    <div class="faq-item" id="faq-${i}">
+      <button class="faq-q" onclick="toggleFaq(${i})">
+        <span>${f[`q_${lang}`] || f.q_en}</span>
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">${f[`a_${lang}`] || f.a_en}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleFaq(i) {
+  const item = document.getElementById('faq-'+i);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ── Form ──────────────────────────────────────────────────
+function submitForm() {
+  const lang = L();
+  const msg = {
+    en: 'Thank you! We will be in touch within 24 hours.',
+    zh: '感谢您的询问！我们将在24小时内联系您。',
+    ja: 'お問い合わせありがとうございます。24時間以内にご連絡いたします。'
+  };
+  alert(msg[lang]);
+  gtag('event', 'inquiry_submitted', { event_category: 'lead', event_label: lang });
+}
+
+// ── Scroll Reveal ─────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Smooth scroll ─────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  });
+});
+
+// ── Init ──────────────────────────────────────────────────
+const initLang = detectLang();
+document.documentElement.setAttribute('data-lang', initLang);
+document.documentElement.setAttribute('lang', initLang === 'zh' ? 'zh-CN' : initLang === 'ja' ? 'ja' : 'en');
+const map = { en:'EN', zh:'中文', ja:'日本語' };
+document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === map[initLang]));
+buildNav();
+buildHero();
+buildPlans();
+buildI18n();
+buildGalleryFilters();
+buildGallery('all');
+buildLog();
+buildGuide();
+buildFAQ();
+</script>
+</body>
+</html>
