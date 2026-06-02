@@ -21,7 +21,9 @@
   /* Show only matching language - set immediately by inline script below */
   html[data-lang=en] [data-en]{display:revert !important; visibility:visible;}
   html[data-lang=zh] [data-zh]{display:revert !important; visibility:visible;}
+  html[data-lang=zh-TW] [data-zhtw]{display:revert !important; visibility:visible;}
   html[data-lang=ja] [data-ja]{display:revert !important; visibility:visible;}
+  [data-zhtw]{display:none !important; visibility:hidden;}
   /* i18n-text elements render via JS textContent */
   .i18n-text,.i18n-btn{display:block !important; visibility:visible;}
   span.i18n-text{display:inline !important;}
@@ -30,15 +32,16 @@
 <script>
 (function(){
   var lang = 'en';
-  try { var s = localStorage.getItem('preferred-lang'); if(s && ['en','zh','ja'].indexOf(s)>-1) lang=s; } catch(e){}
+  try { var s = localStorage.getItem('preferred-lang'); if(s && ['en','zh','zh-TW','ja'].indexOf(s)>-1) lang=s; } catch(e){}
   if(lang==='en'){
     var nav = (navigator.languages&&navigator.languages[0])||navigator.language||'en';
     var c = nav.toLowerCase();
-    if(c.indexOf('zh')===0) lang='zh';
+    if(c==='zh-tw'||c==='zh-hk'||c==='zh-hant') lang='zh-TW';
+    else if(c.indexOf('zh')===0) lang='zh';
     else if(c.indexOf('ja')===0) lang='ja';
   }
   document.documentElement.setAttribute('data-lang', lang);
-  document.documentElement.setAttribute('lang', lang==='zh'?'zh-CN':lang==='ja'?'ja':'en');
+  document.documentElement.setAttribute('lang', lang==='zh'?'zh-CN':lang==='zh-TW'?'zh-TW':lang==='ja'?'ja':'en');
 })();
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-371420585"></script>
@@ -568,7 +571,8 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
   <div class="nav-right">
     <div style="display:flex;gap:.3rem;">
       <button class="lang-btn" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('zh')">中文</button>
+      <button class="lang-btn" onclick="setLang('zh')">简体</button>
+      <button class="lang-btn" onclick="setLang('zh-TW')">繁體</button>
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
     </div>
     <a href="#contact" class="nav-cta" id="nav-cta"></a>
@@ -975,6 +979,7 @@ const PLANS_HEADER = {
   desc: {
     en: 'From beginner shared boats to full-day pro charters and overnight island expeditions — GT, Tuna, Amberjack, Jigging & more. Two completely different services, choose what suits you.',
     zh: '从初学者体验拼船到全天专业包船，再到离岛过夜钓爽——GT、金枪鱼、红甘鲹、铁板钓等均可。两种完全不同的服务，选择适合你的。',
+    'zh-TW': '從初學者體驗拼船到全天專業包船，再到離島過夜釣爽——GT、鮪魚、紅甘鰺、鐵板釣等均可。兩種完全不同的服務，選擇適合您的。',
     ja: '初心者向け乗合から、フルデイプロチャーター、離島泊まり遠征まで対応。2つのまったく異なるサービスからお選びください。'
   }
 };
@@ -982,21 +987,23 @@ const PLANS_HEADER = {
 // ── Service A: Experience Shared Boat ────────────────────
 const SERVICE_A = {
   tag:   { en:'Service A', zh:'服务A', ja:'サービスA' },
-  badge: { en:'Shared Boat · Beginners & Families', zh:'拼船 · 初学者与家庭', ja:'乗合 · 初心者・ファミリー歓迎' },
-  title: { en:'Experience Fishing — Shared Boat', zh:'体验钓鱼（拼船）', ja:'体験釣り（乗合）' },
+  badge: { en:'Shared Boat · Beginners & Families', zh:'拼船 · 初学者与家庭', 'zh-TW':'拼船 · 初學者與家庭', ja:'乗合 · 初心者・ファミリー歓迎' },
+  title: { en:'Experience Fishing — Shared Boat', zh:'体验钓鱼（拼船）', 'zh-TW':'體驗釣魚（拼船）', ja:'体験釣り（乗合）' },
   desc: {
     en: 'A relaxed 2-hour sea fishing experience from Kadena Fishing Port. Perfect for first-timers, families, couples and tourists. All equipment provided. Up to 35 people per boat. We act as booking coordinator.',
     zh: '从嘉手纳渔港出发，轻松愉快的2小时拼船体验钓鱼。非常适合初次体验者、家庭、情侣和游客。全装备提供，最多35人。我们负责协调预约。',
+    'zh-TW': '從嘉手納漁港出發，輕鬆愉快的2小時拼船體驗釣魚。非常適合初次體驗者、家庭、情侶和遊客。全裝備提供，最多35人。我們負責協調預約。',
     ja: '嘉手納漁港から出船する2時間の乗合釣り体験。初めての方、ご家族、カップル、観光客に最適。全装備提供。最大35名。予約コーディネート対応。'
   },
-  port:     { en:'Kadena Fishing Port', zh:'嘉手纳渔港', ja:'嘉手納漁港' },
-  duration: { en:'2 hours', zh:'2小时', ja:'2時間' },
-  capacity: { en:'Up to 35 people / shared boat', zh:'最多35人 / 拼船', ja:'最大35名 / 乗合' },
+  port:     { en:'Kadena Fishing Port', zh:'嘉手纳渔港', 'zh-TW':'嘉手納漁港', ja:'嘉手納漁港' },
+  duration: { en:'2 hours', zh:'2小时', 'zh-TW':'2小時', ja:'2時間' },
+  capacity: { en:'Up to 35 people / shared boat', zh:'最多35人 / 拼船', 'zh-TW':'最多35人 / 拼船', ja:'最大35名 / 乗合' },
   price:    { en:'Contact for pricing', zh:'价格请咨询', ja:'料金はお問い合わせください' },
   note:     {
-    en: 'We coordinate this booking on your behalf. All equipment, life jackets and instruction provided on the day.',
-    zh: '我们代为协调预约，当天提供全部装备、救生衣和钓鱼指导。',
-    ja: '予約のコーディネートを代行します。当日は全装備・ライフジャケット・釣り指導あり。'
+    en: 'All equipment, life jackets and instruction provided on the day. We act as booking coordinator only — all on-site activities, safety and operations are the responsibility of the captain and vessel. Please follow the captain\'s instructions at all times.',
+    zh: '当天提供全部装备、救生衣和钓鱼指导。本预约由我们协调安排，现场活动、安全及运营责任由现场船家负责，请全程听从船长指挥。',
+    'zh-TW': '當天提供全部裝備、救生衣和釣魚指導。本預約由我們協調安排，現場活動、安全及運營責任由現場船家負責，請全程聽從船長指揮。',
+    ja: '当日は全装備・ライフジャケット・釣り指導あり。当社は予約コーディネートのみを担当します。現場での活動・安全・運営は船長・船方の責任となります。船長の指示に必ず従ってください。'
   },
   images: ['img/exp-fishing-1.jpg', 'img/exp-fishing-2.jpg'],
 };
@@ -1082,24 +1089,24 @@ const SERVICE_B_PLANS = [
 
 const SERVICE_B_INFO = {
   tag:      { en:'Service B', zh:'服务B', ja:'サービスB' },
-  badge:    { en:'Private Charter · Your Group Only', zh:'完全包船 · 专属你的团队', ja:'完全貸切 · グループ専用' },
-  title:    { en:'Private Charter Fishing', zh:'专业包船钓鱼', ja:'プライベートチャーターフィッシング' },
-  captain:  { en:'30+ years experience · Max 12 persons · Whole boat yours', zh:'船长30年+经验 · 最多12人 · 整船包', ja:'船長経験30年以上 · 最大12名 · 1船まるごと貸切' },
-  ports:    { en:'Chatan American Village Port (West) · Kadena / 泡瀬 (East)', zh:'北谷美国村渔港（西海岸）· 嘉手纳 / 泡瀬（东海岸）', ja:'北谷アメリカンビレッジ漁港（西）· 嘉手納・泡瀬（東）' },
+  badge:    { en:'Private Charter · Your Group Only', zh:'完全包船 · 专属你的团队', 'zh-TW':'完全包船 · 專屬您的團隊', ja:'完全貸切 · グループ専用' },
+  title:    { en:'Private Charter Fishing', zh:'专业包船钓鱼', 'zh-TW':'專業包船釣魚', ja:'プライベートチャーターフィッシング' },
+  captain:  { en:'30+ years experience · Max 12 persons · Whole boat yours', zh:'船长30年+经验 · 最多12人 · 整船包', 'zh-TW':'船長30年+經驗 · 最多12人 · 整船包', ja:'船長経験30年以上 · 最大12名 · 1船まるごと貸切' },
+  ports:    { en:'Chatan American Village Port (West Coast) · Uruma Awase Port (East Coast)', zh:'北谷美国村渔港（西海岸）· 泡瀬漁港（东海岸）', 'zh-TW':'北谷美國村漁港（西海岸）· 泡瀬漁港（東海岸）', ja:'北谷アメリカンビレッジ漁港（西海岸）· 泡瀬漁港（東海岸）' },
 };
 
 const PRO_GENERAL = {
   coordination: {
-    label: { en:'Coordination & Translation Fee', zh:'翻译协调服务费', ja:'コーディネート・翻訳料' },
-    body: { en:'Approx. 10% of total. Covers booking arrangement, full Chinese/English/Japanese translation and trip support.', zh:'约总费用的10%，含预约安排、全程中英日翻译协调服务。', ja:'総額の約10%。予約手配・中英日翻訳・コーディネートサービスが含まれます。' }
+    label: { en:'Coordination & Translation Fee', zh:'翻译协调服务费', 'zh-TW':'翻譯協調服務費', ja:'コーディネート・翻訳料' },
+    body: { en:'Approx. 10% of total. Covers booking arrangement, full Chinese/English/Japanese translation and trip support.', zh:'约总费用的10%，含预约安排、全程中英日翻译协调服务。', 'zh-TW':'約總費用的10%，含預約安排、全程中英日翻譯協調服務。', ja:'総額の約10%。予約手配・中英日翻訳・コーディネートサービスが含まれます。' }
   },
   payment: {
-    label: { en:'Payment', zh:'付款', ja:'お支払い' },
-    body: { en:'Alipay · WeChat Pay · PayPay · Bank transfer · Square (credit card)', zh:'支付宝 · 微信支付 · PayPay · 银行转账 · Square信用卡', ja:'支付宝・WeChat Pay・PayPay・銀行振込・Square（クレカ）' }
+    label: { en:'Payment', zh:'付款', 'zh-TW':'付款方式', ja:'お支払い' },
+    body: { en:'Alipay · WeChat Pay · PayPay · Bank transfer · Square (credit card)', zh:'支付宝 · 微信支付 · PayPay · 银行转账 · Square信用卡', 'zh-TW':'支付寶 · 微信支付 · PayPay · 銀行轉帳 · Square信用卡', ja:'支付宝・WeChat Pay・PayPay・銀行振込・Square（クレカ）' }
   },
   cancellation: {
-    label: { en:'Cancellation', zh:'取消政策', ja:'キャンセル' },
-    body: { en:'2+ weeks before: charter fee refunded (minus fee), coordination non-refundable. Typhoon/sea conditions (captain decision): full refund including coordination fee.', zh:'2周前以上：退还船费（扣手续费），协调费不退。台风/海况（船长判断）：全额退款含协调费。', ja:'2週間前以上：手数料差引の上船費返金、コーディネート料は返金不可。台風・海況（船長判断）：コーディネート料含む全額返金。' }
+    label: { en:'Cancellation', zh:'取消政策', 'zh-TW':'取消政策', ja:'キャンセル' },
+    body: { en:'2+ weeks before: charter fee refunded (minus fee), coordination non-refundable. Typhoon/sea conditions (captain decision): full refund including coordination fee.', zh:'2周前以上：退还船费（扣手续费），协调费不退。台风/海况（船长判断）：全额退款含协调费。', 'zh-TW':'2週前以上：退還船費（扣手續費），協調費不退。颱風／海況（船長判斷）：全額退款含協調費。', ja:'2週間前以上：手数料差引の上船費返金、コーディネート料は返金不可。台風・海況（船長判断）：コーディネート料含む全額返金。' }
   },
   disclaimer: {
     en: '⚠️ We provide booking coordination and translation only. All operational responsibility is with the captain and vessel.',
@@ -1126,39 +1133,54 @@ function buildPlans() {
 // ── Service A render ───────────────────────────────────────
 function buildServiceA(lang) {
   const a = SERVICE_A;
-  const inquire = { en:'Enquire', zh:'询问预约', ja:'問い合わせ' };
-  const imgs = a.images.map(src =>
-    `<img src="${src}" alt="${a.title[lang]}" loading="lazy" onerror="this.style.display='none'">`
-  ).join('');
+  const inquire = { en:'Enquire', zh:'询问预约', 'zh-TW':'詢問預約', ja:'問い合わせ' };
   const price = typeof a.price === 'string' ? a.price : (a.price[lang]||a.price.en);
 
+  // Also section cards (compact)
+  const alsoTitle = { en:'Also here', zh:'同港还可以玩', 'zh-TW':'同港還可以玩', ja:'同港でも楽しめる' };
+  const alsoNote  = { en:'Book together', zh:'可一起预约', 'zh-TW':'可一起預約', ja:'合わせて予約可' };
+  const alsoCards = [
+    { title:{ en:'Mangrove SUP', zh:'红树林浆板', 'zh-TW':'紅樹林槳板', ja:'マングローブSUP' }, img:'img/exp-sup-4.jpg', emoji:'🏄' },
+    { title:{ en:'Sunset Kayak', zh:'夕阳皮划艇', 'zh-TW':'夕陽皮艇', ja:'サンセットカヤック' }, img:'img/exp-kayak-1.jpg', emoji:'🛶' },
+  ];
+  const alsoHtml = alsoCards.map(c => `
+    <a href="https://snorkel.nice.okinawa" class="also-card" target="_blank" rel="noopener" style="height:120px">
+      <img src="${c.img}" alt="${c.title[lang]||c.title.en}" style="height:120px" onerror="this.outerHTML='<div class=\'also-placeholder\'>${c.emoji}</div>'">
+      <div class="also-overlay"><div><div class="also-card-title" style="font-size:.85rem">${c.title[lang]||c.title.en}</div></div></div>
+    </a>`).join('');
+
+  // One img only - compact
+  const img = `<img src="${a.images[0]}" alt="${a.title[lang]||a.title.en}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+
   return `
-  <div style="margin-bottom:2.5rem">
-    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem">
-      <span style="background:var(--teal);color:var(--deep);font-size:.65rem;font-weight:800;letter-spacing:.1em;padding:.25rem .65rem;border-radius:3px;text-transform:uppercase">${a.tag[lang]}</span>
-      <span style="font-size:.8rem;color:var(--muted)">${{en:'Coordinated booking',zh:'协调预约',ja:'予約コーディネート'}[lang]}</span>
-    </div>
-    <div class="exp-plan-card">
-      <div class="exp-card-top">
-        <div class="exp-card-imgs">${imgs}</div>
-        <div class="exp-card-intro">
-          <div class="exp-card-badge">${a.badge[lang]||a.badge.en}</div>
-          <div class="exp-card-title">${a.title[lang]||a.title.en}</div>
-          <p class="exp-card-desc">${a.desc[lang]||a.desc.en}</p>
-          <div class="exp-card-meta">
-            <div class="exp-meta-item"><span class="exp-meta-icon">⏱</span>${a.duration[lang]||a.duration.en}</div>
-            <div class="exp-meta-item"><span class="exp-meta-icon">📍</span>${a.port[lang]||a.port.en}</div>
-            <div class="exp-meta-item"><span class="exp-meta-icon">👥</span>${a.capacity[lang]||a.capacity.en}</div>
+  <div style="margin-bottom:2.5rem;display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:stretch">
+    <!-- Left: experience fishing card -->
+    <div class="exp-plan-card" style="margin-bottom:0">
+      <div style="display:grid;grid-template-columns:1fr 1fr;height:100%">
+        <div style="overflow:hidden;border-radius:0">${img}</div>
+        <div class="exp-card-intro" style="padding:1.25rem">
+          <div class="exp-card-badge" style="font-size:.6rem;padding:.2rem .6rem;margin-bottom:.5rem">${a.badge[lang]||a.badge.en}</div>
+          <div class="exp-card-title" style="font-size:1.1rem;margin-bottom:.4rem">${a.title[lang]||a.title.en}</div>
+          <p class="exp-card-desc" style="font-size:.78rem;margin-bottom:.6rem;-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden">${a.desc[lang]||a.desc.en}</p>
+          <div class="exp-card-meta" style="gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap">
+            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">⏱</span>${a.duration[lang]||a.duration.en}</div>
+            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">📍</span>${a.port[lang]||a.port.en}</div>
+            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">👥</span>${a.capacity[lang]||a.capacity.en}</div>
           </div>
-          <p style="font-size:.8rem;color:rgba(255,255,255,.45);margin:.75rem 0 1rem;line-height:1.6;border-left:2px solid var(--teal);padding-left:.75rem">${a.note[lang]||a.note.en}</p>
-          <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
-            <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--gold)">${price}</div>
-            <a href="#contact" class="exp-cta">📩 ${inquire[lang]}</a>
+          <p style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.75rem;line-height:1.5;border-left:2px solid var(--teal);padding-left:.6rem">${a.note[lang]||a.note.en}</p>
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+            <div style="font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--gold)">${price}</div>
+            <a href="#contact" class="exp-cta" style="padding:.55rem 1rem;font-size:.75rem">📩 ${inquire[lang]||inquire.en}</a>
           </div>
         </div>
       </div>
     </div>
-    ${buildAlsoSection(lang)}
+    <!-- Right: also section compact -->
+    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:.6rem">
+      <div style="font-size:.75rem;font-weight:700;color:var(--teal);letter-spacing:.05em">+ ${alsoTitle[lang]||alsoTitle.en}</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;flex:1">${alsoHtml}</div>
+      <p style="font-size:.68rem;color:var(--muted);margin-top:.25rem">📩 ${alsoNote[lang]||alsoNote.en} · <a href="https://snorkel.nice.okinawa" target="_blank" style="color:var(--teal)">snorkel.nice.okinawa</a></p>
+    </div>
   </div>`;
 }
 
@@ -1166,7 +1188,7 @@ function buildServiceA(lang) {
 function buildServiceB(lang) {
   const b = SERVICE_B_INFO;
   const g = PRO_GENERAL;
-  const inquire = { en:'Enquire Now', zh:'立即询问', ja:'問い合わせ' };
+  const inquire = { en:'Enquire Now', zh:'立即询问', 'zh-TW':'立即詢問', ja:'問い合わせ' };
 
   const cards = SERVICE_B_PLANS.map(p => {
     const rows = p.rows.map(r => {
@@ -1175,7 +1197,7 @@ function buildServiceB(lang) {
       return `<div class="plan-row"><span class="plan-row-label">${label}</span><span class="plan-row-val"${r.coral?' style="color:#e85d3a"':''}>${val}</span></div>`;
     }).join('');
     const note = p.note ? `<div class="plan-note">${p.note[lang]||p.note.en}</div>` : '';
-    const badge = p.featured ? `<div style="position:absolute;top:1rem;right:1rem;background:var(--gold);color:var(--deep);padding:.2rem .6rem;border-radius:3px;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase">${{en:'Recommended',zh:'推荐',ja:'おすすめ'}[lang]}</div>` : '';
+    const badge = p.featured ? `<div style="position:absolute;top:1rem;right:1rem;background:var(--gold);color:var(--deep);padding:.2rem .6rem;border-radius:3px;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase">${({en:'Recommended',zh:'推荐','zh-TW':'推薦',ja:'おすすめ'})[lang]||'Recommended'}</div>` : '';
     const price = typeof p.price === 'string' ? p.price : (p.price[lang]||p.price.en);
     const price_note = typeof p.price_note === 'string' ? p.price_note : (p.price_note[lang]||p.price_note.en);
     const port_str = typeof p.port === 'string' ? p.port : (p.port[lang]||p.port.en);
@@ -1183,7 +1205,7 @@ function buildServiceB(lang) {
     <div class="plan-card${p.featured?' featured':''}" style="position:relative">
       ${badge}
       <div class="plan-header">
-        <div class="plan-num">${{en:'Plan',zh:'方案',ja:'プラン'}[lang]} ${p.num}</div>
+        <div class="plan-num">${({en:'Plan',zh:'方案','zh-TW':'方案',ja:'プラン'})[lang]||'Plan'} ${p.num}</div>
         <div class="plan-name">${p.name[lang]||p.name.en}</div>
         <p class="plan-desc">${p.desc[lang]||p.desc.en}</p>
         <div style="font-size:.7rem;color:var(--teal);margin-top:.4rem">📍 ${port_str}</div>
@@ -1213,14 +1235,11 @@ function buildServiceB(lang) {
     </div>
   </div>
   <div style="padding:1rem 1.25rem;background:rgba(232,93,58,.05);border:1px solid rgba(232,93,58,.15);border-radius:6px;font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.7">${g.disclaimer[lang]||g.disclaimer.en}</div>
-  <div style="margin-top:.75rem;padding:1rem 1.25rem;background:rgba(255,255,255,.03);border:1px solid var(--glass-b);border-radius:6px;font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.7">⚠️ ${{en:'All charter prices include ice and insurance. Prices subject to change without notice.',zh:'所有包船价格含冰块费和保险费，价格可能随时变动。',ja:'料金は氷代・保険料込み。予告なく変更の場合あり。'}[lang]}</div>`;
+  <div style="margin-top:.75rem;padding:1rem 1.25rem;background:rgba(255,255,255,.03);border:1px solid var(--glass-b);border-radius:6px;font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.7">⚠️ ${{en:'All charter prices include ice and insurance. Prices subject to change without notice.',zh:'所有包船价格含冰块费和保险费，价格可能随时变动。','zh-TW':'所有包船價格含冰塊費和保險費，價格可能隨時變動。',ja:'料金は氷代・保険料込み。予告なく変更の場合あり。'}[lang]}</div>`;
 
   return `
   <div>
-    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem">
-      <span style="background:var(--gold);color:var(--deep);font-size:.65rem;font-weight:800;letter-spacing:.1em;padding:.25rem .65rem;border-radius:3px;text-transform:uppercase">${b.tag[lang]}</span>
-      <span style="font-size:.8rem;color:var(--muted)">${{en:'Private charter · your group only',zh:'完全包船 · 专属你的团队',ja:'完全貸切 · グループ専用'}[lang]}</span>
-    </div>
+
     <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem">
       <div class="exp-card-badge" style="margin-bottom:.6rem">${b.badge[lang]}</div>
       <div style="font-family:var(--font-d);font-size:1.4rem;font-weight:700;margin-bottom:.5rem">${b.title[lang]}</div>
@@ -1255,9 +1274,9 @@ function buildAlsoSection(lang) {
 
 function buildRentalSection(lang) {
   const data = {
-    title:{ en:'🚗 Rent a Car + Fishing Package', zh:'🚗 租车 + 钓鱼套餐优惠', ja:'🚗 レンタカー＋釣りパッケージ' },
-    desc: { en:'Book car rental together with your fishing trip for exclusive direct rates — 300+ vehicles, no agency markup. Book early in peak season before cars and boats fill up.', zh:'和钓鱼一起预约，享独家直接优惠——直接对接租车公司，跳过中间平台，300多款车任选。旺季早预约，免得没车没船两头抓。', ja:'釣りツアーと一緒にご予約で特別優待価格。300台以上からダイレクトにお選びいただけます。繁忙期は早めの予約がおすすめ。' },
-    cta:  { en:'Ask about car rental', zh:'咨询租车优惠', ja:'レンタカーについて聞く' },
+    title:{ en:'🚗 Rent a Car + Fishing Package', zh:'🚗 租车 + 钓鱼套餐优惠', 'zh-TW':'🚗 租車 + 釣魚套餐優惠', ja:'🚗 レンタカー＋釣りパッケージ' },
+    desc: { en:'Book car rental together with your fishing trip for exclusive direct rates — 300+ vehicles, no agency markup. Book early in peak season before cars and boats fill up.', zh:'和钓鱼一起预约，享独家直接优惠——直接对接租车公司，跳过中间平台，300多款车任选。旺季早预约，免得没车没船两头抓。', 'zh-TW':'和釣魚一起預約，享獨家直接優惠——直接對接租車公司，跳過中間平台，300多款車任選。旺季早預約，免得沒車沒船兩頭抓。', ja:'釣りツアーと一緒にご予約で特別優待価格。300台以上からダイレクトにお選びいただけます。繁忙期は早めの予約がおすすめ。' },
+    cta:  { en:'Ask about car rental', zh:'咨询租车优惠', 'zh-TW':'詢問租車優惠', ja:'レンタカーについて聞く' },
   };
   return `
   <div class="also-section" style="margin-top:1rem;background:rgba(200,164,74,.05);border-color:rgba(200,164,74,.2)">
@@ -1269,11 +1288,12 @@ function buildRentalSection(lang) {
 
 // ── Nav content ───────────────────────────────────────────
 const NAV_LINKS = {
-  en: [['#plans','Plans & Pricing'],['#gallery','Gallery'],['#guide','Guide'],['#contact','Contact']],
-  zh: [['#plans','方案价格'],['#gallery','照片'],['#guide','指南'],['#contact','联系']],
-  ja: [['#plans','プラン・料金'],['#gallery','ギャラリー'],['#guide','ガイド'],['#contact','お問合せ']]
+  en:    [['#plans','Plans'],['#gallery','Gallery'],['#guide','Guide'],['#contact','Contact']],
+  zh:    [['#plans','方案价格'],['#gallery','照片'],['#guide','指南'],['#contact','联系']],
+  'zh-TW': [['#plans','方案價格'],['#gallery','漁獲照片'],['#guide','釣魚指南'],['#contact','聯絡我們']],
+  ja:    [['#plans','プラン・料金'],['#gallery','ギャラリー'],['#guide','ガイド'],['#contact','お問合せ']]
 };
-const NAV_CTA = { en:'Book Now', zh:'立即预订', ja:'予約する' };
+const NAV_CTA = { en:'Book Now', zh:'立即预订', 'zh-TW':'立即預約', ja:'予約する' };
 
 function buildNav() {
   const lang = L();
@@ -1285,35 +1305,40 @@ function buildNav() {
 // ── Hero content ──────────────────────────────────────────
 const HERO_CONTENT = {
   eyebrow: {
-    en: '🎣 Shared Boat / Private Charter · Chatan · Kadena ·泡瀬',
-    zh: '🎣 拼船 / 包船均可 · 北谷 · 嘉手纳 · 泡瀬漁港出发',
-    ja: '🎣 乗合・貸切対応 · 北谷・嘉手納・泡瀬漁港から出船'
+    en:    '🎣 Shared & Private Charters · Chatan · Kadena · Awase',
+    zh:    '🎣 拼船 / 包船均可 · 北谷 · 嘉手纳 · 泡瀬漁港出发',
+    'zh-TW': '🎣 拼船／包船均可 · 北谷 · 嘉手納 · 泡瀬漁港出發',
+    ja:    '🎣 乗合・貸切対応 · 北谷・嘉手納・泡瀬漁港から出船'
   },
   title: {
-    en: 'Okinawa<br><em>Fishing</em>',
-    zh: '冲绳<br><em>海钓体验</em>',
-    ja: '沖縄<br><em>フィッシング</em>'
+    en:    'Okinawa<br><em>Fishing</em>',
+    zh:    '冲绳<br><em>海钓体验</em>',
+    'zh-TW': '沖繩<br><em>海釣體驗</em>',
+    ja:    '沖縄<br><em>フィッシング</em>'
   },
   sub: {
-    en: 'Beginner experience tours to full-day pro charters — GT, Tuna, Amberjack, Jigging & more. Departing from Chatan American Village Port & Kadena Fishing Port. For remote islands (Ishigaki / Miyako), please enquire directly.',
-    zh: '从初学者体验团到全天专业包船——GT、金枪鱼、红甘鲹、铁板钓等均可。从北谷美国村渔港及嘉手纳渔港出发。离岛（石垣岛／宫古岛）请直接咨询。',
-    ja: '初心者向け体験ツアーからプロ向けフルデイチャーターまで——GT・マグロ・カンパチ・ジギングなど。北谷アメリカンビレッジ漁港・嘉手納漁港から出船。離島（石垣島・宮古島）はお問い合わせください。'
+    en:    'Group tours for beginners to full-day private charters for serious anglers — GT, Tuna, Amberjack, Jigging & more. Departing from Chatan, Kadena and Awase ports. Ishigaki & Miyako Island trips by enquiry.',
+    zh:    '从初学者体验拼船到全天专业包船，再到离岛过夜钓爽——GT、金枪鱼、红甘鲹、铁板钓等均可。从北谷美国村渔港、嘉手纳及泡瀬漁港出发。离岛（石垣岛／宫古岛）请直接咨询。',
+    'zh-TW': '從初學者體驗拼船到全天專業包船，再到離島過夜釣爽——GT、鮪魚、紅甘鰺、鐵板釣等均可。從北谷美國村漁港、嘉手納及泡瀬漁港出發。離島（石垣島／宮古島）請直接詢問。',
+    ja:    '初心者向け体験ツアーからプロ向けフルデイチャーターまで——GT・マグロ・カンパチ・ジギングなど。北谷・嘉手納・泡瀬漁港から出船。離島（石垣島・宮古島）はお問い合わせください。'
   },
   btn1: {
-    en: '📩 Book Now',
-    zh: '📩 立即预约',
-    ja: '📩 今すぐ予約'
+    en:    '📩 Book Now',
+    zh:    '📩 立即预约',
+    'zh-TW': '📩 立即預約',
+    ja:    '📩 今すぐ予約'
   },
   btn2: {
-    en: 'View Plans',
-    zh: '查看方案',
-    ja: 'プランを見る'
+    en:    'View Plans',
+    zh:    '查看方案',
+    'zh-TW': '查看方案',
+    ja:    'プランを見る'
   },
   stats: [
-    { num: '30+',  label: { en: 'Years Experience', zh: '船长经验30年+', ja: '船長経験30年以上' } },
-    { num: '50kg+',label: { en: 'Biggest Catch',    zh: '最大渔获',     ja: '最大釣果' } },
-    { num: '3',    label: { en: 'Departure Ports', zh: '3个出发港口', ja: '3つの出船港' } },
-    { num: '365',  label: { en: 'Days Available',    zh: '全年预约开放', ja: '年中予約受付' } }
+    { num: '30+',  label: { en: 'Years Experience', zh: '船长30年+经验', 'zh-TW': '船長30年+經驗', ja: '船長経験30年以上' } },
+    { num: '50kg+',label: { en: 'Biggest Catch',    zh: '最大渔获',     'zh-TW': '最大漁獲',     ja: '最大釣果' } },
+    { num: '3',    label: { en: 'Departure Ports',  zh: '3个出发港口', 'zh-TW': '3個出發港口', ja: '3つの出船港' } },
+    { num: '365',  label: { en: 'Days Available',   zh: '全年预约开放', 'zh-TW': '全年預約開放', ja: '年中予約受付' } }
   ]
 };
 
@@ -1443,36 +1468,38 @@ function toggleLog(id) {
 // ── Guide ─────────────────────────────────────────────────
 function buildGuide() {
   const lang = L();
+  // Map lang key for guide data (zh-TW -> zhtw to avoid hyphen in key)
+  const gLang = lang === 'zh-TW' ? 'zhtw' : lang;
   // Seasons
   document.getElementById('seasons-grid').innerHTML = GUIDE.seasons.map(s => `
     <div class="season-card">
       <span class="season-icon">${s.icon}</span>
-      <div class="season-name">${s[`name_${lang}`] || s.name_en}</div>
-      <div class="season-highlight">${s[`highlight_${lang}`] || s.highlight_en}</div>
-      <div class="season-desc">${s[`desc_${lang}`] || s.desc_en}</div>
-      <div class="season-fish">${(s[`target_${lang}`] || s.target_en).map(t => `<span class="season-tag">${t}</span>`).join('')}</div>
+      <div class="season-name">${s['name_'+gLang] || s.name_en}</div>
+      <div class="season-highlight">${s['highlight_'+gLang] || s.highlight_en}</div>
+      <div class="season-desc">${s['desc_'+gLang] || s.desc_en}</div>
+      <div class="season-fish">${(s['target_'+gLang] || s.target_en).map(t => '<span class="season-tag">'+t+'</span>').join('')}</div>
     </div>`).join('');
   // Species
   document.getElementById('species-grid').innerHTML = GUIDE.species.map(sp => {
-    const dots = Array.from({length:5},(_,i)=>`<div class="diff-dot${i<sp.difficulty?' fill':''}"></div>`).join('');
+    const dots = Array.from({length:5},(_,i)=>'<div class="diff-dot'+(i<sp.difficulty?' fill':'')+'"></div>').join('');
     return `
     <div class="species-card">
-      <div class="species-name">${sp[`name_${lang}`] || sp.name_en}</div>
+      <div class="species-name">${sp['name_'+gLang] || sp.name_en}</div>
       <div class="difficulty">${dots}<span class="diff-label">${sp.difficulty}/5</span></div>
-      <div class="species-season">${sp[`season_${lang}`] || sp.season_en} · ${sp[`size_${lang}`] || sp.size_en}</div>
-      <div class="species-desc">${sp[`desc_${lang}`] || sp.desc_en}</div>
-      <div class="species-methods">${(sp[`method_${lang}`]||sp.method_en).map(m=>`<span class="species-method-tag">${m}</span>`).join('')}</div>
+      <div class="species-season">${sp['season_'+gLang] || sp.season_en} · ${sp['size_'+gLang] || sp.size_en}</div>
+      <div class="species-desc">${sp['desc_'+gLang] || sp.desc_en}</div>
+      <div class="species-methods">${(sp['method_'+gLang]||sp.method_en).map(m=>'<span class="species-method-tag">'+m+'</span>').join('')}</div>
     </div>`;
   }).join('');
   // Methods
   document.getElementById('methods-grid').innerHTML = GUIDE.methods.map(m => {
-    const dots = Array.from({length:5},(_,i)=>`<div class="diff-dot${i<m.difficulty?' fill':''}"></div>`).join('');
+    const dots = Array.from({length:5},(_,i)=>'<div class="diff-dot'+(i<m.difficulty?' fill':'')+'"></div>').join('');
     return `
     <div class="method-card">
       <div class="method-icon">${m.icon}</div>
-      <div class="method-name">${m[`name_${lang}`] || m.name_en}</div>
+      <div class="method-name">${m['name_'+gLang] || m.name_en}</div>
       <div class="difficulty">${dots}<span class="diff-label">${m.difficulty}/5</span></div>
-      <div class="method-desc">${m[`desc_${lang}`] || m.desc_en}</div>
+      <div class="method-desc">${m['desc_'+gLang] || m.desc_en}</div>
     </div>`;
   }).join('');
 }
@@ -1491,73 +1518,91 @@ const FAQS = [
   {
     q_en: "Is this a private charter — no shared boats?",
     q_zh: "是完全包船吗？不会和陌生人拼船？",
+    'q_zh-TW': "是完全包船嗎？不會和陌生人拼船？",
     q_ja: "完全チャーター（貸切）ですか？",
-    a_en: "Yes — every trip is a private charter. Your group has the entire boat. We do not operate shared boats.",
-    a_zh: "是的，所有行程均为完全包船。您的团队独享整艘船，我们不提供拼团服务。",
-    a_ja: "はい、すべての釣行は完全チャーターです。あなたのグループだけの貸切で、乗合いは行っておりません。"
+    a_en: "The private charters are your group only — no strangers. We also offer shared boat experience tours for beginners departing from Kadena port.",
+    a_zh: "专业包船行程均为整船包，只有你们的团队。我们也提供嘉手纳渔港出发的拼船体验团。",
+    'a_zh-TW': "專業包船行程均為整船包，只有您們的團隊。我們也提供嘉手納漁港出發的拼船體驗團。",
+    a_ja: "プライベートチャーターはグループ専用です。嘉手納漁港からの乗合体験ツアーもご用意しています。"
   },
   {
     q_en: "Do I need prior fishing experience?",
     q_zh: "需要有钓鱼经验吗？",
+    'q_zh-TW': "需要有釣魚經驗嗎？",
     q_ja: "釣りの経験がなくても大丈夫ですか？",
-    a_en: "For most plans, no experience is needed. GT fishing is exception — it requires experience with heavy tackle and long-distance casting. Please discuss with us beforehand.",
-    a_zh: "大多数方案无需钓鱼经验。GT钓鱼是例外——需要使用重型装备和远距离抛投的经验，请提前告知。",
-    a_ja: "ほとんどのプランは未経験でも大丈夫です。GTフィッシングは例外で、重いタックルの扱いと遠投の経験が必要です。事前にご相談ください。"
+    a_en: "For most plans, no experience needed. GT fishing is the exception — it requires heavy tackle and long-distance casting experience. Chat with us first if unsure.",
+    a_zh: "大多数方案无需钓鱼经验。GT钓鱼是例外——需要重型装备和远距离抛投经验，不确定请先联系我们。",
+    'a_zh-TW': "大多數方案無需釣魚經驗。GT釣魚是例外——需要重型裝備和遠距離拋投經驗，不確定請先聯絡我們。",
+    a_ja: "ほとんどのプランは未経験でも大丈夫。GTフィッシングは例外で、重いタックルと遠投の経験が必要です。"
   },
   {
     q_en: "Do I need to bring fishing gear?",
     q_zh: "需要自带钓鱼装备吗？",
+    'q_zh-TW': "需要自帶釣魚裝備嗎？",
     q_ja: "釣り道具は持参する必要がありますか？",
-    a_en: "No. Tackle rental is available for all plans. If you want to bring your own gear, please discuss in advance.",
-    a_zh: "不需要。所有方案均可租赁装备。如希望自带装备，请提前协商。",
-    a_ja: "不要です。全プランでタックルレンタルが可能です。自前のタックルを持参する場合は事前にご相談ください。"
+    a_en: "No — all tackle is provided or available to rent. Bring your own if you prefer, just let us know in advance.",
+    a_zh: "不需要，全套装备提供或可租赁。如想自带，提前告知即可。",
+    'a_zh-TW': "不需要，全套裝備提供或可租借。如想自帶，提前告知即可。",
+    a_ja: "不要です。全タックル提供またはレンタル可能。持参希望の場合は事前にご連絡ください。"
   },
   {
-    q_en: "What happens if the weather is bad?",
+    q_en: "What if the weather is bad?",
     q_zh: "天气不好怎么办？",
+    'q_zh-TW': "天氣不好怎麼辦？",
     q_ja: "天候が悪い場合はどうなりますか？",
-    a_en: "Safety first. If the captain judges conditions unsafe, the trip is cancelled and you receive a full refund — including the coordination fee.",
-    a_zh: "安全第一。如船长判断海况不安全，行程取消，全额退款（含协调费）。",
-    a_ja: "安全最優先。船長が危険と判断した場合は中止となり、コーディネート料を含む全額を返金いたします。"
+    a_en: "Safety first. If the captain calls it unsafe, the trip is cancelled and you get a full refund — including the coordination fee.",
+    a_zh: "安全第一。船长判断海况不安全则取消行程，全额退款，含协调费。",
+    'a_zh-TW': "安全第一。船長判斷海況不安全則取消行程，全額退款，含協調費。",
+    a_ja: "安全最優先。船長が危険と判断した場合は中止・全額返金（コーディネート料含む）。"
   },
   {
     q_en: "Can children join?",
     q_zh: "孩子可以参加吗？",
+    'q_zh-TW': "小孩可以參加嗎？",
     q_ja: "子どもは参加できますか？",
-    a_en: "Yes. Please let us know ages and group composition when booking. Life jackets are provided for all ages.",
-    a_zh: "可以。预约时请告知年龄和团队组成，所有年龄均提供救生衣。",
-    a_ja: "はい。ご予約時に年齢と参加者構成をお知らせください。全員にライフジャケットをご用意します。"
+    a_en: "Yes! Let us know their ages when booking. Life jackets are provided for everyone. The shared boat experience is especially great for kids.",
+    a_zh: "可以！预约时告知年龄，所有人提供救生衣。拼船体验特别适合带孩子参加。",
+    'a_zh-TW': "可以！預約時告知年齡，所有人提供救生衣。拼船體驗特別適合帶小孩參加。",
+    a_ja: "はい！ご予約時に年齢をお知らせください。ライフジャケットは全員分ご用意します。"
   },
   {
     q_en: "How do I prevent seasickness?",
     q_zh: "如何预防晕船？",
+    'q_zh-TW': "如何預防暈船？",
     q_ja: "船酔いを防ぐには？",
-    a_en: "Take seasickness medication 1–2 hours before departure, stay hydrated, eat a light meal, and focus on the horizon. Near-shore trips tend to be calmer. Our team can recommend local products.",
-    a_zh: "出发前1～2小时服用晕船药，保持水分，吃清淡食物，盯着地平线。近岸行程较平稳。我们团队可推荐当地相关产品。",
-    a_ja: "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。近海ポイントは波が穏やかです。地元でおすすめの薬もご案内できます。"
+    a_en: "Take motion sickness tablets 1–2 hours before, stay hydrated, eat light, and keep your eyes on the horizon. We can recommend what to grab locally.",
+    a_zh: "出发前1-2小时服用晕船药，保持补水，吃清淡食物，眼望地平线。我们可以推荐当地的晕船药（成人推荐大白兔）。",
+    'a_zh-TW': "出發前1-2小時服用暈船藥，保持補水，吃清淡食物，眼望地平線。我們可以推薦當地的暈船藥。",
+    a_ja: "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。"
   },
   {
-    q_en: "What language support do you offer?",
+    q_en: "What languages do you support?",
     q_zh: "提供哪些语言服务？",
+    'q_zh-TW': "提供哪些語言服務？",
     q_ja: "言語サポートはどうなりますか？",
-    a_en: "We provide coordination and translation support in English, Chinese (Mandarin) and Japanese. The captain communicates primarily in Japanese but is comfortable with basic English and some Mandarin.",
-    a_zh: "我们提供中文、英语和日语的协调翻译服务。船长主要使用日语，但基本英语和部分中文没有问题。",
-    a_ja: "英語・中国語（普通話）・日本語のコーディネート・翻訳サポートを提供しています。船長は日本語メインですが、基本的な英語と多少の中国語にも対応しています。"
+    a_en: "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you.",
+    a_zh: "我们支持中文、英语和日语。船长是日本人，有基本英语和部分中文能力，我们负责所有沟通。",
+    'a_zh-TW': "我們支援中文、英語和日語。船長是日本人，有基本英語和部分中文能力，我們負責所有溝通。",
+    a_ja: "英語・中国語・日本語に対応。船長は日本語メインですが、英語・中国語も少々対応可能。コミュニケーションはすべて当方がサポートします。"
   }
 ];
 
 function buildFAQ() {
   const lang = L();
-  document.getElementById('faq-list').innerHTML = FAQS.map((f,i) => `
+  document.getElementById('faq-list').innerHTML = FAQS.map((f,i) => {
+    const q = f['q_'+lang] || f.q_en;
+    const a = f['a_'+lang] || f.a_en;
+    return `
     <div class="faq-item" id="faq-${i}">
       <button class="faq-q" onclick="toggleFaq(${i})">
-        <span>${f[`q_${lang}`] || f.q_en}</span>
+        <span>${q}</span>
         <span class="faq-icon">+</span>
       </button>
       <div class="faq-a">
-        <div class="faq-a-inner">${f[`a_${lang}`] || f.a_en}</div>
+        <div class="faq-a-inner">${a}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleFaq(i) {
@@ -1596,8 +1641,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // ── Init ──────────────────────────────────────────────────
 const initLang = detectLang();
 document.documentElement.setAttribute('data-lang', initLang);
-document.documentElement.setAttribute('lang', initLang === 'zh' ? 'zh-CN' : initLang === 'ja' ? 'ja' : 'en');
-const map = { en:'EN', zh:'中文', ja:'日本語' };
+document.documentElement.setAttribute('lang', initLang==='zh'?'zh-CN':initLang==='zh-TW'?'zh-TW':initLang==='ja'?'ja':'en');
+const map = { en:'EN', zh:'简体', 'zh-TW':'繁體', ja:'日本語' };
 document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === map[initLang]));
 buildNav();
 buildHero();
