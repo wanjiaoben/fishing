@@ -910,7 +910,7 @@ function setLang(lang) {
   document.documentElement.setAttribute('data-lang', lang);
   document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en');
   const map = { en:'EN', zh:'中文', ja:'日本語' };
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === map[lang]));
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', map[lang] && b.textContent.trim() === map[lang]));
   try { localStorage.setItem('preferred-lang', lang); } catch(e) {}
   buildNav();
   buildHero();
@@ -1102,11 +1102,17 @@ const PRO_GENERAL = {
 // ── Build Plans ────────────────────────────────────────────
 function buildPlans() {
   const lang = L();
+  // Global t() helper for this scope
+  const t = (obj) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || (lang==='zh-TW' ? obj['zh'] : null) || obj['en'] || '';
+  };
 
   document.getElementById('plans-header').innerHTML = `
-    <div class="s-label">${PLANS_HEADER.label[lang]}</div>
-    <h2 class="s-title">${PLANS_HEADER.title[lang]}</h2>
-    <p class="s-desc">${PLANS_HEADER.desc[lang]}</p>`;
+    <div class="s-label">${t(PLANS_HEADER.label)}</div>
+    <h2 class="s-title">${t(PLANS_HEADER.title)}</h2>
+    <p class="s-desc">${t(PLANS_HEADER.desc)}</p>`;
 
   document.getElementById('plan-tabs').innerHTML = '';
 
@@ -1125,7 +1131,7 @@ function buildDivider(lang) {
   <div style="display:flex;align-items:center;gap:1.25rem;margin:2rem 0 1.5rem">
     <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))"></div>
     <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--gold);white-space:nowrap">
-      ⚓ ${labels[lang]||labels.en}
+      ⚓ ${labels[lang]||labels['zh']||labels.en}
     </div>
     <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)"></div>
   </div>`;
@@ -1135,11 +1141,16 @@ function buildDivider(lang) {
 function buildServiceA(lang) {
   const a = SERVICE_A;
   const inquire = { en:'Enquire', zh:'询问预约', 'zh-TW':'詢問預約', ja:'問い合わせ' };
-  const price = typeof a.price === 'string' ? a.price : (a.price[lang]||a.price.en);
+  const t = (obj) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || (lang==='zh-TW' ? obj['zh'] : null) || obj['en'] || '';
+  };
+  const price = t(a.price);
 
   // Also section cards (compact)
   const alsoTitle = { en:'Also here', zh:'同港还可以玩', 'zh-TW':'同港還可以玩', ja:'同港でも楽しめる' };
-  const alsoNote  = { en:'Book together', zh:'可一起预约', 'zh-TW':'可一起預約', ja:'合わせて予約可' };
+  const alsoNote  = { en:'Book together for a discount — uninhabited island snorkelling', zh:'可一起预约有优惠无人岛浮潜', 'zh-TW':'可一起預約有優惠無人島浮潛', ja:'セット予約で割引・無人島シュノーケリング' };
   const alsoCards = [
     { title:{ en:'Mangrove SUP', zh:'红树林浆板', 'zh-TW':'紅樹林槳板', ja:'マングローブSUP' }, img:'img/exp-sup-4.jpg', emoji:'🏄' },
     { title:{ en:'Sunset Kayak', zh:'夕阳皮划艇', 'zh-TW':'夕陽皮艇', ja:'サンセットカヤック' }, img:'img/exp-kayak-1.jpg', emoji:'🛶' },
@@ -1151,7 +1162,7 @@ function buildServiceA(lang) {
     </a>`).join('');
 
   // One img only - compact
-  const img = `<img src="${a.images[0]}" alt="${a.title[lang]||a.title.en}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+  const img = `<img src="${a.images[0]}" alt="${t(a.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
 
   return `
   <div style="margin-bottom:0;display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:stretch">
@@ -1160,15 +1171,15 @@ function buildServiceA(lang) {
       <div style="display:grid;grid-template-columns:1fr 1fr;height:100%">
         <div style="overflow:hidden;border-radius:0">${img}</div>
         <div class="exp-card-intro" style="padding:1.25rem">
-          <div class="exp-card-badge" style="font-size:.6rem;padding:.2rem .6rem;margin-bottom:.5rem">${a.badge[lang]||a.badge.en}</div>
-          <div class="exp-card-title" style="font-size:1.1rem;margin-bottom:.4rem">${a.title[lang]||a.title.en}</div>
-          <p class="exp-card-desc" style="font-size:.78rem;margin-bottom:.6rem;-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden">${a.desc[lang]||a.desc.en}</p>
+          <div class="exp-card-badge" style="font-size:.6rem;padding:.2rem .6rem;margin-bottom:.5rem">${t(a.badge)}</div>
+          <div class="exp-card-title" style="font-size:1.1rem;margin-bottom:.4rem">${t(a.title)}</div>
+          <p class="exp-card-desc" style="font-size:.78rem;margin-bottom:.6rem;-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden">${t(a.desc)}</p>
           <div class="exp-card-meta" style="gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap">
-            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">⏱</span>${a.duration[lang]||a.duration.en}</div>
-            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">📍</span>${a.port[lang]||a.port.en}</div>
-            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">👥</span>${a.capacity[lang]||a.capacity.en}</div>
+            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">⏱</span>${t(a.duration)}</div>
+            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">📍</span>${t(a.port)}</div>
+            <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">👥</span>${t(a.capacity)}</div>
           </div>
-          <p style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.75rem;line-height:1.5;border-left:2px solid var(--teal);padding-left:.6rem">${a.note[lang]||a.note.en}</p>
+          <p style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.75rem;line-height:1.5;border-left:2px solid var(--teal);padding-left:.6rem">${t(a.note)}</p>
           <div style="font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--gold);margin-top:.5rem">${price}</div>
         </div>
       </div>
@@ -1187,6 +1198,12 @@ function buildServiceB(lang) {
   const b = SERVICE_B_INFO;
   const g = PRO_GENERAL;
   const inquire = { en:'Enquire Now', zh:'立即询问', 'zh-TW':'立即詢問', ja:'問い合わせ' };
+  // Helper: get localized string, fallback zh-TW -> zh -> en
+  const t = (obj) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || (lang==='zh-TW' ? obj['zh'] : null) || obj['en'] || '';
+  };
 
   const cards = SERVICE_B_PLANS.map(p => {
     const rows = p.rows.map(r => {
@@ -1194,18 +1211,18 @@ function buildServiceB(lang) {
       const val   = typeof r.val   === 'string' ? r.val   : (r.val[lang]  ||r.val.en);
       return `<div class="plan-row"><span class="plan-row-label">${label}</span><span class="plan-row-val"${r.coral?' style="color:#e85d3a"':''}>${val}</span></div>`;
     }).join('');
-    const note = p.note ? `<div class="plan-note">${p.note[lang]||p.note.en}</div>` : '';
+    const note = p.note ? `<div class="plan-note">${t(p.note)}</div>` : '';
     const badge = p.featured ? `<div style="position:absolute;top:1rem;right:1rem;background:var(--gold);color:var(--deep);padding:.2rem .6rem;border-radius:3px;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase">${({en:'Recommended',zh:'推荐','zh-TW':'推薦',ja:'おすすめ'})[lang]||'Recommended'}</div>` : '';
-    const price = typeof p.price === 'string' ? p.price : (p.price[lang]||p.price.en);
-    const price_note = typeof p.price_note === 'string' ? p.price_note : (p.price_note[lang]||p.price_note.en);
-    const port_str = typeof p.port === 'string' ? p.port : (p.port[lang]||p.port.en);
+    const price = t(p.price);
+    const price_note = t(p.price_note);
+    const port_str = t(p.port);
     return `
     <div class="plan-card${p.featured?' featured':''}" style="position:relative">
       ${badge}
       <div class="plan-header">
         <div class="plan-num">${({en:'Plan',zh:'方案','zh-TW':'方案',ja:'プラン'})[lang]||'Plan'} ${p.num}</div>
-        <div class="plan-name">${p.name[lang]||p.name.en}</div>
-        <p class="plan-desc">${p.desc[lang]||p.desc.en}</p>
+        <div class="plan-name">${t(p.name)}</div>
+        <p class="plan-desc">${t(p.desc)}</p>
         <div style="font-size:.7rem;color:var(--teal);margin-top:.4rem">📍 ${port_str}</div>
       </div>
       <div class="plan-body">
@@ -1213,26 +1230,26 @@ function buildServiceB(lang) {
         <div class="plan-price-note">${price_note}</div>
         ${rows}${note}
       </div>
-      <div class="plan-footer"><a href="#contact" class="plan-cta">📩 ${inquire[lang]}</a></div>
+      <div class="plan-footer"><a href="#contact" class="plan-cta">📩 ${inquire[lang]||inquire['zh']||inquire['en']}</a></div>
     </div>`;
   }).join('');
 
   const general = `
   <div style="margin-top:2rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
     <div class="exp-detail-box">
-      <div class="exp-detail-label">${g.coordination.label[lang]||g.coordination.label.en}</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${g.coordination.body[lang]||g.coordination.body.en}</div>
+      <div class="exp-detail-label">${t(g.coordination.label)}</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${t(g.coordination.body)}</div>
     </div>
     <div class="exp-detail-box">
-      <div class="exp-detail-label">${g.payment.label[lang]||g.payment.label.en}</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${g.payment.body[lang]||g.payment.body.en}</div>
+      <div class="exp-detail-label">${t(g.payment.label)}</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${t(g.payment.body)}</div>
     </div>
     <div class="exp-detail-box">
-      <div class="exp-detail-label">${g.cancellation.label[lang]||g.cancellation.label.en}</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${g.cancellation.body[lang]||g.cancellation.body.en}</div>
+      <div class="exp-detail-label">${t(g.cancellation.label)}</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${t(g.cancellation.body)}</div>
     </div>
   </div>
-  <div style="padding:1rem 1.25rem;background:rgba(232,93,58,.05);border:1px solid rgba(232,93,58,.15);border-radius:6px;font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.7">${g.disclaimer[lang]||g.disclaimer.en}</div>
+  <div style="padding:1rem 1.25rem;background:rgba(232,93,58,.05);border:1px solid rgba(232,93,58,.15);border-radius:6px;font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.7">${t(g.disclaimer)}</div>
   <div style="margin-top:.75rem;padding:1rem 1.25rem;background:rgba(255,255,255,.03);border:1px solid var(--glass-b);border-radius:6px;font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.7">⚠️ ${{en:'All charter prices include ice and insurance. Prices subject to change without notice.',zh:'所有包船价格含冰块费和保险费，价格可能随时变动。','zh-TW':'所有包船價格含冰塊費和保險費，價格可能隨時變動。',ja:'料金は氷代・保険料込み。予告なく変更の場合あり。'}[lang]}</div>`;
 
   return `
@@ -1250,10 +1267,10 @@ function buildServiceB(lang) {
       </div>
       <!-- Info -->
       <div style="padding:1.5rem;display:flex;flex-direction:column;justify-content:center">
-        <div class="exp-card-badge" style="margin-bottom:.75rem">${b.badge[lang]||b.badge.en}</div>
-        <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:700;margin-bottom:.75rem">${b.title[lang]||b.title.en}</div>
-        <div style="font-size:.85rem;color:var(--teal);margin-bottom:.4rem">🎖 ${b.captain[lang]||b.captain.en}</div>
-        <div style="font-size:.82rem;color:var(--muted)">📍 ${b.ports[lang]||b.ports.en}</div>
+        <div class="exp-card-badge" style="margin-bottom:.75rem">${t(b.badge)}</div>
+        <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:700;margin-bottom:.75rem">${t(b.title)}</div>
+        <div style="font-size:.85rem;color:var(--teal);margin-bottom:.4rem">🎖 ${t(b.captain)}</div>
+        <div style="font-size:.82rem;color:var(--muted)">📍 ${t(b.ports)}</div>
       </div>
     </div>
     <div style="margin-bottom:1.25rem;padding:1rem 1.25rem;background:rgba(0,180,200,.06);border:1px solid rgba(0,180,200,.2);border-radius:8px">
@@ -1280,14 +1297,14 @@ function buildAlsoSection(lang) {
   ];
   const cardHtml = cards.map(a => `
     <a href="${a.link}" class="also-card" target="_blank" rel="noopener">
-      <img src="${a.img}" alt="${a.title[lang]||a.title.en}" onerror="this.outerHTML='<div class=\'also-placeholder\'>${a.emoji}</div>'">
-      <div class="also-overlay"><div><div class="also-card-title">${a.title[lang]||a.title.en}</div><div class="also-card-sub">${a.sub[lang]||a.sub.en}</div></div></div>
+      <img src="${a.img}" alt="${t(a.title)}" onerror="this.outerHTML='<div class=\'also-placeholder\'>${a.emoji}</div>'">
+      <div class="also-overlay"><div><div class="also-card-title">${t(a.title)}</div><div class="also-card-sub">${a.sub[lang]||a.sub.en}</div></div></div>
     </a>`).join('');
   return `
   <div class="also-section" style="margin-top:1rem">
-    <div class="also-title">+ ${title[lang]}</div>
+    <div class="also-title">+ ${title[lang]||title['zh']||title['en']}</div>
     <div class="also-grid">${cardHtml}</div>
-    <p style="font-size:.78rem;color:var(--muted);margin-top:.75rem">📩 ${note[lang]} · <a href="https://snorkel.nice.okinawa" target="_blank" style="color:var(--teal)">snorkel.nice.okinawa</a></p>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:.75rem">📩 ${note[lang]||note['zh']||note['en']} · <a href="https://snorkel.nice.okinawa" target="_blank" style="color:var(--teal)">snorkel.nice.okinawa</a></p>
   </div>`;
 }
 
@@ -1299,9 +1316,9 @@ function buildRentalSection(lang) {
   };
   return `
   <div class="also-section" style="margin-top:1rem;background:rgba(200,164,74,.05);border-color:rgba(200,164,74,.2)">
-    <div class="also-title" style="color:var(--gold)">${data.title[lang]}</div>
-    <p style="font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:.85rem">${data.desc[lang]||data.desc.en}</p>
-    <a href="#contact" class="exp-cta" style="display:inline-flex">📩 ${data.cta[lang]||data.cta.en}</a>
+    <div class="also-title" style="color:var(--gold)">${data.title[lang]||data.title['zh']||data.title.en}</div>
+    <p style="font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:.85rem">${data.desc[lang]||data.desc['zh']||data.desc.en}</p>
+    <a href="#contact" class="exp-cta" style="display:inline-flex">📩 ${data.cta[lang]||data.cta['zh']||data.cta.en}</a>
   </div>`;
 }
 
@@ -1317,8 +1334,8 @@ const NAV_CTA = { en:'Book Now', zh:'立即预订', 'zh-TW':'立即預約', ja:'
 function buildNav() {
   const lang = L();
   document.getElementById('nav-links').innerHTML =
-    NAV_LINKS[lang].map(([href, label]) => `<a href="${href}">${label}</a>`).join('');
-  document.getElementById('nav-cta').textContent = NAV_CTA[lang];
+    (NAV_LINKS[lang]||NAV_LINKS['en']).map(([href, label]) => `<a href="${href}">${label}</a>`).join('');
+  document.getElementById('nav-cta').textContent = NAV_CTA[lang]||NAV_CTA['en'];
 }
 
 // ── Hero content ──────────────────────────────────────────
@@ -1365,15 +1382,15 @@ function buildHero() {
   const lang = L();
   const h = HERO_CONTENT;
   document.getElementById('hero-dynamic').innerHTML = `
-    <div class="hero-eyebrow">${h.eyebrow[lang]}</div>
-    <h1 class="hero-title">${h.title[lang]}</h1>
-    <p class="hero-sub">${h.sub[lang]}</p>
+    <div class="hero-eyebrow">${h.eyebrow[lang]||h.eyebrow['zh']||h.eyebrow['en']}</div>
+    <h1 class="hero-title">${h.title[lang]||h.title['zh']||h.title['en']}</h1>
+    <p class="hero-sub">${h.sub[lang]||h.sub['zh']||h.sub['en']}</p>
     <div class="hero-btns">
-      <a href="#contact" class="btn-gold">${h.btn1[lang]}</a>
-      <a href="#plans" class="btn-ghost">${h.btn2[lang]}</a>
+      <a href="#contact" class="btn-gold">${h.btn1[lang]||h.btn1['zh']||h.btn1['en']}</a>
+      <a href="#plans" class="btn-ghost">${h.btn2[lang]||h.btn2['zh']||h.btn2['en']}</a>
     </div>
     <div class="hero-stats">
-      ${h.stats.map(s => `<div><span class="stat-num">${s.num}</span><div class="stat-label">${s.label[lang]}</div></div>`).join('')}
+      ${h.stats.map(s => `<div><span class="stat-num">${s.num}</span><div class="stat-label">${s.label[lang]||s.label['zh']||s.label['en']}</div></div>`).join('')}
     </div>`;
 }
 
@@ -1385,7 +1402,7 @@ function buildGalleryFilters() {
   const container = document.getElementById('gallery-filters');
   const lang = L();
   const allLabel = {en:'All', zh:'全部', ja:'すべて'};
-  let html = `<button class="filter-btn active" onclick="buildGallery('all',this)">${allLabel[lang]}</button>`;
+  let html = `<button class="filter-btn active" onclick="buildGallery('all',this)">${allLabel[lang]||allLabel['zh']||allLabel['en']}</button>`;
   months.forEach(m => {
     const [y, mo] = m.split('-');
     const d = new Date(y, parseInt(mo)-1);
@@ -1598,9 +1615,9 @@ function buildGuide() {
   };
 
   document.getElementById('guide-header').innerHTML = `
-    <div class="s-label">${labels.slabel[lang]||labels.slabel.en}</div>
-    <h2 class="s-title">${labels.title[lang]||labels.title.en}</h2>
-    <p class="s-desc">${labels.desc[lang]||labels.desc.en}</p>`;
+    <div class="s-label">${labels.slabel[lang]||labels.slabel['zh']||labels.slabel.en}</div>
+    <h2 class="s-title">${labels.title[lang]||labels.title['zh']||labels.title.en}</h2>
+    <p class="s-desc">${labels.desc[lang]||labels.desc['zh']||labels.desc.en}</p>`;
 
   // Style cards
   const styleCards = FISHING_STYLES.map(s => {
@@ -1614,20 +1631,20 @@ function buildGuide() {
       </div>
       <div style="padding:1rem">
         <div style="display:grid;grid-template-columns:auto 1fr;gap:.3rem .75rem;font-size:.78rem;margin-bottom:.75rem">
-          <span style="color:var(--muted)">${labels.target[lang]}</span>
+          <span style="color:var(--muted)">${labels.target[lang]||labels.target['zh']||labels.target['en']}</span>
           <span style="color:rgba(255,255,255,.75)">${s.target[lang]||s.target.en}</span>
-          <span style="color:var(--muted)">${labels.season[lang]}</span>
+          <span style="color:var(--muted)">${labels.season[lang]||labels.season['zh']||labels.season['en']}</span>
           <span style="color:rgba(255,255,255,.75)">${s.season[lang]||s.season.en}</span>
-          <span style="color:var(--muted)">${labels.size[lang]}</span>
+          <span style="color:var(--muted)">${labels.size[lang]||labels.size['zh']||labels.size['en']}</span>
           <span style="color:rgba(255,255,255,.75)">${s.size[lang]||s.size.en}</span>
-          <span style="color:var(--muted)">${labels.bestfor[lang]}</span>
+          <span style="color:var(--muted)">${labels.bestfor[lang]||labels.bestfor['zh']||labels.bestfor['en']}</span>
           <span style="color:rgba(255,255,255,.75)">${s.for[lang]||s.for.en}</span>
         </div>
         <div style="font-size:.75rem;color:${c.text};padding:.5rem .65rem;background:${c.bg};border-radius:4px;line-height:1.5">
           ✦ ${s.highlight[lang]||s.highlight.en}
         </div>
         <details style="margin-top:.65rem">
-          <summary style="font-size:.68rem;color:var(--muted);cursor:pointer;letter-spacing:.05em">${labels.tackle[lang]} ▸</summary>
+          <summary style="font-size:.68rem;color:var(--muted);cursor:pointer;letter-spacing:.05em">${labels.tackle[lang]||labels.tackle['zh']||labels.tackle['en']} ▸</summary>
           <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-top:.4rem;line-height:1.6">${s.tackle[lang]||s.tackle.en}</div>
         </details>
       </div>
@@ -1636,7 +1653,7 @@ function buildGuide() {
 
   document.getElementById('guide-styles').innerHTML = `
     <div style="margin-bottom:.75rem">
-      <div class="s-label" style="margin-bottom:.5rem">${labels.styles[lang]||labels.styles.en}</div>
+      <div class="s-label" style="margin-bottom:.5rem">${labels.styles[lang]||labels.styles['zh']||labels.styles.en}</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:3rem">${styleCards}</div>`;
 
@@ -1657,7 +1674,7 @@ function buildGuide() {
   }).join('');
 
   document.getElementById('guide-calendar').innerHTML = `
-    <div class="s-label" style="margin-bottom:.75rem">${labels.calendar[lang]||labels.calendar.en}</div>
+    <div class="s-label" style="margin-bottom:.75rem">${labels.calendar[lang]||labels.calendar['zh']||labels.calendar.en}</div>
     <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden">${calRows}</div>`;
 }
 
@@ -1775,7 +1792,7 @@ function submitForm() {
     zh: '感谢您的询问！我们将在24小时内联系您。',
     ja: 'お問い合わせありがとうございます。24時間以内にご連絡いたします。'
   };
-  alert(msg[lang]);
+  alert(msg[lang]||msg['en']);
   gtag('event', 'inquiry_submitted', { event_category: 'lead', event_label: lang });
 }
 
