@@ -1,3 +1,4 @@
+
 // ============================================================
 // photos.js — fishing.nice.okinawa
 // 管理方法: 新しい写真を追加する時はこのファイルだけ編集
@@ -627,3 +628,4 @@ function getFeaturedPhotos() {
 function getLogPhotos() {
   return PHOTOS.filter(p => p.showInLog).sort((a,b) => b.date.localeCompare(a.date));
 }
+
