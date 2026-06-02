@@ -2893,6 +2893,9 @@ function submitForm() {
   gtag('event', 'inquiry_submitted', { event_category: 'lead', event_label: lang });
 }
 
+// ── i18n stub (handled by JS render functions)
+function buildI18n() { /* all i18n handled by buildNav/buildHero/buildPlans/buildGuide/buildFAQ */ }
+
 // ── Scroll Reveal ─────────────────────────────────────────
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
