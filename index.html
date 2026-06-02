@@ -161,7 +161,7 @@ section { padding:5.5rem 0; }
 .container { max-width:1200px; margin:0 auto; padding:0 2rem; }
 .s-label { font-size:.65rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin-bottom:.75rem; }
 .s-title { font-family:var(--font-d); font-size:clamp(2rem,3.5vw,3rem); font-weight:700; line-height:1.15; margin-bottom:1rem; }
-.s-desc { font-size:1rem; color:rgba(255,255,255,.55); max-width:520px; line-height:1.75; margin-bottom:2.5rem; }
+.s-desc { font-size:1rem; color:rgba(255,255,255,.55); max-width:520px; line-height:1.75; margin-bottom:1.5rem; }
 .divider-line { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--glass-b),transparent); }
 
 /* ── PLANS ── */
@@ -715,39 +715,9 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 <!-- ═══ GUIDE ══════════════════════════════════════════════ -->
 <section class="guide-section" id="guide">
   <div class="container">
-    <div class="s-label" data-en>Okinawa Fishing</div>
-    <div class="s-label" data-zh>冲绳钓鱼</div>
-    <div class="s-label" data-ja>沖縄フィッシング</div>
-    <h2 class="s-title" data-en>Fishing Guide</h2>
-    <h2 class="s-title" data-zh>钓鱼指南</h2>
-    <h2 class="s-title" data-ja>フィッシングガイド</h2>
-    <p class="s-desc" data-en>Okinawa's waters offer world-class fishing year-round. Here's what you need to know.</p>
-    <p class="s-desc" data-zh>冲绳海域全年提供世界级钓鱼体验，这是你需要了解的一切。</p>
-    <p class="s-desc" data-ja>沖縄の海は一年中、世界レベルの釣りを提供します。知っておくべきことをご紹介。</p>
-
-    <!-- Seasons -->
-    <div class="s-label" style="margin-bottom:.75rem;" data-en>Seasonal Calendar</div>
-    <div class="s-label" style="margin-bottom:.75rem;" data-zh>四季鱼历</div>
-    <div class="s-label" style="margin-bottom:.75rem;" data-ja>シーズンカレンダー</div>
-    <div class="seasons-grid" id="seasons-grid">
-      <!-- JS populated -->
-    </div>
-
-    <!-- Species & Methods tabs -->
-    <div class="guide-tabs">
-      <button class="guide-tab active" onclick="switchGuideTab('species',this)" data-en>Fish Species</button>
-      <button class="guide-tab active" onclick="switchGuideTab('species',this)" data-zh>鱼种介绍</button>
-      <button class="guide-tab active" onclick="switchGuideTab('species',this)" data-ja>魚種</button>
-      <button class="guide-tab" onclick="switchGuideTab('methods',this)" data-en>Fishing Methods</button>
-      <button class="guide-tab" onclick="switchGuideTab('methods',this)" data-zh>钓法介绍</button>
-      <button class="guide-tab" onclick="switchGuideTab('methods',this)" data-ja>釣り方</button>
-    </div>
-    <div class="guide-panel active" id="panel-species">
-      <div class="species-grid" id="species-grid"></div>
-    </div>
-    <div class="guide-panel" id="panel-methods">
-      <div class="methods-grid" id="methods-grid"></div>
-    </div>
+    <div id="guide-header"></div>
+    <div id="guide-styles"></div>
+    <div id="guide-calendar"></div>
   </div>
 </section>
 
@@ -1085,12 +1055,26 @@ const SERVICE_B_PLANS = [
       { label:{ en:'Bottom / Grouper', zh:'石斑底物', ja:'グルクン・底物' }, val:'¥80,000〜90,000' },
     ],
   },
+  {
+    num:'🏝️', featured:false, island:true,
+    name:{ en:'Remote Island Charter', zh:'离岛包船钓鱼', 'zh-TW':'離島包船釣魚', ja:'離島チャーター' },
+    desc:{
+      en: "Planning a fishing trip around Ishigaki Island or Miyako Island? We coordinate remote island charters — just get in touch and we'll sort out the details.",
+      zh: '想在石垣岛或宫古岛附近钓鱼？我们可以协调安排离岛包船，直接联系客服，把你的想法告诉我们，我们来处理细节。',
+      'zh-TW': '想在石垣島或宮古島附近釣魚？我們可以協調安排離島包船，直接聯絡客服，把您的想法告訴我們，我們來處理細節。',
+      ja: '石垣島・宮古島周辺での釣りをご希望ですか？離島チャーターのコーディネートも対応可能です。お気軽にお問い合わせください。'
+    },
+    port:{ en:'Ishigaki Island · Miyako Island', zh:'石垣岛 · 宫古岛', 'zh-TW':'石垣島 · 宮古島', ja:'石垣島・宮古島' },
+    price:null,
+    price_note:null,
+    rows:[],
+  },
 ];
 
 const SERVICE_B_INFO = {
   tag:      { en:'Service B', zh:'服务B', ja:'サービスB' },
   badge:    { en:'Private Charter · Your Group Only', zh:'完全包船 · 专属你的团队', 'zh-TW':'完全包船 · 專屬您的團隊', ja:'完全貸切 · グループ専用' },
-  title:    { en:'Private Charter Fishing', zh:'专业包船钓鱼', 'zh-TW':'專業包船釣魚', ja:'プライベートチャーターフィッシング' },
+  title:    { en:'Private Charter Fishing', zh:'包船钓鱼（初学者·专业均可）', 'zh-TW':'包船釣魚（初學者·專業均可）', ja:'貸切チャーター釣り（初心者・プロ問わず）' },
   captain:  { en:'30+ years experience · Max 12 persons · Whole boat yours', zh:'船长30年+经验 · 最多12人 · 整船包', 'zh-TW':'船長30年+經驗 · 最多12人 · 整船包', ja:'船長経験30年以上 · 最大12名 · 1船まるごと貸切' },
   ports:    { en:'Chatan American Village Port (West Coast) · Uruma Awase Port (East Coast)', zh:'北谷美国村渔港（西海岸）· 泡瀬漁港（东海岸）', 'zh-TW':'北谷美國村漁港（西海岸）· 泡瀬漁港（東海岸）', ja:'北谷アメリカンビレッジ漁港（西海岸）· 泡瀬漁港（東海岸）' },
 };
@@ -1127,7 +1111,24 @@ function buildPlans() {
   document.getElementById('plan-tabs').innerHTML = '';
 
   document.getElementById('plans-content').innerHTML =
-    buildServiceA(lang) + buildServiceB(lang);
+    buildServiceA(lang) + buildDivider(lang) + buildServiceB(lang);
+}
+
+function buildDivider(lang) {
+  const labels = {
+    en: 'Private Charter Fishing',
+    zh: '包船钓鱼（初学者·专业均可）',
+    'zh-TW': '包船釣魚（初學者·專業均可）',
+    ja: '貸切チャーター（初心者・プロ問わず）'
+  };
+  return `
+  <div style="display:flex;align-items:center;gap:1.25rem;margin:2rem 0 1.5rem">
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))"></div>
+    <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--gold);white-space:nowrap">
+      ⚓ ${labels[lang]||labels.en}
+    </div>
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)"></div>
+  </div>`;
 }
 
 // ── Service A render ───────────────────────────────────────
@@ -1153,7 +1154,7 @@ function buildServiceA(lang) {
   const img = `<img src="${a.images[0]}" alt="${a.title[lang]||a.title.en}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
 
   return `
-  <div style="margin-bottom:2.5rem;display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:stretch">
+  <div style="margin-bottom:0;display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:stretch">
     <!-- Left: experience fishing card -->
     <div class="exp-plan-card" style="margin-bottom:0">
       <div style="display:grid;grid-template-columns:1fr 1fr;height:100%">
@@ -1168,10 +1169,7 @@ function buildServiceA(lang) {
             <div class="exp-meta-item" style="font-size:.72rem"><span class="exp-meta-icon">👥</span>${a.capacity[lang]||a.capacity.en}</div>
           </div>
           <p style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.75rem;line-height:1.5;border-left:2px solid var(--teal);padding-left:.6rem">${a.note[lang]||a.note.en}</p>
-          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-            <div style="font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--gold)">${price}</div>
-            <a href="#contact" class="exp-cta" style="padding:.55rem 1rem;font-size:.75rem">📩 ${inquire[lang]||inquire.en}</a>
-          </div>
+          <div style="font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--gold);margin-top:.5rem">${price}</div>
         </div>
       </div>
     </div>
@@ -1257,6 +1255,15 @@ function buildServiceB(lang) {
         <div style="font-size:.85rem;color:var(--teal);margin-bottom:.4rem">🎖 ${b.captain[lang]||b.captain.en}</div>
         <div style="font-size:.82rem;color:var(--muted)">📍 ${b.ports[lang]||b.ports.en}</div>
       </div>
+    </div>
+    <div style="margin-bottom:1.25rem;padding:1rem 1.25rem;background:rgba(0,180,200,.06);border:1px solid rgba(0,180,200,.2);border-radius:8px">
+      <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem">${{en:'Customise Your Trip',zh:'定制你的行程',ja:'オーダーメイドプラン','zh-TW':'客製化您的行程'}[lang]||'Customise'}</div>
+      <p style="font-size:.83rem;color:rgba(255,255,255,.62);line-height:1.7">${{
+        en: 'Every charter is tailored to the season and your group. Before you book, just let us know — hotel pick-up & drop-off, sashimi preparation on board, or bringing your catch back to the hotel to share with friends. We arrange it all.',
+        zh: '每次包船都根据时节和你们的需求量身定做。预约前告诉我们就好——接送酒店、船上处理刺身、或者带回酒店跟大家一起品尝，都可以提前商量安排。',
+        'zh-TW': '每次包船都根據時節和您們的需求量身定制。預約前告訴我們就好——接送酒店、船上處理刺身、或者帶回酒店和大家一起品嚐，都可以提前商量安排。',
+        ja: '季節とグループに合わせてオーダーメイドで対応します。ホテル送迎、船上での刺身処理、ホテルに持ち帰ってみんなで味わうなど、ご要望はご予約前にお気軽にご相談ください。'
+      }[lang]||''}</p>
     </div>
     <div class="plans-grid">${cards}</div>
     ${general}
@@ -1478,50 +1485,186 @@ function toggleLog(id) {
 }
 
 // ── Guide ─────────────────────────────────────────────────
+// ── Guide Data ────────────────────────────────────────────
+const FISHING_STYLES = [
+  {
+    id: 'tiprun',
+    icon: '🦑',
+    name: { en:'Tip Run (Red Monster Squid)', zh:'Tip Run（红怪乌贼）', 'zh-TW':'Tip Run（紅怪烏賊）', ja:'ティップラン（アオリイカ）' },
+    target: { en:'Bigfin Reef Squid (Aori) · Red Monster', zh:'アオリイカ · 红怪乌贼', 'zh-TW':'アオリイカ · 紅怪烏賊', ja:'アオリイカ（レッドモンスター）' },
+    season: { en:'Dec – mid Jun · Peak: Apr – mid Jun', zh:'12月～6月中旬 · 高峰期：4月～6月中旬', 'zh-TW':'12月～6月中旬 · 高峰：4月～6月中旬', ja:'12月〜6月中旬 · 最盛期：4〜6月中旬' },
+    size: { en:'3–4kg class monsters', zh:'3kg～4kg级怪物乌贼', 'zh-TW':'3kg～4kg級怪物烏賊', ja:'3〜4kgクラスのモンスター' },
+    tackle: { en:'Tip Run rod · Spinning 2500–3000 · PE0.4–0.6 · Leader 1.5–2m · Egi 40–70g', zh:'TipRun竿 · 纺车2500-3000 · PE0.4-0.6 · 子线1.5-2m · 铅笔饵40-70g', 'zh-TW':'TipRun竿 · 紡車2500-3000 · PE0.4-0.6 · 子線1.5-2m · 鉛筆餌40-70g', ja:'ティップランロッド · スピニング2500〜3000 · PE0.4〜0.6 · リーダー1.5〜2m · エギ40〜70g' },
+    for: { en:'Squid fans · Photographers · Foodies', zh:'乌贼爱好者 · 摄影党 · 美食党', 'zh-TW':'烏賊愛好者 · 攝影愛好者 · 美食愛好者', ja:'イカ好き · 写真好き · 食にこだわる方' },
+    highlight: { en:'One of the most iconic Okinawa fishing styles', zh:'冲绳最具代表性的钓法之一', 'zh-TW':'沖繩最具代表性的釣法之一', ja:'沖縄を代表するフィッシングスタイルの一つ' },
+  },
+  {
+    id: 'gt',
+    icon: '🦈',
+    name: { en:'GT Fishing (Giant Trevally)', zh:'GT钓鱼（旅鲹）', 'zh-TW':'GT釣魚（浪人鰺）', ja:'GTフィッシング（ロウニンアジ）' },
+    target: { en:'Giant Trevally (GT)', zh:'GT（旅鲹 / ロウニンアジ）', 'zh-TW':'GT（浪人鰺）', ja:'GT（ロウニンアジ）' },
+    season: { en:'Year-round · Peak: Apr–Jul & Oct–Dec', zh:'全年 · 高峰期：4-7月 / 10-12月', 'zh-TW':'全年 · 高峰：4-7月 / 10-12月', ja:'通年 · 最盛期：4〜7月・10〜12月' },
+    size: { en:'10–50kg+', zh:'10kg～50kg+', 'zh-TW':'10kg～50kg+', ja:'10〜50kg超' },
+    tackle: { en:'GT rod · Overhead 14000+ · PE5–8 · Popper/Stickbait 180–300mm', zh:'GT竿 · 两轴14000+ · PE5-8 · 浮水饵/水面饵180-300mm', 'zh-TW':'GT竿 · 雙軸14000+ · PE5-8 · 水面餌180-300mm', ja:'GTロッド · オーバーヘッド14000以上 · PE5〜8 · ポッパー・スティックベイト180〜300mm' },
+    for: { en:'Advanced anglers · Overseas anglers · AU / NZ market', zh:'高端玩家 · 海外钓手 · 澳洲/新西兰市场', 'zh-TW':'進階釣手 · 海外釣手 · 澳洲/紐西蘭市場', ja:'上級アングラー · 海外フィッシャー · 豪州・NZ市場' },
+    highlight: { en:'World-class sport fishing · Explosive power', zh:'世界级运动钓鱼 · 爆发力极强', 'zh-TW':'世界級運動釣魚 · 爆發力極強', ja:'世界レベルのスポーツフィッシング · 爆発的な引き' },
+  },
+  {
+    id: 'hairtail',
+    icon: '🐟',
+    name: { en:'Giant Hairtail', zh:'巨型太刀鱼', 'zh-TW':'巨型白帶魚', ja:'ビッグタチウオ' },
+    target: { en:'Giant Hairtail (Tachiuo)', zh:'巨型太刀鱼', 'zh-TW':'巨型白帶魚', ja:'タチウオ（ビッグサイズ）' },
+    season: { en:'Jul – Nov', zh:'7月～11月', 'zh-TW':'7月～11月', ja:'7〜11月' },
+    size: { en:'Over 2 metres · Depth 300–400m', zh:'可超过2米 · 深度300-400m', 'zh-TW':'可超過2米 · 水深300-400m', ja:'2m超え · 水深300〜400m' },
+    tackle: { en:'Jigging rod · Spinning 2500–4000 · PE1.5–2 · Leader 2–3m · Jig 250–400g', zh:'Jig竿 · 纺车2500-4000 · PE1.5-2 · 子线2-3m · Jig 250-400g', 'zh-TW':'Jig竿 · 紡車2500-4000 · PE1.5-2 · 子線2-3m · Jig 250-400g', ja:'ジグロッド · スピニング2500〜4000 · PE1.5〜2 · リーダー2〜3m · ジグ250〜400g' },
+    for: { en:'Chinese & Taiwanese market — everyone knows hairtail', zh:'中国/台湾市场（大家都认识太刀鱼）', 'zh-TW':'中國/台灣市場（大家都認識白帶魚）', ja:'中国・台湾市場。知名度が高い' },
+    highlight: { en:'Recognisable to Chinese & Taiwanese visitors — great table fish', zh:'华人市场必杀技——人人认识，超好吃', 'zh-TW':'華人市場必殺技——人人認識，超好吃', ja:'中華圏での知名度抜群。食べても絶品' },
+  },
+  {
+    id: 'jigging',
+    icon: '🎣',
+    name: { en:'Deep Sea Jigging', zh:'深海铁板钓', 'zh-TW':'深海鐵板釣', ja:'ディープシージギング' },
+    target: { en:'Amberjack (カンパチ) · Coral Grouper (スジアラ) · Rock Fish', zh:'红甘（カンパチ）· 东星斑（スジアラ）· 根鱼', 'zh-TW':'紅甘（カンパチ）· 東星斑（スジアラ）· 根魚', ja:'カンパチ · スジアラ · 根魚' },
+    season: { en:'Peak: Jan – Jun', zh:'最佳：1月～6月', 'zh-TW':'最佳：1月～6月', ja:'最盛期：1〜6月' },
+    size: { en:'Amberjack 5–50kg+', zh:'红甘5-50kg+', 'zh-TW':'紅甘5-50kg+', ja:'カンパチ5〜50kg超' },
+    tackle: { en:'Jigging rod · Overhead 6000–8000 · PE2–3 · Leader 1.5m · Jig 150–400g', zh:'Jig竿 · 两轴6000-8000 · PE2-3 · 子线1.5m · Jig 150-400g', 'zh-TW':'Jig竿 · 雙軸6000-8000 · PE2-3 · 子線1.5m · Jig 150-400g', ja:'ジギングロッド · オーバーヘッド6000〜8000 · PE2〜3 · リーダー1.5m · ジグ150〜400g' },
+    for: { en:'Chinese-speaking market · Food lovers', zh:'华人市场 · 吃鱼玩家的天堂', 'zh-TW':'華人市場 · 愛吃魚的釣手天堂', ja:'中華圏市場 · 食へのこだわり派' },
+    highlight: { en:'Premium table fish — amberjack & coral grouper are top-tier ingredients', zh:'吃鱼玩家天堂——红甘和东星斑都是顶级食材', 'zh-TW':'愛吃魚釣手的天堂——紅甘和東星斑都是頂級食材', ja:'カンパチ・スジアラなど高級食材が狙える。食べる楽しみ重視派に最高' },
+  },
+  {
+    id: 'slj',
+    icon: '🌊',
+    name: { en:'SLJ (Super Light Jigging)', zh:'SLJ 超轻铁板', 'zh-TW':'SLJ 超輕鐵板', ja:'SLJ（スーパーライトジギング）' },
+    target: { en:'Reef Fish · Pelagics · Various species', zh:'礁鱼 · 青物 · 各种鱼', 'zh-TW':'礁魚 · 青物 · 各種魚', ja:'リーフフィッシュ · 青物 · 多魚種' },
+    season: { en:'Peak: Jul – Oct', zh:'最佳：7月～10月', 'zh-TW':'最佳：7月～10月', ja:'最盛期：7〜10月' },
+    size: { en:'Various', zh:'多种多样', 'zh-TW':'多種多樣', ja:'多種多様' },
+    tackle: { en:'SLJ rod · Spinning 3000–4000 · PE0.6–1 · Leader 2m · Jig 30–80g', zh:'SLJ竿 · 纺车3000-4000 · PE0.6-1 · 子线2m · Jig 30-80g', 'zh-TW':'SLJ竿 · 紡車3000-4000 · PE0.6-1 · 子線2m · Jig 30-80g', ja:'SLJロッド · スピニング3000〜4000 · PE0.6〜1 · リーダー2m · ジグ30〜80g' },
+    for: { en:'Experience clients · Families · Beginners', zh:'体验客 · 家庭客 · 新手', 'zh-TW':'體驗客 · 家庭客 · 新手', ja:'体験客 · ファミリー · 初心者向け' },
+    highlight: { en:'Easy to learn · Beginner-friendly · Wide variety of species', zh:'容易上手 · 新手友好 · 鱼种丰富', 'zh-TW':'容易上手 · 新手友善 · 魚種豐富', ja:'簡単に楽しめる · 初心者にやさしい · 多彩な魚種' },
+  },
+  {
+    id: 'tenya',
+    icon: '🪝',
+    name: { en:'Gomeoku Tenya', zh:'五目テンヤ（天亚钓法）', 'zh-TW':'五目テンヤ（天亞釣法）', ja:'五目テンヤ' },
+    target: { en:'Snapper · Reef Fish · Emperor Fish · Various bottom species', zh:'笛鲷 · 礁鱼 · 皇帝鱼 · 各种底层鱼', 'zh-TW':'笛鯛 · 礁魚 · 皇帝魚 · 各種底層魚', ja:'スナッパー · リーフフィッシュ · エンペラーフィッシュ · 底物各種' },
+    season: { en:'Year-round', zh:'全年', 'zh-TW':'全年', ja:'通年' },
+    size: { en:'Various', zh:'多种', 'zh-TW':'多種', ja:'多様' },
+    tackle: { en:'Tenya rod · Spinning/Baitcast · PE0.6–1 · Leader 2–3m · Tenya rig', zh:'天亚竿 · 纺车/两轴 · PE0.6-1 · 子线2-3m · 天亚仕掛け', 'zh-TW':'天亞竿 · 紡車/雙軸 · PE0.6-1 · 子線2-3m · 天亞仕掛', ja:'テンヤロッド · スピニング/ベイト · PE0.6〜1 · リーダー2〜3m · テンヤ仕掛け' },
+    for: { en:'Experience clients · Beginners · Anyone who wants to catch fish', zh:'体验客 · 新手 · 想要钓到鱼的所有人', 'zh-TW':'體驗客 · 新手 · 想釣到魚的所有人', ja:'体験客 · 初心者 · とにかく釣りたい方' },
+    highlight: { en:'Okinawa sea fishing experience · Highest catch rate · Most beginner-friendly', zh:'最容易钓到鱼 · 最适合新手 · 冲绳版海钓体验', 'zh-TW':'最容易釣到魚 · 最適合新手 · 沖繩版海釣體驗', ja:'最も釣れやすい · 最も初心者に優しい · 沖縄らしい海釣り体験' },
+  },
+];
+
+const MONTHLY_CALENDAR = [
+  { month:{ en:'Jan', zh:'1月', 'zh-TW':'1月', ja:'1月' }, styles:['jigging'] },
+  { month:{ en:'Feb', zh:'2月', 'zh-TW':'2月', ja:'2月' }, styles:['jigging'] },
+  { month:{ en:'Mar', zh:'3月', 'zh-TW':'3月', ja:'3月' }, styles:['jigging'] },
+  { month:{ en:'Apr', zh:'4月', 'zh-TW':'4月', ja:'4月' }, styles:['gt','tiprun'] },
+  { month:{ en:'May', zh:'5月', 'zh-TW':'5月', ja:'5月' }, styles:['gt','tiprun'] },
+  { month:{ en:'Jun', zh:'6月', 'zh-TW':'6月', ja:'6月' }, styles:['gt','tiprun'] },
+  { month:{ en:'Jul', zh:'7月', 'zh-TW':'7月', ja:'7月' }, styles:['hairtail','slj'] },
+  { month:{ en:'Aug', zh:'8月', 'zh-TW':'8月', ja:'8月' }, styles:['hairtail','slj'] },
+  { month:{ en:'Sep', zh:'9月', 'zh-TW':'9月', ja:'9月' }, styles:['hairtail','slj'] },
+  { month:{ en:'Oct', zh:'10月','zh-TW':'10月', ja:'10月'}, styles:['gt','hairtail','slj'] },
+  { month:{ en:'Nov', zh:'11月','zh-TW':'11月', ja:'11月'}, styles:['gt','hairtail'] },
+  { month:{ en:'Dec', zh:'12月','zh-TW':'12月', ja:'12月'}, styles:['gt','tiprun'] },
+];
+
+// Style color map
+const STYLE_COLOR = {
+  tiprun:   { bg:'rgba(0,180,200,.15)',  border:'rgba(0,180,200,.4)',  text:'var(--teal)' },
+  gt:       { bg:'rgba(232,93,58,.12)',  border:'rgba(232,93,58,.4)',  text:'#e85d3a' },
+  hairtail: { bg:'rgba(160,120,255,.12)',border:'rgba(160,120,255,.4)',text:'#a078ff' },
+  jigging:  { bg:'rgba(200,164,74,.12)', border:'rgba(200,164,74,.4)', text:'var(--gold)' },
+  slj:      { bg:'rgba(50,200,100,.12)', border:'rgba(50,200,100,.4)', text:'#32c864' },
+  tenya:    { bg:'rgba(255,180,0,.12)',  border:'rgba(255,180,0,.4)',  text:'#ffb400' },
+};
+
 function buildGuide() {
   const lang = L();
-  // Map lang key for guide data (zh-TW -> zhtw to avoid hyphen in key)
-  const gLang = lang === 'zh-TW' ? 'zhtw' : lang;
-  // Seasons
-  document.getElementById('seasons-grid').innerHTML = GUIDE.seasons.map(s => `
-    <div class="season-card">
-      <span class="season-icon">${s.icon}</span>
-      <div class="season-name">${s['name_'+gLang] || s.name_en}</div>
-      <div class="season-highlight">${s['highlight_'+gLang] || s.highlight_en}</div>
-      <div class="season-desc">${s['desc_'+gLang] || s.desc_en}</div>
-      <div class="season-fish">${(s['target_'+gLang] || s.target_en).map(t => '<span class="season-tag">'+t+'</span>').join('')}</div>
-    </div>`).join('');
-  // Species
-  document.getElementById('species-grid').innerHTML = GUIDE.species.map(sp => {
-    const dots = Array.from({length:5},(_,i)=>'<div class="diff-dot'+(i<sp.difficulty?' fill':'')+'"></div>').join('');
+
+  // Header
+  const labels = {
+    title:   { en:'Okinawa Fishing Guide', zh:'冲绳海钓指南', 'zh-TW':'沖繩海釣指南', ja:'沖縄フィッシングガイド' },
+    slabel:  { en:'Okinawa Fishing', zh:'冲绳钓鱼', 'zh-TW':'沖繩釣魚', ja:'沖縄フィッシング' },
+    desc:    { en:"Okinawa's waters deliver world-class fishing across 6 distinct styles — each with its own season, targets and character. Here's how to pick the right one.", zh:'冲绳海域拥有6种截然不同的钓法，各有其最佳季节、目标鱼种和特色。这是你选对方案的指南。', 'zh-TW':'沖繩海域擁有6種截然不同的釣法，各有其最佳季節、目標魚種和特色。這是您選對方案的指南。', ja:'沖縄の海は6つの異なるフィッシングスタイルで世界レベルの釣りを提供しています。季節・ターゲット・特徴を比較してご自分に合うプランをお選びください。' },
+    styles:  { en:'6 Fishing Styles', zh:'6种钓鱼方式', 'zh-TW':'6種釣魚方式', ja:'6つのフィッシングスタイル' },
+    calendar:{ en:'Monthly Recommendations', zh:'月份推荐', 'zh-TW':'月份推薦', ja:'月別おすすめ' },
+    target:  { en:'Target', zh:'目标', 'zh-TW':'目標', ja:'ターゲット' },
+    season:  { en:'Season', zh:'季节', 'zh-TW':'季節', ja:'シーズン' },
+    size:    { en:'Size / Depth', zh:'尺寸/水深', 'zh-TW':'尺寸/水深', ja:'サイズ/水深' },
+    tackle:  { en:'Tackle Reference', zh:'装备参考', 'zh-TW':'裝備參考', ja:'タックル参考' },
+    bestfor: { en:'Best For', zh:'适合', 'zh-TW':'適合', ja:'おすすめ' },
+  };
+
+  document.getElementById('guide-header').innerHTML = `
+    <div class="s-label">${labels.slabel[lang]||labels.slabel.en}</div>
+    <h2 class="s-title">${labels.title[lang]||labels.title.en}</h2>
+    <p class="s-desc">${labels.desc[lang]||labels.desc.en}</p>`;
+
+  // Style cards
+  const styleCards = FISHING_STYLES.map(s => {
+    const c = STYLE_COLOR[s.id] || STYLE_COLOR.slj;
     return `
-    <div class="species-card">
-      <div class="species-name">${sp['name_'+gLang] || sp.name_en}</div>
-      <div class="difficulty">${dots}<span class="diff-label">${sp.difficulty}/5</span></div>
-      <div class="species-season">${sp['season_'+gLang] || sp.season_en} · ${sp['size_'+gLang] || sp.size_en}</div>
-      <div class="species-desc">${sp['desc_'+gLang] || sp.desc_en}</div>
-      <div class="species-methods">${(sp['method_'+gLang]||sp.method_en).map(m=>'<span class="species-method-tag">'+m+'</span>').join('')}</div>
+    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden;transition:border-color .2s"
+         onmouseover="this.style.borderColor='${c.border}'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'">
+      <div style="padding:.75rem 1rem;background:${c.bg};border-bottom:1px solid ${c.border};display:flex;align-items:center;gap:.6rem">
+        <span style="font-size:1.4rem">${s.icon}</span>
+        <div style="font-family:var(--font-d);font-size:1rem;font-weight:700;color:${c.text}">${s.name[lang]||s.name.en}</div>
+      </div>
+      <div style="padding:1rem">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:.3rem .75rem;font-size:.78rem;margin-bottom:.75rem">
+          <span style="color:var(--muted)">${labels.target[lang]}</span>
+          <span style="color:rgba(255,255,255,.75)">${s.target[lang]||s.target.en}</span>
+          <span style="color:var(--muted)">${labels.season[lang]}</span>
+          <span style="color:rgba(255,255,255,.75)">${s.season[lang]||s.season.en}</span>
+          <span style="color:var(--muted)">${labels.size[lang]}</span>
+          <span style="color:rgba(255,255,255,.75)">${s.size[lang]||s.size.en}</span>
+          <span style="color:var(--muted)">${labels.bestfor[lang]}</span>
+          <span style="color:rgba(255,255,255,.75)">${s.for[lang]||s.for.en}</span>
+        </div>
+        <div style="font-size:.75rem;color:${c.text};padding:.5rem .65rem;background:${c.bg};border-radius:4px;line-height:1.5">
+          ✦ ${s.highlight[lang]||s.highlight.en}
+        </div>
+        <details style="margin-top:.65rem">
+          <summary style="font-size:.68rem;color:var(--muted);cursor:pointer;letter-spacing:.05em">${labels.tackle[lang]} ▸</summary>
+          <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-top:.4rem;line-height:1.6">${s.tackle[lang]||s.tackle.en}</div>
+        </details>
+      </div>
     </div>`;
   }).join('');
-  // Methods
-  document.getElementById('methods-grid').innerHTML = GUIDE.methods.map(m => {
-    const dots = Array.from({length:5},(_,i)=>'<div class="diff-dot'+(i<m.difficulty?' fill':'')+'"></div>').join('');
+
+  document.getElementById('guide-styles').innerHTML = `
+    <div style="margin-bottom:.75rem">
+      <div class="s-label" style="margin-bottom:.5rem">${labels.styles[lang]||labels.styles.en}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:3rem">${styleCards}</div>`;
+
+  // Calendar
+  const styleNames = {};
+  FISHING_STYLES.forEach(s => { styleNames[s.id] = s.name[lang]||s.name.en; });
+
+  const calRows = MONTHLY_CALENDAR.map(m => {
+    const tags = m.styles.map(sid => {
+      const c = STYLE_COLOR[sid] || STYLE_COLOR.slj;
+      return `<span style="display:inline-block;padding:.15rem .55rem;border-radius:3px;font-size:.68rem;font-weight:700;background:${c.bg};border:1px solid ${c.border};color:${c.text};white-space:nowrap">${styleNames[sid]||sid}</span>`;
+    }).join('');
     return `
-    <div class="method-card">
-      <div class="method-icon">${m.icon}</div>
-      <div class="method-name">${m['name_'+gLang] || m.name_en}</div>
-      <div class="difficulty">${dots}<span class="diff-label">${m.difficulty}/5</span></div>
-      <div class="method-desc">${m['desc_'+gLang] || m.desc_en}</div>
+    <div style="display:grid;grid-template-columns:3rem 1fr;align-items:center;gap:.75rem;padding:.6rem .5rem;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div style="font-size:.8rem;font-weight:700;color:var(--muted);text-align:center">${m.month[lang]||m.month.en}</div>
+      <div style="display:flex;gap:.35rem;flex-wrap:wrap">${tags}</div>
     </div>`;
   }).join('');
+
+  document.getElementById('guide-calendar').innerHTML = `
+    <div class="s-label" style="margin-bottom:.75rem">${labels.calendar[lang]||labels.calendar.en}</div>
+    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden">${calRows}</div>`;
 }
 
 let activeGuidePanel = 'species';
 function switchGuideTab(panel, btn) {
   document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  document.querySelectorAll('.guide-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + panel).classList.add('active');
   activeGuidePanel = panel;
 }
 
