@@ -1240,11 +1240,23 @@ function buildServiceB(lang) {
   return `
   <div>
 
-    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem">
-      <div class="exp-card-badge" style="margin-bottom:.6rem">${b.badge[lang]}</div>
-      <div style="font-family:var(--font-d);font-size:1.4rem;font-weight:700;margin-bottom:.5rem">${b.title[lang]}</div>
-      <div style="font-size:.82rem;color:var(--teal);margin-bottom:.3rem">🎖 ${b.captain[lang]}</div>
-      <div style="font-size:.8rem;color:var(--muted)">📍 ${b.ports[lang]}</div>
+    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr">
+      <!-- Photos -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+        <img src="img/boat-fishing.jpg" alt="fishing charter boat" loading="lazy"
+          style="width:100%;height:200px;object-fit:cover;display:block"
+          onerror="this.style.display='none'">
+        <img src="img/captain-bigfish.jpg" alt="captain with big catch" loading="lazy"
+          style="width:100%;height:200px;object-fit:cover;display:block"
+          onerror="this.style.display='none'">
+      </div>
+      <!-- Info -->
+      <div style="padding:1.5rem;display:flex;flex-direction:column;justify-content:center">
+        <div class="exp-card-badge" style="margin-bottom:.75rem">${b.badge[lang]||b.badge.en}</div>
+        <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:700;margin-bottom:.75rem">${b.title[lang]||b.title.en}</div>
+        <div style="font-size:.85rem;color:var(--teal);margin-bottom:.4rem">🎖 ${b.captain[lang]||b.captain.en}</div>
+        <div style="font-size:.82rem;color:var(--muted)">📍 ${b.ports[lang]||b.ports.en}</div>
+      </div>
     </div>
     <div class="plans-grid">${cards}</div>
     ${general}
