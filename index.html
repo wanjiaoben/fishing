@@ -185,6 +185,11 @@ section { padding:5.5rem 0; }
 .plan-row:last-child { border-bottom:none; }
 .plan-row-label { font-size:.78rem; color:var(--muted); }
 .plan-row-val { font-size:.88rem; font-weight:600; text-align:right; }
+/* Schedule rows — time fixed left, text wraps naturally on right */
+.schedule-row { display:flex; align-items:flex-start; gap:.85rem; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.schedule-row:last-child { border-bottom:none; }
+.schedule-time { font-size:.78rem; color:var(--teal); font-weight:700; flex-shrink:0; width:2.8rem; padding-top:.05rem; }
+.schedule-text { font-size:.82rem; color:rgba(255,255,255,.7); line-height:1.55; }
 .plan-price { font-family:var(--font-d); font-size:1.8rem; font-weight:700; color:var(--gold); margin:.75rem 0 .25rem; }
 .plan-price-note { font-size:.72rem; color:var(--muted); }
 .plan-footer { padding:1.25rem 1.75rem; }
@@ -271,6 +276,13 @@ section { padding:5.5rem 0; }
   .also-grid { grid-template-columns:1fr; }
 }
 
+/* Exp sub-tabs */
+.exp-sub-tabs { display:flex; gap:.5rem; margin-bottom:1.5rem; }
+.exp-sub-tab { padding:.5rem 1.25rem; border-radius:100px; border:1px solid var(--glass-b); background:var(--glass); color:var(--muted); font-size:.8rem; font-weight:700; cursor:pointer; font-family:var(--font-b); transition:all .2s; }
+.exp-sub-tab:hover { color:var(--white); border-color:rgba(255,255,255,.2); }
+.exp-sub-tab.active { background:var(--teal); border-color:var(--teal); color:var(--deep); }
+.exp-sub-panel { display:none; }
+.exp-sub-panel.active { display:block; }
 /* ── BOOKING ── */
 .booking-section { background:var(--deep); }
 .booking-section::before { content:''; display:block; width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin-bottom:0; }
@@ -645,45 +657,29 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       <div class="payment-title" data-ja>お支払い・キャンセルポリシー</div>
       <div class="payment-grid">
         <div class="payment-item">
-          <div class="payment-item-label" data-en>Payment Timing</div>
-          <div class="payment-item-label" data-zh>付款时间</div>
-          <div class="payment-item-label" data-ja>お支払いタイミング</div>
-          <div class="payment-item-val" data-en>Full payment required at first booking. Second-time guests may pay cash on the day.</div>
-          <div class="payment-item-val" data-zh>首次预约需支付全款。第二次及以后的熟客可当天支付现金。</div>
-          <div class="payment-item-val" data-ja>初回予約は全額前払い。2回目以降のリピーターは当日現金払いも可。</div>
+          <div class="payment-item-label" data-en>How to Confirm a Booking</div>
+          <div class="payment-item-label" data-zh>如何确认预约</div>
+          <div class="payment-item-label" data-ja>予約確定について</div>
+          <div class="payment-item-val" data-en>After confirming the plan and details, full payment is required. Your spot is secured once we send you a booking confirmation. The total includes an approx. 10% coordination & translation fee.</div>
+          <div class="payment-item-val" data-zh>预约内容和信息确认后，支付全款，收到确认信即算站位成功。全款内含约10%的翻译协调费。</div>
+          <div class="payment-item-val" data-ja>プランと内容確認後、全額お支払いください。予約確認メールをお送りした時点で予約成立です。料金にはコーディネート・翻訳料（約10%）が含まれます。</div>
         </div>
         <div class="payment-item">
           <div class="payment-item-label" data-en>Payment Methods</div>
           <div class="payment-item-label" data-zh>付款方式</div>
           <div class="payment-item-label" data-ja>お支払い方法</div>
-          <div class="payment-item-val" data-en>Alipay, WeChat Pay, PayPay, Bank transfer, Credit card (via Square). Cash JPY accepted on-site.</div>
-          <div class="payment-item-val" data-zh>支付宝、微信支付、PayPay、银行转账、信用卡（Square）。现场可付日元现金。</div>
-          <div class="payment-item-val" data-ja>支付宝、WeChat Pay、PayPay、銀行振込、クレジットカード（Square）。現場での円現金も可。</div>
-        </div>
-        <div class="payment-item">
-          <div class="payment-item-label" data-en>Exchange Rate</div>
-          <div class="payment-item-label" data-zh>汇率说明</div>
-          <div class="payment-item-label" data-ja>為替レート</div>
-          <div class="payment-item-val" data-en>CNY payments calculated at cash rate (approx. ¥5 = ¥1 JPY as of 2026). Rate confirmed at time of booking.</div>
-          <div class="payment-item-val" data-zh>人民币付款按取现汇率计算（2026年约5人民币=1日元）。汇率以预约时为准。</div>
-          <div class="payment-item-val" data-ja>人民元決済は現金レートで計算（2026年目安：5元＝1円）。予約時のレートを適用。</div>
-        </div>
-        <div class="payment-item">
-          <div class="payment-item-label" data-en>Coordination Fee</div>
-          <div class="payment-item-label" data-zh>翻译协调费</div>
-          <div class="payment-item-label" data-ja>コーディネート料</div>
-          <div class="payment-item-val" data-en>10% of total charter fee. Covers translation, coordination and support throughout your trip.</div>
-          <div class="payment-item-val" data-zh>总船费的10%，含全程翻译、协调和支持服务。</div>
-          <div class="payment-item-val" data-ja>チャーター料金の10%。翻訳・コーディネート・サポートが含まれます。</div>
+          <div class="payment-item-val" data-en>Alipay · WeChat Pay · PayPay · Bank transfer · Credit card (Square)</div>
+          <div class="payment-item-val" data-zh>支付宝 · 微信支付 · PayPay · 银行转账 · 信用卡（Square）</div>
+          <div class="payment-item-val" data-ja>支付宝・WeChat Pay・PayPay・銀行振込・クレジットカード（Square）</div>
         </div>
       </div>
       <div class="cancel-box">
         <div class="cancel-title" data-en>Cancellation Policy</div>
         <div class="cancel-title" data-zh>取消政策</div>
         <div class="cancel-title" data-ja>キャンセルポリシー</div>
-        <p class="cancel-body" data-en>Cancellations 2+ weeks before departure: charter fee refunded minus processing fee. Coordination fee non-refundable. Cancellations due to typhoon or sea conditions (captain's decision): full refund including coordination fee.</p>
-        <p class="cancel-body" data-zh>出发前2周以上取消：退还船费（扣除手续费），翻译协调费不退。因台风或海况原因（船长判断）无法出海：全额退款，含协调费。</p>
-        <p class="cancel-body" data-ja>出船2週間前からのお客様キャンセル：手数料を除いた船費を返金。コーディネート料は返金不可。台風・海況等による船長判断でのキャンセル：船費・コーディネート料ともに全額返金。</p>
+        <p class="cancel-body" data-en>Cancelled 2+ weeks before departure: charter fee refunded minus processing fee. Coordination fee is non-refundable. Cancelled due to typhoon or sea conditions (captain's decision): full refund including coordination fee.</p>
+        <p class="cancel-body" data-zh>出发前2周以上取消：退还船费（扣除手续费），翻译协调费不退。因台风或海况原因（船长判断）无法出海：全额退款，协调费也退。</p>
+        <p class="cancel-body" data-ja>出船2週間前以上前のキャンセル：手数料を除いた船費を返金。コーディネート料は返金不可。台風・海況等による船長判断でのキャンセル：コーディネート料含む全額返金。</p>
       </div>
     </div>
   </div>
@@ -977,9 +973,9 @@ const PLANS_HEADER = {
   label: { en:'Fishing Plans', zh:'钓鱼方案', ja:'フィッシングプラン' },
   title: { en:'Plans & Pricing', zh:'方案与价格', ja:'プラン・料金表' },
   desc:  {
-    en: 'From beginner-friendly experience fishing to full-day private pro charters — we have the right plan for every angler.',
-    zh: '从适合初学者的体验钓鱼到全天专业包船——适合每一种钓手的方案。',
-    ja: '初心者向けの体験釣りから、プロ向け1日チャーターまで、あらゆるアングラーに最適なプランをご用意。'
+    en: 'Beginner shared boats, private charters, full-day pro fishing, overnight island expeditions — fish your way in Okinawa.',
+    zh: '从初学者体验拼船/包船，全天专业包船，包船离岛过夜钓爽——冲绳各种玩法都有。',
+    ja: '初心者向け乗合・貸切から、フルデイプロチャーター、離島泊まり遠征まで——沖縄の釣りを思いきり楽しもう。'
   }
 };
 
@@ -988,31 +984,55 @@ const PLAN_TABS = [
   { id:'pro',        icon:'⚓', label:{ en:'Pro Charter',       zh:'专业包船',  ja:'プロチャーター' } },
 ];
 
-const EXPERIENCE_PLAN = {
-  badge:  { en:'Beginners & Families Welcome', zh:'适合初学者与家庭', ja:'初心者・ファミリー歓迎' },
-  title:  { en:'Experience Fishing Tour', zh:'体验钓鱼之旅', ja:'体験フィッシングツアー' },
-  desc:   {
-    en: 'A 2-hour sea fishing experience perfect for first-timers, families, couples and tourists. All equipment provided. Departing from Kadena Fishing Port.',
-    zh: '2小时出海钓鱼体验，非常适合初次体验者、家庭、情侣和游客。全装备提供，从嘉手纳渔港出发。',
-    ja: '2時間の海釣り体験ツアー。初めての方、ご家族、カップル、観光客に最適。全装備提供。嘉手納漁港から出船。'
+const EXPERIENCE_PLANS = [
+  {
+    id: 'shared',
+    badge:  { en:'Shared Boat · Beginners & Families', zh:'拼船 · 适合初学者与家庭', ja:'乗合 · 初心者・ファミリー歓迎' },
+    title:  { en:'Experience Fishing — Shared Boat', zh:'体验钓鱼（拼船）', ja:'体験釣り（乗合）' },
+    desc: {
+      en: 'A 2-hour shared boat experience departing from Kadena Fishing Port. Perfect for first-timers, families, couples and tourists. All equipment provided. Max 12 adults per boat.',
+      zh: '2小时拼船钓鱼体验，从嘉手纳渔港出发。非常适合初次体验者、家庭、情侣和游客。全装备提供，每船最多12名成人。',
+      ja: '嘉手納漁港から出船する2時間の乗合釣り体験。初めての方、ご家族、カップル、観光客に最適。全装備提供。1船最大12名。'
+    },
+    port:     { en:'Kadena Fishing Port', zh:'嘉手纳渔港', ja:'嘉手納漁港' },
+    duration: { en:'2 hours', zh:'2小时', ja:'2時間' },
+    type:     { en:'Shared Boat', zh:'拼船', ja:'乗合' },
+    capacity: { en:'Max 12 adults (children 0–10 = 0.5)', zh:'最多12名成人（10岁以下按0.5计）', ja:'最大12名（10歳以下0.5名換算）' },
+    price:    { en:'Contact for pricing', zh:'价格请咨询', ja:'料金はお問い合わせください' },
+    images:   ['img/exp-fishing-1.jpg', 'img/exp-fishing-2.jpg'],
+    showAlso: true,
   },
-  meta: [
-    { icon:'⏱', en:'2 hours total', zh:'全程2小时', ja:'所要時間2時間' },
-    { icon:'📍', en:'Kadena Fishing Port', zh:'嘉手纳渔港', ja:'嘉手納漁港集合' },
-    { icon:'👥', en:'Max 12 adults / boat', zh:'每船最多12名成人', ja:'1船最大12名' },
-    { icon:'👧', en:'Children welcome (age 0–10 = 0.5 person)', zh:'欢迎儿童（10岁以下按0.5名计）', ja:'お子様歓迎（10歳以下0.5名換算）' },
-  ],
+  {
+    id: 'charter',
+    badge:  { en:'Private Charter · Your Group Only', zh:'包船 · 专属你的团队', ja:'貸切 · グループ専用' },
+    title:  { en:'Experience Fishing — Private Charter', zh:'体验钓鱼（包船）', ja:'体験釣り（貸切）' },
+    desc: {
+      en: 'A private charter from Chatan American Village Port — 4 to 10 hours, fully flexible. Ideal for families, friends and corporate groups who want privacy and a personalised trip.',
+      zh: '从北谷美国村渔港出发的专属包船，时长4至10小时，灵活安排。非常适合想要私密空间的家庭、朋友或企业团体。',
+      ja: '北谷アメリカンビレッジ漁港から出船する貸切チャーター。4〜10時間でフレキシブルに対応。プライベートを重視するグループ・ご家族・法人旅行に最適。'
+    },
+    port:     { en:'Chatan American Village Port', zh:'北谷美国村渔港', ja:'北谷アメリカンビレッジ漁港' },
+    duration: { en:'4–10 hours (flexible)', zh:'4至10小时（灵活）', ja:'4〜10時間（フレキシブル）' },
+    type:     { en:'Private Charter', zh:'包船', ja:'貸切チャーター' },
+    capacity: { en:'Your group only — no strangers', zh:'仅限你的团队，不拼船', ja:'グループ専用・乗合なし' },
+    price:    { en:'Contact for pricing', zh:'价格请咨询', ja:'料金はお問い合わせください' },
+    images:   ['img/exp-fishing-2.jpg', 'img/exp-fishing-1.jpg'],
+    showAlso: false,
+  },
+];
+
+const EXPERIENCE_COMMON = {
   schedule: [
-    { time:'08:30', en:'Meet at Kadena Fishing Port — paperwork & restroom', zh:'嘉手纳渔港集合——填写文件、上厕所', ja:'嘉手納漁港集合、書類記入・トイレ' },
+    { time:'08:30', en:'Meet at port — paperwork & restroom', zh:'渔港集合——填写文件、上厕所', ja:'漁港集合・書類記入・トイレ' },
     { time:'09:00', en:'Depart — approx. 15 min to fishing spot', zh:'出发——约15分钟到达钓点', ja:'出船——約15分で釣り場へ' },
-    { time:'09:15', en:'Instructor briefing — tackle & technique explanation', zh:'教练讲解——钓具使用和技巧说明', ja:'インストラクター説明——道具の使い方・釣り方解説' },
-    { time:'09:20', en:'Fishing! Stunning ocean views, possible fighter jet sightings near Kadena base', zh:'开始钓鱼！欣赏冲绳美丽海景，可能看到嘉手纳基地战斗机起降', ja:'釣り開始！美しい海を眺めながら。嘉手納基地近くで戦闘機が見えることも' },
+    { time:'09:15', en:'Instructor briefing — tackle & technique', zh:'教练讲解钓具使用和技巧', ja:'インストラクターによる釣り方説明' },
+    { time:'09:20', en:'Start fishing! Ocean views near Kadena base — watch for fighter jets', zh:'开始钓鱼！美丽海景，可能看到嘉手纳基地战斗机起降', ja:'釣り開始！嘉手納基地近くで戦闘機が見えることも' },
     { time:'11:00', en:'Return to port — farewell', zh:'回港解散', ja:'帰港・解散' },
   ],
   includes: {
     label: { en:"What's Included", zh:'包含项目', ja:'含まれるもの' },
     items: {
-      en: ['Fishing rod & reel','Fishing line & bait','All tackle','Life jacket','Hand towel','Fish bag & ice'],
+      en: ['Fishing rod & reel','Line & bait','All tackle','Life jacket','Hand towel','Fish bag & ice'],
       zh: ['鱼竿和渔轮','鱼线和鱼饵','全套钓具','救生衣','擦手毛巾','带鱼袋和冰块'],
       ja: ['釣り竿・リール','仕掛け・エサ','全タックル','ライフジャケット','ハンドタオル','魚袋・氷']
     }
@@ -1020,7 +1040,7 @@ const EXPERIENCE_PLAN = {
   prepare: {
     label: { en:'What to Bring', zh:'建议携带', ja:'持ち物' },
     items: {
-      en: ['Hat & sunscreen','Clothes that can get wet','Sunglasses (secure ones!','Bottled drinks (no toilet on board)','Seasickness medication (recommended)'],
+      en: ['Hat & sunscreen','Clothes that can get wet',"Sunglasses (won't fly off)",'Bottled drinks (no toilet on board)','Seasickness medication (recommended)'],
       zh: ['帽子和防晒霜','不怕弄湿的衣服','太阳镜（选不易被风吹走的）','瓶装饮料（船上无厕所）','晕船药（推荐大白兔，成人1天1颗）'],
       ja: ['帽子・日焼け止め','濡れても大丈夫な服装','サングラス（風で飛ばない物）','ペットボトル飲料（船内トイレなし）','酔い止め薬（推奨）']
     }
@@ -1030,45 +1050,43 @@ const EXPERIENCE_PLAN = {
     items: {
       en: [
         'Life jackets must be worn at all times on the water.',
-        'Fish caught may need to be released if undersized — not all catches can be kept.',
-        'Fish can smell strongly — if your transfer vehicle is affected, a cleaning fee may apply.',
-        'Restaurants may refuse to cook caught fish. We suggest taking a photo and gifting it to the captain.',
-        'Not suitable for: high blood pressure, coronary heart disease, pregnancy or suspected pregnancy. Please self-declare.',
-        'Losing personal items (glasses, phones, hats) at sea — no compensation possible.'
+        'Fish caught may need to be released if undersized.',
+        'Fish smell strongly — if your vehicle is affected a cleaning fee may apply.',
+        'Restaurants may refuse to cook caught fish. Photo it, then gift it to the captain.',
+        'Not suitable for: high blood pressure, heart disease, pregnancy. Please self-declare.',
+        'Lost personal items (glasses, phones, hats) cannot be compensated.'
       ],
       zh: [
-        '出海必须全程穿着发放的救生衣。',
-        '部分鱼类若不符合大小规定无法带走。',
-        '带走的鱼处理不当会有强烈气味，如污染接送车辆可能被要求支付清洁费。',
+        '出海必须全程穿着救生衣。',
+        '部分鱼类若不符合规定尺寸无法带走。',
+        '带走的鱼处理不当气味强烈，如污染接送车辆可能被要求支付清洁费。',
         '食堂很可能拒绝处理钓上来的鱼，建议拍照后送给船长。',
-        '以下人群不宜参加：高血压、冠心病等需每日服药者、孕妇或疑似怀孕者，请自行申报。',
-        '太阳镜、手机、帽子等物品在船上丢失无法赔偿，请妥善保管。'
+        '高血压、冠心病、孕妇或疑似怀孕者不宜参加，请自行申报。',
+        '太阳镜、手机、帽子等在船上丢失无法赔偿，请妥善保管。'
       ],
       ja: [
         '乗船中はライフジャケットを必ず着用してください。',
         'サイズ規定を満たさない魚は持ち帰り不可の場合があります。',
-        '魚は適切に処理しないと強い臭いが出ます。送迎車を汚した場合、クリーニング代を請求することがあります。',
-        '食堂で釣った魚を調理してもらえないことが多いため、写真撮影後に船長へ贈ることをお勧めします。',
-        '高血圧・冠動脈疾患等で毎日服薬している方、妊娠中または妊娠の可能性がある方はご参加をご遠慮ください。',
-        'サングラス・スマホ・帽子等の紛失について補償はできません。'
+        '魚の臭いで送迎車を汚した場合、クリーニング代を請求することがあります。',
+        '食堂での調理を断られることが多いため、写真撮影後に船長への贈呈をお勧めします。',
+        '高血圧・心疾患・妊娠中の方はご参加をご遠慮ください。',
+        'サングラス・スマホ等の紛失について補償はできません。'
       ]
     }
   },
   cancellation: {
     label: { en:'Cancellation Policy', zh:'退款政策', ja:'キャンセルポリシー' },
     note: {
-      en: 'Full refund for typhoon, sea conditions or visa refusal (force majeure). Personal reasons (illness, hangover, etc.) incur fees from 10 days prior.',
-      zh: '台风、海况、拒签等不可抗力全额退款。个人原因（感冒、喝多了等）从10天前开始产生手续费。',
-      ja: '台風・海況・ビザ不許可等の不可抗力は全額返金。個人的な理由（体調不良・二日酔い等）は10日前より手数料発生。'
+      en: 'Full refund for typhoon, sea conditions or force majeure. Personal reasons incur fees from 10 days prior.',
+      zh: '台风、海况等不可抗力全额退款。个人原因从10天前开始产生手续费。',
+      ja: '台風・海況等の不可抗力は全額返金。個人的な理由は10日前より手数料発生。'
     },
     tiers: [
       { period:{ en:'11+ days before', zh:'11天以前', ja:'11日前以上' }, policy:{ en:'Full refund', zh:'全额退款', ja:'全額返金' }, color:'teal' },
-      { period:{ en:'10–3 days before', zh:'10天前至3天前', ja:'10〜3日前' }, policy:{ en:'80% cancellation fee', zh:'扣80%手续费', ja:'80%キャンセル料' }, color:'gold' },
+      { period:{ en:'10–3 days before', zh:'10天前至3天前', ja:'10〜3日前' }, policy:{ en:'80% fee', zh:'扣80%手续费', ja:'80%キャンセル料' }, color:'gold' },
       { period:{ en:'2 days – day of', zh:'2天前至当天', ja:'前日〜当日' }, policy:{ en:'No refund', zh:'全额不退', ja:'返金不可' }, color:'coral' },
     ]
   },
-  price: { en:'TBD — Contact for pricing', zh:'价格待定，请联系我们', ja:'料金未定・お問い合わせください' },
-  images: ['img/exp-fishing-1.jpg','img/exp-fishing-2.jpg'],
 };
 
 const PRO_PLANS = [
@@ -1183,76 +1201,124 @@ function switchPlanTab(tab) {
 }
 
 function buildExperiencePanel(lang) {
-  const p = EXPERIENCE_PLAN;
-  const imgs = p.images.map(src => `<img src="${src}" alt="experience fishing" onerror="this.outerHTML='<div class=\'img-placeholder\'>🎣</div>'">`).join('');
-  const schedule = p.schedule.map(s => `
-    <div class="plan-row">
-      <span class="plan-row-label">${s.time}</span>
-      <span class="plan-row-val">${s[lang]||s.en}</span>
+  const c = EXPERIENCE_COMMON;
+  const inquire = { en:'Inquire Now', zh:'立即询问', ja:'問い合わせ' };
+
+  const schedule = c.schedule.map(s => `
+    <div class="schedule-row">
+      <span class="schedule-time">${s.time}</span>
+      <span class="schedule-text">${s[lang]||s.en}</span>
     </div>`).join('');
-  const includes = p.includes.items[lang].map(i => `<div class="exp-check-item"><span class="exp-check-icon">✓</span>${i}</div>`).join('');
-  const prepare = p.prepare.items[lang].map(i => `<div class="exp-check-item"><span class="exp-check-icon">→</span>${i}</div>`).join('');
-  const warnings = p.warnings.items[lang].map(i => `<li>${i}</li>`).join('');
-  const cancel_tiers = p.cancellation.tiers.map(t => `
+  const includes = c.includes.items[lang].map(i => `<div class="exp-check-item"><span class="exp-check-icon">✓</span>${i}</div>`).join('');
+  const prepare  = c.prepare.items[lang].map(i =>  `<div class="exp-check-item"><span class="exp-check-icon">→</span>${i}</div>`).join('');
+  const warnings = c.warnings.items[lang].map(i => `<li>${i}</li>`).join('');
+  const cancel_tiers = c.cancellation.tiers.map(t => `
     <div class="exp-cancel-item">
       <div class="exp-cancel-period" style="color:${t.color==='teal'?'var(--teal)':t.color==='gold'?'var(--gold)':'#e85d3a'}">${t.period[lang]||t.period.en}</div>
       <div class="exp-cancel-policy">${t.policy[lang]||t.policy.en}</div>
     </div>`).join('');
-  const meta = p.meta.map(m => `<div class="exp-meta-item"><span class="exp-meta-icon">${m.icon}</span>${m[lang]||m.en}</div>`).join('');
 
-  const inquire_label = { en:'Inquire Now', zh:'立即询问', ja:'問い合わせ' };
+  // Build sub-tabs for shared / charter
+  const subTabLabels = {
+    shared:  { en:'Shared Boat', zh:'拼船', ja:'乗合' },
+    charter: { en:'Private Charter', zh:'包船', ja:'貸切' },
+  };
+  const subTabs = EXPERIENCE_PLANS.map(p => `
+    <button class="exp-sub-tab${p.id==='shared'?' active':''}" onclick="switchExpTab('${p.id}',this)">
+      ${subTabLabels[p.id][lang]}
+    </button>`).join('');
 
-  return `
-  <div class="exp-plan-card">
-    <div class="exp-card-top">
-      <div class="exp-card-imgs">${imgs}</div>
-      <div class="exp-card-intro">
-        <div class="exp-card-badge">${p.badge[lang]||p.badge.en}</div>
-        <div class="exp-card-title">${p.title[lang]||p.title.en}</div>
-        <p class="exp-card-desc">${p.desc[lang]||p.desc.en}</p>
-        <div class="exp-card-meta">${meta}</div>
-        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
-          <div>
-            <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:700;color:var(--gold)">${p.price[lang]||p.price.en}</div>
+  const planCards = EXPERIENCE_PLANS.map(p => {
+    const imgs = p.images.map(src => `<img src="${src}" alt="${p.title[lang]}" loading="lazy" onerror="this.style.display='none'">`).join('');
+    const price = typeof p.price === 'string' ? p.price : (p.price[lang]||p.price.en);
+    const alsoBlock = p.showAlso ? buildAlsoSection(lang) : '';
+    return `
+    <div class="exp-sub-panel${p.id==='shared'?' active':''}" id="exp-panel-${p.id}">
+      <div class="exp-plan-card" style="margin-bottom:1.5rem">
+        <div class="exp-card-top">
+          <div class="exp-card-imgs">${imgs}</div>
+          <div class="exp-card-intro">
+            <div class="exp-card-badge">${p.badge[lang]||p.badge.en}</div>
+            <div class="exp-card-title">${p.title[lang]||p.title.en}</div>
+            <p class="exp-card-desc">${p.desc[lang]||p.desc.en}</p>
+            <div class="exp-card-meta">
+              <div class="exp-meta-item"><span class="exp-meta-icon">⏱</span>${p.duration[lang]||p.duration.en}</div>
+              <div class="exp-meta-item"><span class="exp-meta-icon">📍</span>${p.port[lang]||p.port.en}</div>
+              <div class="exp-meta-item"><span class="exp-meta-icon">👥</span>${p.capacity[lang]||p.capacity.en}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:.85rem">
+              <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--gold)">${price}</div>
+              <a href="#contact" class="exp-cta">📩 ${inquire[lang]}</a>
+            </div>
           </div>
-          <a href="#contact" class="exp-cta">📩 ${inquire_label[lang]}</a>
         </div>
       </div>
-    </div>
-    <div class="exp-card-details">
+      ${alsoBlock}
+      ${buildRentalSection(lang)}
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="exp-sub-tabs" id="exp-sub-tabs">${subTabs}</div>
+  ${planCards}
+  <div class="exp-plan-card" style="margin-top:1.5rem">
+    <div class="exp-card-details" style="border-top:none">
       <div class="exp-details-grid">
         <div class="exp-detail-box">
-          <div class="exp-detail-label">${{en:'Schedule',zh:'行程安排',ja:'スケジュール'}[lang]}</div>
+          <div class="exp-detail-label">${{en:'Schedule (Shared Boat)',zh:'行程安排（拼船）',ja:'スケジュール（乗合）'}[lang]}</div>
           <div>${schedule}</div>
         </div>
         <div class="exp-detail-box">
-          <div class="exp-detail-label">${p.includes.label[lang]||p.includes.label.en}</div>
+          <div class="exp-detail-label">${c.includes.label[lang]||c.includes.label.en}</div>
           <div class="exp-checklist">${includes}</div>
         </div>
         <div class="exp-detail-box">
-          <div class="exp-detail-label">${p.prepare.label[lang]||p.prepare.label.en}</div>
+          <div class="exp-detail-label">${c.prepare.label[lang]||c.prepare.label.en}</div>
           <div class="exp-checklist">${prepare}</div>
         </div>
       </div>
       <div class="exp-detail-box" style="margin-bottom:1rem">
-        <div class="exp-detail-label">${p.cancellation.label[lang]||p.cancellation.label.en}</div>
-        <div style="font-size:.8rem;color:rgba(255,255,255,.55);margin-bottom:.75rem;line-height:1.65">${p.cancellation.note[lang]||p.cancellation.note.en}</div>
+        <div class="exp-detail-label">${c.cancellation.label[lang]||c.cancellation.label.en}</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.55);margin-bottom:.75rem;line-height:1.65">${c.cancellation.note[lang]||c.cancellation.note.en}</div>
         <div class="exp-cancel-grid">${cancel_tiers}</div>
       </div>
       <div class="exp-warning-box">
-        <strong style="color:#e85d3a;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase">${p.warnings.label[lang]||p.warnings.label.en}</strong>
+        <strong style="color:#e85d3a;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase">${c.warnings.label[lang]||c.warnings.label.en}</strong>
         <ul style="padding-left:1.25rem;margin-top:.5rem">${warnings}</ul>
       </div>
     </div>
-  </div>
-  ${buildAlsoSection(lang)}`;
+  </div>`;
+}
+
+function switchExpTab(id, btn) {
+  document.querySelectorAll('.exp-sub-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.exp-sub-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('exp-panel-' + id);
+  if (panel) panel.classList.add('active');
 }
 
 function buildAlsoSection(lang) {
-  const title = { en:'Also available at the same port', zh:'同一渔港还可以玩', ja:'同じ港から参加できるアクティビティ' };
-  const contact_note = { en:'Contact us to book together', zh:'可一起预约，联系我们', ja:'合わせてご予約可能。お気軽にご相談を' };
-  const cards = ALSO_ACTIVITIES.map(a => `
-    <a href="#contact" class="also-card">
+  const title = { en:'Also at the same port', zh:'同一渔港还可以玩', ja:'同じ港でほかにも楽しめる' };
+  const note  = { en:'Book together — ask us', zh:'可一起预约，联系我们', ja:'合わせてご予約可能' };
+  const cards = [
+    {
+      title:{ en:'Mangrove SUP', zh:'红树林立式浆板', ja:'マングローブSUP' },
+      sub:  { en:'2 hours · Kadena Port', zh:'2小时 · 嘉手纳港', ja:'2時間 · 嘉手納港' },
+      img:  'img/exp-sup-4.jpg',
+      link: 'https://snorkel.nice.okinawa',
+      emoji:'🏄',
+    },
+    {
+      title:{ en:'Sunset Kayak', zh:'夕阳皮划艇', ja:'サンセットカヤック' },
+      sub:  { en:'2 hours · Same port', zh:'2小时 · 同渔港', ja:'2時間 · 同港' },
+      img:  'img/exp-kayak-1.jpg',
+      link: 'https://snorkel.nice.okinawa',
+      emoji:'🛶',
+    },
+  ];
+  const cardHtml = cards.map(a => `
+    <a href="${a.link}" class="also-card" target="_blank" rel="noopener">
       <img src="${a.img}" alt="${a.title[lang]||a.title.en}" onerror="this.outerHTML='<div class=\'also-placeholder\'>${a.emoji}</div>'">
       <div class="also-overlay">
         <div>
@@ -1264,8 +1330,26 @@ function buildAlsoSection(lang) {
   return `
   <div class="also-section">
     <div class="also-title">+ ${title[lang]}</div>
-    <div class="also-grid">${cards}</div>
-    <p style="font-size:.78rem;color:var(--muted);margin-top:.85rem">📩 ${contact_note[lang]}</p>
+    <div class="also-grid">${cardHtml}</div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:.75rem">📩 ${note[lang]} · <a href="https://snorkel.nice.okinawa" target="_blank" style="color:var(--teal)">snorkel.nice.okinawa</a></p>
+  </div>`;
+}
+
+function buildRentalSection(lang) {
+  const data = {
+    title: { en:'🚗 Rent a Car + Fishing Package', zh:'🚗 租车 + 钓鱼套餐优惠', ja:'🚗 レンタカー＋釣りパッケージ' },
+    desc:  {
+      en: 'Planning to rent a car? Book together with your fishing trip and get exclusive rates — direct access to 300+ vehicles, no agency markup. Great value in peak season when cars sell out fast.',
+      zh: '打算租车？和钓鱼一起预约，可享受独家优惠——直接对接租车公司，跳过中间平台，300多款车任选。旺季早预约，免得没车没船两头抓。',
+      ja: 'レンタカーをお考えですか？釣りツアーと一緒にご予約いただくと特別優待価格でご案内。300台以上の車種からダイレクトにお選びいただけます。繁忙期は車も船も早めの予約がおすすめ。'
+    },
+    cta: { en:'Ask about car rental', zh:'咨询租车优惠', ja:'レンタカーについて聞く' },
+  };
+  return `
+  <div class="also-section" style="margin-top:1rem;background:rgba(200,164,74,.05);border-color:rgba(200,164,74,.2)">
+    <div class="also-title" style="color:var(--gold)">${data.title[lang]}</div>
+    <p style="font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:.85rem">${data.desc[lang]||data.desc.en}</p>
+    <a href="#contact" class="exp-cta" style="display:inline-flex">📩 ${data.cta[lang]||data.cta.en}</a>
   </div>`;
 }
 
@@ -1346,9 +1430,9 @@ function buildNav() {
 // ── Hero content ──────────────────────────────────────────
 const HERO_CONTENT = {
   eyebrow: {
-    en: '🎣 Experience & Pro Fishing · Shared or Private Charter',
-    zh: '🎣 体验钓鱼 & 专业包船 · 拼船 / 包船均可',
-    ja: '🎣 体験釣り＆プロチャーター · 乗合・貸切どちらも対応'
+    en: '🎣 Experience & Pro Fishing · West & East Coast Departures',
+    zh: '🎣 体验钓鱼 & 专业包船 · 西海岸 / 东海岸出发',
+    ja: '🎣 体験釣り＆プロチャーター · 西海岸・東海岸から出船'
   },
   title: {
     en: 'Okinawa<br><em>Fishing</em>',
@@ -1371,10 +1455,10 @@ const HERO_CONTENT = {
     ja: 'プランを見る'
   },
   stats: [
-    { num: '30+',  label: { en: 'Recent Catches', zh: '近期渔获', ja: '最近の釣果' } },
-    { num: '50kg+',label: { en: 'Biggest Fish',   zh: '最大渔获', ja: '最大魚' } },
-    { num: '2',    label: { en: 'Departure Ports', zh: '出发港口', ja: '出船港' } },
-    { num: '365',  label: { en: 'Days Available',  zh: '全年开放', ja: '年中対応' } }
+    { num: '30+',  label: { en: 'Years Experience', zh: '船长经验30年+', ja: '船長経験30年以上' } },
+    { num: '50kg+',label: { en: 'Biggest Catch',    zh: '最大渔获',     ja: '最大釣果' } },
+    { num: '東西',  label: { en: 'East & West Coast', zh: '东西海岸出发', ja: '東西海岸から出船' } },
+    { num: '365',  label: { en: 'Days Available',    zh: '全年预约开放', ja: '年中予約受付' } }
   ]
 };
 
@@ -1668,6 +1752,48 @@ buildGalleryFilters();
 buildGallery('all');
 buildGuide();
 buildFAQ();
+
+// ── Float Contact ─────────────────────────────────────────
+function toggleFloat() {
+  const toggle = document.getElementById('float-toggle');
+  const channels = document.getElementById('float-channels');
+  const isOpen = channels.classList.contains('open');
+  if (isOpen) {
+    channels.classList.remove('open');
+    toggle.classList.remove('open');
+    toggle.textContent = '✉';
+  } else {
+    channels.classList.add('open');
+    toggle.classList.add('open');
+    toggle.textContent = '✕';
+  }
+}
+
+function copyWechat(e) {
+  e.preventDefault();
+  const lang = L();
+  const msg = { en: 'WeChat ID copied: OkinawaOnline', zh: '微信号已复制：OkinawaOnline', ja: 'WeChat IDをコピーしました：OkinawaOnline' };
+  navigator.clipboard.writeText('OkinawaOnline').then(() => {
+    alert(msg[lang] || msg.en);
+  }).catch(() => {
+    // fallback
+    alert('WeChat ID: OkinawaOnline');
+  });
+}
+
+// Close float on outside click
+document.addEventListener('click', function(e) {
+  const fc = document.getElementById('float-contact');
+  if (fc && !fc.contains(e.target)) {
+    const channels = document.getElementById('float-channels');
+    const toggle = document.getElementById('float-toggle');
+    if (channels && channels.classList.contains('open')) {
+      channels.classList.remove('open');
+      toggle.classList.remove('open');
+      toggle.textContent = '✉';
+    }
+  }
+});
 </script>
 </body>
 </html>
