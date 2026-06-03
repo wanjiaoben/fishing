@@ -1277,11 +1277,11 @@ section { padding:5.5rem 0; }
   background:var(--gold); color:var(--deep);
   padding:.2rem .6rem; border-radius:3px; font-size:.62rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
 }
-.plan-header { padding:1.75rem 1.75rem 1rem; border-bottom:1px solid var(--glass-b); }
+.plan-header { padding:1rem 1.25rem .75rem; border-bottom:1px solid var(--glass-b); }
 .plan-num { font-size:.65rem; font-weight:700; letter-spacing:.15em; color:var(--teal); text-transform:uppercase; margin-bottom:.5rem; }
-.plan-name { font-family:var(--font-d); font-size:1.5rem; font-weight:700; margin-bottom:.5rem; }
+.plan-name { font-family:var(--font-d); font-size:1.2rem; font-weight:700; margin-bottom:.3rem; }
 .plan-desc { font-size:.82rem; color:rgba(255,255,255,.5); line-height:1.65; }
-.plan-body { padding:1.5rem 1.75rem; }
+.plan-body { padding:.75rem 1.25rem 1rem; }
 .plan-row { display:flex; justify-content:space-between; align-items:baseline; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.05); }
 .plan-row:last-child { border-bottom:none; }
 .plan-row-label { font-size:.78rem; color:var(--muted); }
@@ -1291,7 +1291,7 @@ section { padding:5.5rem 0; }
 .schedule-row:last-child { border-bottom:none; }
 .schedule-time { font-size:.78rem; color:var(--teal); font-weight:700; flex-shrink:0; width:2.8rem; padding-top:.05rem; }
 .schedule-text { font-size:.82rem; color:rgba(255,255,255,.7); line-height:1.55; }
-.plan-price { font-family:var(--font-d); font-size:1.8rem; font-weight:700; color:var(--gold); margin:.75rem 0 .25rem; }
+.plan-price { font-family:var(--font-d); font-size:1.4rem; font-weight:700; color:var(--gold); margin:.4rem 0 .15rem; }
 .plan-price-note { font-size:.72rem; color:var(--muted); }
 .plan-footer { padding:1.25rem 1.75rem; }
 .plan-cta { display:block; text-align:center; background:var(--gold); color:var(--deep); border-radius:4px; padding:.8rem; font-weight:700; font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; transition:all .3s; }
@@ -1361,8 +1361,8 @@ section { padding:5.5rem 0; }
 .also-placeholder { background:linear-gradient(135deg,var(--ocean),var(--blue)); display:flex; align-items:center; justify-content:center; font-size:2rem; }
 .also-card:hover img { transform:scale(1.04); }
 .also-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(6,13,24,.85) 0%,transparent 55%); display:flex; align-items:flex-end; padding:1rem; }
-.also-card-title { font-family:var(--font-d); font-size:1rem; font-weight:700; }
-.also-card-sub { font-size:.72rem; color:rgba(255,255,255,.6); margin-top:.1rem; }
+.also-card-title { font-family:var(--font-d); font-size:1rem; font-weight:700; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.8); }
+.also-card-sub { font-size:.72rem; color:rgba(255,255,255,.85); margin-top:.1rem; text-shadow:0 1px 3px rgba(0,0,0,.8); }
 
 @media(max-width:860px){
   .exp-card-top { grid-template-columns:1fr; }
@@ -1384,6 +1384,64 @@ section { padding:5.5rem 0; }
 .exp-sub-tab.active { background:var(--teal); border-color:var(--teal); color:var(--deep); }
 .exp-sub-panel { display:none; }
 .exp-sub-panel.active { display:block; }
+
+
+/* ── Service B mobile ── */
+.service-b-header {
+  background:var(--glass);
+  border:1px solid var(--glass-b);
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:1.5rem;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+.pro-general-grid {
+  margin-top:2rem;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1rem;
+  margin-bottom:1rem;
+}
+@media(max-width:700px){
+  .service-b-header {
+    grid-template-columns:1fr;
+  }
+  .service-b-header img {
+    height:160px !important;
+  }
+  .pro-general-grid {
+    grid-template-columns:1fr;
+  }
+  .plans-grid {
+    grid-template-columns:1fr !important;
+  }
+}
+/* ── Service A mobile ── */
+.service-a-grid {
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:1rem;
+  align-items:stretch;
+  margin-bottom:0;
+}
+.service-a-inner {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  height:100%;
+}
+@media(max-width:700px){
+  .service-a-grid {
+    grid-template-columns:1fr;
+  }
+  .service-a-inner {
+    grid-template-columns:1fr;
+  }
+  .service-a-inner img {
+    height:220px !important;
+    object-fit:cover;
+  }
+}
 /* ── BOOKING ── */
 .booking-section { background:var(--deep); }
 .booking-section::before { content:''; display:block; width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin-bottom:0; }
@@ -1752,38 +1810,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       </div>
     </div>
 
-    <!-- Payment Info -->
-    <div class="payment-box reveal">
-      <div class="payment-title" data-en>Payment & Cancellation Policy</div>
-      <div class="payment-title" data-zh>付款与取消政策</div>
-      <div class="payment-title" data-ja>お支払い・キャンセルポリシー</div>
-      <div class="payment-grid">
-        <div class="payment-item">
-          <div class="payment-item-label" data-en>How to Confirm a Booking</div>
-          <div class="payment-item-label" data-zh>如何确认预约</div>
-          <div class="payment-item-label" data-ja>予約確定について</div>
-          <div class="payment-item-val" data-en>After confirming the plan and details, full payment is required. Your spot is secured once we send you a booking confirmation. The total includes an approx. 10% coordination & translation fee.</div>
-          <div class="payment-item-val" data-zh>预约内容和信息确认后，支付全款，收到确认信即算站位成功。全款内含约10%的翻译协调费。</div>
-          <div class="payment-item-val" data-ja>プランと内容確認後、全額お支払いください。予約確認メールをお送りした時点で予約成立です。料金にはコーディネート・翻訳料（約10%）が含まれます。</div>
-        </div>
-        <div class="payment-item">
-          <div class="payment-item-label" data-en>Payment Methods</div>
-          <div class="payment-item-label" data-zh>付款方式</div>
-          <div class="payment-item-label" data-ja>お支払い方法</div>
-          <div class="payment-item-val" data-en>Alipay · WeChat Pay · PayPay · Bank transfer · Credit card (Square)</div>
-          <div class="payment-item-val" data-zh>支付宝 · 微信支付 · PayPay · 银行转账 · 信用卡（Square）</div>
-          <div class="payment-item-val" data-ja>支付宝・WeChat Pay・PayPay・銀行振込・クレジットカード（Square）</div>
-        </div>
-      </div>
-      <div class="cancel-box">
-        <div class="cancel-title" data-en>Cancellation Policy</div>
-        <div class="cancel-title" data-zh>取消政策</div>
-        <div class="cancel-title" data-ja>キャンセルポリシー</div>
-        <p class="cancel-body" data-en>Cancelled 2+ weeks before departure: charter fee refunded minus processing fee. Coordination fee is non-refundable. Cancelled due to typhoon or sea conditions (captain's decision): full refund including coordination fee.</p>
-        <p class="cancel-body" data-zh>出发前2周以上取消：退还船费（扣除手续费），翻译协调费不退。因台风或海况原因（船长判断）无法出海：全额退款，协调费也退。</p>
-        <p class="cancel-body" data-ja>出船2週間前以上前のキャンセル：手数料を除いた船費を返金。コーディネート料は返金不可。台風・海況等による船長判断でのキャンセル：コーディネート料含む全額返金。</p>
-      </div>
-    </div>
+
   </div>
 </section>
 
@@ -2095,7 +2122,7 @@ const SERVICE_B_PLANS = [
       { label:{ en:'Target fish', zh:'目标鱼', ja:'ターゲット' }, val:{ en:'Amberjack (カンパチ)', zh:'红甘鲹', ja:'カンパチ' } },
       { label:{ en:'Tackle rental', zh:'装备租赁', ja:'タックルレンタル' }, val:'¥10,000/人' },
     ],
-    note:{ en:'💡 Have ¥150,000 cash? Pay the captain directly on the day — we refund the charter portion and keep only the coordination fee.', zh:'💡 持有约15万日元现金？可当天直接支付给船长，我们退还船费，仅保留协调翻译费。', ja:'💡 15万円前後の現金をお持ちの方は当日船長に直接払いも可能。その場合、船費分を返金しコーディネート料のみいただきます。' },
+    
   },
   {
     num:'02', featured:false,
@@ -2173,7 +2200,7 @@ const SERVICE_B_INFO = {
   tag:      { en:'Service B', zh:'服务B', ja:'サービスB' },
   badge:    { en:'Private Charter · Your Group Only', zh:'完全包船 · 专属你的团队', 'zh-TW':'完全包船 · 專屬您的團隊', ja:'完全貸切 · グループ専用' },
   title:    { en:'Private Charter Fishing', zh:'包船钓鱼（初学者·专业均可）', 'zh-TW':'包船釣魚（初學者·專業均可）', ja:'貸切チャーター釣り（初心者・プロ問わず）' },
-  captain:  { en:'30+ years experience · Max 12 persons · Whole boat yours', zh:'船长30年+经验 · 最多12人 · 整船包', 'zh-TW':'船長30年+經驗 · 最多12人 · 整船包', ja:'船長経験30年以上 · 最大12名 · 1船まるごと貸切' },
+  captain:  { en:'30+ years experience · Max 12 persons · Communicates via translation app', zh:'船长30年+经验 · 最多12人 · 日语沟通，借助翻译App', 'zh-TW':'船長30年+經驗 · 最多12人 · 日語溝通，借助翻譯App', ja:'船長経験30年以上 · 最大12名 · 翻訳アプリ使用でコミュニケーション' },
   ports:    { en:'Chatan American Village Port (West Coast) · Uruma Awase Port (East Coast)', zh:'北谷美国村渔港（西海岸）· 泡瀬漁港（东海岸）', 'zh-TW':'北谷美國村漁港（西海岸）· 泡瀬漁港（東海岸）', ja:'北谷アメリカンビレッジ漁港（西海岸）· 泡瀬漁港（東海岸）' },
 };
 
@@ -2255,7 +2282,7 @@ function buildServiceA(lang) {
   ];
   const alsoHtml = alsoCards.map(c => `
     <a href="https://snorkel.nice.okinawa" class="also-card" target="_blank" rel="noopener" style="height:120px">
-      <img src="${c.img}" alt="${c.title[lang]||c.title.en}" style="height:120px" onerror="this.outerHTML='<div class=\'also-placeholder\'>${c.emoji}</div>'">
+      <img src="${c.img}" alt="${c.title[lang]||c.title.en}" style="height:120px" onerror="this.outerHTML='<div class=\'also-placeholder\'>${c.emoji}</div>'" style="object-fit:cover;display:block">
       <div class="also-overlay"><div><div class="also-card-title" style="font-size:.85rem">${c.title[lang]||c.title.en}</div></div></div>
     </a>`).join('');
 
@@ -2263,10 +2290,10 @@ function buildServiceA(lang) {
   const img = `<img src="${a.images[0]}" alt="${t(a.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
 
   return `
-  <div style="margin-bottom:0;display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:stretch">
+  <div class="service-a-grid">
     <!-- Left: experience fishing card -->
     <div class="exp-plan-card" style="margin-bottom:0">
-      <div style="display:grid;grid-template-columns:1fr 1fr;height:100%">
+      <div class="service-a-inner">
         <div style="overflow:hidden;border-radius:0">${img}</div>
         <div class="exp-card-intro" style="padding:1.25rem">
           <div class="exp-card-badge" style="font-size:.6rem;padding:.2rem .6rem;margin-bottom:.5rem">${t(a.badge)}</div>
@@ -2332,7 +2359,7 @@ function buildServiceB(lang) {
   }).join('');
 
   const general = `
-  <div style="margin-top:2rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+  <div class="pro-general-grid">
     <div class="exp-detail-box">
       <div class="exp-detail-label">${t(g.coordination.label)}</div>
       <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.65">${t(g.coordination.body)}</div>
@@ -2352,7 +2379,7 @@ function buildServiceB(lang) {
   return `
   <div>
 
-    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr">
+    <div class="service-b-header">
       <!-- Photos -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
         <img src="img/boat-fishing.jpg" alt="fishing charter boat" loading="lazy"
@@ -2370,13 +2397,27 @@ function buildServiceB(lang) {
         <div style="font-size:.82rem;color:var(--muted)">📍 ${t(b.ports)}</div>
       </div>
     </div>
-    <div style="margin-bottom:1.25rem;padding:1rem 1.25rem;background:rgba(0,180,200,.06);border:1px solid rgba(0,180,200,.2);border-radius:8px">
-      <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem">${{en:'Customise Your Trip',zh:'定制你的行程',ja:'オーダーメイドプラン','zh-TW':'客製化您的行程'}[lang]||'Customise'}</div>
-      <p style="font-size:.83rem;color:rgba(255,255,255,.62);line-height:1.7">${{
-        en: 'Every charter is tailored to the season and your group. Before you book, just let us know — hotel pick-up & drop-off, sashimi preparation on board, or bringing your catch back to the hotel to share with friends. We arrange it all.',
-        zh: '每次包船都根据时节和你们的需求量身定做。预约前告诉我们就好——接送酒店、船上处理刺身、或者带回酒店跟大家一起品尝，都可以提前商量安排。',
-        'zh-TW': '每次包船都根據時節和您們的需求量身定制。預約前告訴我們就好——接送酒店、船上處理刺身、或者帶回酒店和大家一起品嚐，都可以提前商量安排。',
-        ja: '季節とグループに合わせてオーダーメイドで対応します。ホテル送迎、船上での刺身処理、ホテルに持ち帰ってみんなで味わうなど、ご要望はご予約前にお気軽にご相談ください。'
+    <div style="margin-bottom:1.25rem;padding:1.25rem;background:rgba(0,180,200,.06);border:1px solid rgba(0,180,200,.2);border-radius:10px">
+      <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem">${{en:'Everything Can Be Customised',zh:'全程可定制',ja:'すべてオーダーメイド対応','zh-TW':'全程可客製化'}[lang]||'Customise'}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem">
+        ${[
+          { icon:'🚗', en:'Hotel pick-up & drop-off', zh:'接送酒店', 'zh-TW':'接送酒店', ja:'ホテル送迎' },
+          { icon:'🔪', en:'Sashimi prepared on board', zh:'船上处理刺身', 'zh-TW':'船上處理刺身', ja:'船上での刺身処理' },
+          { icon:'🥢', en:'Soy sauce · Wasabi · Chopsticks', zh:'提供酱油芥末筷子', 'zh-TW':'提供醬油芥末筷子', ja:'醤油・わさび・箸付き' },
+          { icon:'🏨', en:'Bring catch back to hotel', zh:'带回酒店共享', 'zh-TW':'帶回酒店共享', ja:'ホテルに持ち帰り' },
+          { icon:'📱', en:'Translation app communication', zh:'翻译App全程辅助', 'zh-TW':'翻譯App全程輔助', ja:'翻訳アプリでサポート' },
+          { icon:'🎣', en:'Tackle & technique advice', zh:'装备和钓法建议', 'zh-TW':'裝備和釣法建議', ja:'タックル・釣り方アドバイス' },
+        ].map(item => `
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.7rem .85rem;display:flex;align-items:flex-start;gap:.6rem">
+            <span style="font-size:1.4rem;line-height:1;flex-shrink:0">${item.icon}</span>
+            <span style="font-size:.75rem;color:rgba(255,255,255,.7);line-height:1.45">${item[lang]||item['zh']||item.en}</span>
+          </div>`).join('')}
+      </div>
+      <p style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.85rem;line-height:1.6">${{
+        en: 'Tell us what you need before booking — we handle all coordination with the captain.',
+        zh: '预约前告诉我们你的需求，我们负责和船长全程沟通协调。',
+        'zh-TW': '預約前告訴我們您的需求，我們負責和船長全程溝通協調。',
+        ja: 'ご予約前にご要望をお知らせください。船長との調整はすべて当方が行います。'
       }[lang]||''}</p>
     </div>
     <div class="plans-grid">${cards}</div>
@@ -2892,6 +2933,9 @@ function submitForm() {
   alert(msg[lang]||msg['en']);
   gtag('event', 'inquiry_submitted', { event_category: 'lead', event_label: lang });
 }
+
+// ── i18n stub (handled by JS render functions)
+function buildI18n() { /* all i18n handled by buildNav/buildHero/buildPlans/buildGuide/buildFAQ */ }
 
 // ── Scroll Reveal ─────────────────────────────────────────
 const observer = new IntersectionObserver(entries => {
