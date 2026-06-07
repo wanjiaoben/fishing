@@ -14,16 +14,17 @@
 <!-- Critical: hide all multilingual elements until lang is set -->
 <style>
   /* Hide ALL multilingual elements by default - zero flash */
-  [data-en],[data-zh],[data-ja]{
+  [data-en],[data-zh],[data-zhtw],[data-ja],[data-ko],[data-th]{
     display:none !important;
     visibility:hidden;
   }
   /* Show only matching language - set immediately by inline script below */
-  html[data-lang=en] [data-en]{display:revert !important; visibility:visible;}
-  html[data-lang=zh] [data-zh]{display:revert !important; visibility:visible;}
+  html[data-lang=en]    [data-en]   {display:revert !important; visibility:visible;}
+  html[data-lang=zh]    [data-zh]   {display:revert !important; visibility:visible;}
   html[data-lang=zh-TW] [data-zhtw]{display:revert !important; visibility:visible;}
-  html[data-lang=ja] [data-ja]{display:revert !important; visibility:visible;}
-  [data-zhtw]{display:none !important; visibility:hidden;}
+  html[data-lang=ja]    [data-ja]   {display:revert !important; visibility:visible;}
+  html[data-lang=ko]    [data-ko]   {display:revert !important; visibility:visible;}
+  html[data-lang=th]    [data-th]   {display:revert !important; visibility:visible;}
   /* i18n-text elements render via JS textContent */
   .i18n-text,.i18n-btn{display:block !important; visibility:visible;}
   span.i18n-text{display:inline !important;}
@@ -32,16 +33,19 @@
 <script>
 (function(){
   var lang = 'en';
-  try { var s = localStorage.getItem('preferred-lang'); if(s && ['en','zh','zh-TW','ja'].indexOf(s)>-1) lang=s; } catch(e){}
+  try { var s = localStorage.getItem('preferred-lang'); if(s && ['en','zh','zh-TW','ja','ko','th'].indexOf(s)>-1) lang=s; } catch(e){}
   if(lang==='en'){
     var nav = (navigator.languages&&navigator.languages[0])||navigator.language||'en';
     var c = nav.toLowerCase();
     if(c==='zh-tw'||c==='zh-hk'||c==='zh-hant') lang='zh-TW';
     else if(c.indexOf('zh')===0) lang='zh';
     else if(c.indexOf('ja')===0) lang='ja';
+    else if(c.indexOf('ko')===0) lang='ko';
+    else if(c.indexOf('th')===0) lang='th';
   }
   document.documentElement.setAttribute('data-lang', lang);
-  document.documentElement.setAttribute('lang', lang==='zh'?'zh-CN':lang==='zh-TW'?'zh-TW':lang==='ja'?'ja':'en');
+  var langAttr = lang==='zh'?'zh-CN':lang==='zh-TW'?'zh-TW':lang==='ja'?'ja':lang==='ko'?'ko':lang==='th'?'th':'en';
+  document.documentElement.setAttribute('lang', langAttr);
 })();
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-371420585"></script>
@@ -1686,6 +1690,52 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 .float-ch-name { font-size:.75rem; font-weight:700; line-height:1.2; }
 .float-ch-val { font-size:.64rem; color:var(--muted); margin-top:.1rem; }
 
+/* ── FLOAT NAV ── */
+.float-nav {
+  position:fixed;
+  bottom:1.75rem;
+  right:5.5rem; /* contact button width + gap */
+  z-index:900;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.45rem;
+}
+.float-nav-btn {
+  display:flex;
+  align-items:center;
+  gap:.55rem;
+  background:rgba(6,13,24,.92);
+  border:1px solid var(--glass-b);
+  border-radius:8px;
+  padding:.5rem .85rem;
+  color:rgba(255,255,255,.75);
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  cursor:pointer;
+  text-decoration:none;
+  white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+  transition:all .2s;
+  font-family:var(--font-b);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.float-nav-btn:hover {
+  border-color:var(--teal);
+  color:var(--white);
+  transform:translateX(-3px);
+}
+.float-nav-icon {
+  font-size:.9rem;
+  flex-shrink:0;
+}
+@media(max-width:480px){
+  .float-nav { right:4.75rem; bottom:1.25rem; }
+  .float-nav-btn { font-size:.65rem; padding:.42rem .7rem; }
+}
+
 /* ── REVEAL ── */
 .reveal { opacity:0; transform:translateY(20px); transition:opacity .55s ease, transform .55s ease; }
 .reveal.visible { opacity:1; transform:none; }
@@ -1730,6 +1780,8 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       <button class="lang-btn" onclick="setLang('zh')">简体</button>
       <button class="lang-btn" onclick="setLang('zh-TW')">繁體</button>
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+      <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+      <button class="lang-btn" onclick="setLang('th')">ภาษาไทย</button>
     </div>
     <a href="#contact" class="nav-cta" id="nav-cta"></a>
   </div>
@@ -1957,6 +2009,37 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
   </div>
 </footer>
 
+<!-- ═══ FLOAT NAV ════════════════════════════════════════ -->
+<div class="float-nav" id="float-nav">
+  <a class="float-nav-btn" href="#plans" onclick="smoothTo(event,'plans')">
+    <span class="float-nav-icon">🎣</span>
+    <span data-en>Plans &amp; Pricing</span>
+    <span data-zh>方案和价格</span>
+    <span data-zhtw>方案與價格</span>
+    <span data-ja>プランと料金</span>
+    <span data-ko>플랜 및 요금</span>
+    <span data-th>แผนและราคา</span>
+  </a>
+  <a class="float-nav-btn" href="#gallery" onclick="smoothTo(event,'gallery')">
+    <span class="float-nav-icon">📸</span>
+    <span data-en>Catch Gallery</span>
+    <span data-zh>鱼获Gallery</span>
+    <span data-zhtw>漁獲Gallery</span>
+    <span data-ja>釣果ギャラリー</span>
+    <span data-ko>어획 갤러리</span>
+    <span data-th>แกลเลอรี่</span>
+  </a>
+  <a class="float-nav-btn" href="#guide" onclick="smoothTo(event,'guide')">
+    <span class="float-nav-icon">🗺</span>
+    <span data-en>Fishing Guide</span>
+    <span data-zh>冲绳海钓指南</span>
+    <span data-zhtw>沖繩海釣指南</span>
+    <span data-ja>沖縄釣りガイド</span>
+    <span data-ko>오키나와 낚시 가이드</span>
+    <span data-th>คู่มือตกปลา</span>
+  </a>
+</div>
+
 <!-- ═══ FLOAT CONTACT ════════════════════════════════════ -->
 <div class="float-contact" id="float-contact">
   <div class="float-channels" id="float-channels">
@@ -1981,9 +2064,10 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 // ── Language ──────────────────────────────────────────────
 function setLang(lang) {
   document.documentElement.setAttribute('data-lang', lang);
-  document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en');
-  const map = { en:'EN', zh:'中文', ja:'日本語' };
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', map[lang] && b.textContent.trim() === map[lang]));
+  const langAttr = lang==='zh'?'zh-CN':lang==='zh-TW'?'zh-TW':lang==='ja'?'ja':lang==='ko'?'ko':lang==='th'?'th':'en';
+  document.documentElement.setAttribute('lang', langAttr);
+  const map = { en:'EN', zh:'简体', 'zh-TW':'繁體', ja:'日本語', ko:'한국어', th:'ภาษาไทย' };
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (map[lang]||'')));
   try { localStorage.setItem('preferred-lang', lang); } catch(e) {}
   buildNav();
   buildHero();
@@ -1995,16 +2079,17 @@ function setLang(lang) {
 }
 
 function detectLang() {
-  // 1. Check localStorage (manual override)
   try {
     const saved = localStorage.getItem('preferred-lang');
-    if (saved && ['en','zh','ja'].includes(saved)) return saved;
+    if (saved && ['en','zh','zh-TW','ja','ko','th'].includes(saved)) return saved;
   } catch(e) {}
-  // 2. Browser language
   const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
   const code = nav.toLowerCase();
+  if (code==='zh-tw'||code==='zh-hk'||code==='zh-hant') return 'zh-TW';
   if (code.startsWith('zh')) return 'zh';
   if (code.startsWith('ja')) return 'ja';
+  if (code.startsWith('ko')) return 'ko';
+  if (code.startsWith('th')) return 'th';
   return 'en';
 }
 
@@ -2902,9 +2987,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // ── Init ──────────────────────────────────────────────────
 const initLang = detectLang();
 document.documentElement.setAttribute('data-lang', initLang);
-document.documentElement.setAttribute('lang', initLang==='zh'?'zh-CN':initLang==='zh-TW'?'zh-TW':initLang==='ja'?'ja':'en');
-const map = { en:'EN', zh:'简体', 'zh-TW':'繁體', ja:'日本語' };
-document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === map[initLang]));
+const initLangAttr = initLang==='zh'?'zh-CN':initLang==='zh-TW'?'zh-TW':initLang==='ja'?'ja':initLang==='ko'?'ko':initLang==='th'?'th':'en';
+document.documentElement.setAttribute('lang', initLangAttr);
+const map = { en:'EN', zh:'简体', 'zh-TW':'繁體', ja:'日本語', ko:'한국어', th:'ภาษาไทย' };
+document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (map[initLang]||'')));
 buildNav();
 buildHero();
 buildPlans();
@@ -2913,6 +2999,13 @@ buildGalleryFilters();
 buildGallery('all');
 buildGuide();
 buildFAQ();
+
+// ── Float Nav Scroll ──────────────────────────────────────
+function smoothTo(e, id) {
+  e.preventDefault();
+  const t = document.getElementById(id);
+  if (t) t.scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
 // ── Float Contact ─────────────────────────────────────────
 function toggleFloat() {
