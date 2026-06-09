@@ -18,7 +18,7 @@
 fishing.nice.okinawa/
 ├── index.html     主页（面向用户，需完整合规）
 ├── img/gallery/   图片
-└── PROGRESS.md    进度日志
+└── records.md    进度日志
 ```
 
 ---
@@ -35,4 +35,4 @@ fishing.nice.okinawa/
 
 1. 读 RULES.md（全局规则）
 2. 读本文件（本站专属规则）
-3. 读 PROGRESS.md（当前进度和待办）
+3. 读 records.md（当前进度和待办）

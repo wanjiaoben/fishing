@@ -1,4 +1,4 @@
-# PROGRESS — fishing
+# RECORDS — fishing
 
 > 此文件由 Claude / CC / Codex 共同维护。每次执行任务后更新对应区块。
 
@@ -16,11 +16,12 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
-| 2026-06-09 | Codex | 新增 `CLAUDE.md`、`RULES.md` 和 `PROGRESS.md` |
+| 2026-06-09 | Codex | 新增 `CLAUDE.md`、`RULES.md` 和 `records.md` |
 | 2026-06-09 | Codex | 填入 fishing 专属港口和服务信息 |
 | 2026-06-09 | Codex | 清理首页中文客群地域标签，改为 `中文圈` / `Chinese-speaking visitors` |
 | 2026-06-09 | Codex | 在 `RULES.md` 加入旅行活动保险与协调说明 |
-| 2026-06-09 | Codex | 在 `RULES.md` 加入 `PROGRESS.md` 收工维护规则 |
+| 2026-06-09 | Codex | 在 `RULES.md` 加入 `records.md` 收工维护规则 |
+| 2026-06-09 | Codex | 将旧记录文件更名为 `records.md`，避免与 progress.nice.okinawa 混淆 |
 
 ---
 
@@ -62,4 +63,5 @@
 | 2026-06-09 | Codex | 推送规则初始化提交 | ✅ |
 | 2026-06-09 | Codex | 推送中文标识页面修正 | ✅ |
 | 2026-06-09 | Codex | 推送旅行保险协调规则 | ✅ |
-| 2026-06-09 | Codex | 记录本次 PROGRESS 维护规则更新 | ✅ |
+| 2026-06-09 | Codex | 记录本次 records.md 维护规则更新 | ✅ |
+| 2026-06-09 | Codex | 重命名记录文件并同步更新规则引用 | ✅ |
