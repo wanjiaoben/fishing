@@ -1777,6 +1777,34 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 <link rel="alternate" hreflang="x-default" href="https://fishing.nice.okinawa/">
 <link rel="alternate" hreflang="en" href="https://fishing.nice.okinawa/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Okinawa Fishing Charter | fishing.nice.okinawa","description":"Book private Okinawa fishing charters from Chatan: GT, tuna, amberjack, jigging and live bait trips with local captains.","url":"https://fishing.nice.okinawa/"}</script>
+<style id="nice-screenshot-mark-style">
+.nice-screenshot-mark {
+  position: fixed;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 2147483000;
+  max-width: min(70vw, 520px);
+  padding: 5px 8px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.88);
+  color: rgba(17, 24, 39, 0.74);
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.10);
+  font: 600 11px/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+}
+@media (max-width: 640px) {
+  .nice-screenshot-mark {
+    max-width: calc(100vw - 20px);
+    font-size: 10px;
+  }
+}
+@media print {
+  .nice-screenshot-mark { display: none; }
+}
+</style>
 </head>
 <body>
 
@@ -3132,5 +3160,6 @@ document.addEventListener('click', function(e) {
 });
 </script>
 <script src="https://analytics.nice.okinawa/script.js" defer></script>
+<div class="nice-screenshot-mark" aria-label="Page address and version">fishing.nice.okinawa/ · v2026.06.14</div>
 </body>
 </html>
