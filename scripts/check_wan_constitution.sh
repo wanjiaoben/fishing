@@ -32,15 +32,20 @@ if [[ -n "${WAN_RULES_LOCAL_PATH:-}" ]]; then
   [[ -f "${constitution}" ]] || fail "WAN_RULES_LOCAL_PATH does not contain CONSTITUTION.md"
   latest_version="$(sed -nE 's/^# WAN Constitution (v[0-9]+(\.[0-9]+)*)$/\1/p' "${constitution}" | head -n 1)"
 else
-  TMP_DIR="$(mktemp -d)"
-  clone_args=(-c advice.detachedHead=false)
   if [[ -n "${WAN_RULES_TOKEN:-}" ]]; then
-    clone_args+=(-c "http.extraHeader=Authorization: Bearer ${WAN_RULES_TOKEN}")
+    constitution="$(curl -fsSL \
+      -H "Authorization: Bearer ${WAN_RULES_TOKEN}" \
+      -H "Accept: application/vnd.github.raw" \
+      "https://api.github.com/repos/wanjiaoben/wan-rules/contents/CONSTITUTION.md?ref=main")" \
+      || fail "cannot read wanjiaoben/wan-rules via GitHub API; check WAN_RULES_TOKEN"
+    latest_version="$(printf '%s\n' "${constitution}" | sed -nE 's/^# WAN Constitution (v[0-9]+(\.[0-9]+)*)$/\1/p' | head -n 1)"
+  else
+    TMP_DIR="$(mktemp -d)"
+    if ! git -c advice.detachedHead=false clone --depth 1 https://github.com/wanjiaoben/wan-rules.git "${TMP_DIR}/wan-rules" >/dev/null 2>&1; then
+      fail "cannot read wanjiaoben/wan-rules; set WAN_RULES_TOKEN or WAN_RULES_LOCAL_PATH"
+    fi
+    latest_version="$(sed -nE 's/^# WAN Constitution (v[0-9]+(\.[0-9]+)*)$/\1/p' "${TMP_DIR}/wan-rules/CONSTITUTION.md" | head -n 1)"
   fi
-  if ! git "${clone_args[@]}" clone --depth 1 https://github.com/wanjiaoben/wan-rules.git "${TMP_DIR}/wan-rules" >/dev/null 2>&1; then
-    fail "cannot read wanjiaoben/wan-rules; set WAN_RULES_TOKEN or WAN_RULES_LOCAL_PATH"
-  fi
-  latest_version="$(sed -nE 's/^# WAN Constitution (v[0-9]+(\.[0-9]+)*)$/\1/p' "${TMP_DIR}/wan-rules/CONSTITUTION.md" | head -n 1)"
 fi
 
 if [[ -z "${latest_version}" ]]; then
