@@ -1,5 +1,5 @@
-<!--WAN-CONSTITUTION-START version=v1.0-->
-# WAN Constitution v1.0
+<!--WAN-CONSTITUTION-START version=v1.1-->
+# WAN Constitution v1.1
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 
@@ -17,6 +17,7 @@
 密钥零明文:密钥只进 wrangler secret / 环境变量,禁止出现在代码、配置文件、仓库、聊天记录明文中。
 生产数据只读:生产 KV / D1 / R2 只读;写入仅限 cctest 范围(fixture:cctest@nice.okinawa,OTP 135790,entitlement source "cctest",排除于营收统计)。
 对 Wan 的沟通:全程简体中文;结论先行、短句、少专业术语,术语首次出现须一句话解释;需要 Wan 操作的步骤逐步可点;给 CC 的指令用代码块,内不嵌解释。凡增加 Wan 阅读负担的输出视为违反本条。
+核心链路保护:核心用户链路(登录、取题/取词、作答、判分、复盘、支付)的改动必须独立分支、独立验收,禁止与新功能混合合并;每类内容(题目/单词/音频)入库必须通过对应校验脚本,无校验脚本的内容类型不得批量入库;大规模推广前,监控+备份+核心链路探测必须全部在位。
 (空位):留给盘点后确认的真全局项。
 <!--WAN-CONSTITUTION-END-->
 
