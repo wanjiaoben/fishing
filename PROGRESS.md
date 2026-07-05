@@ -1,1 +1,1 @@
-T0705-04 wan-rules v1.0 constitution synced to CLAUDE.md; MERGE_GATE checks CLAUDE.md version against wan-rules latest.
+T0705-07 wan-rules v1.2 synced to CLAUDE.md.
