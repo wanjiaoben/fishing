@@ -1,3 +1,25 @@
+<!--WAN-CONSTITUTION-START version=v1.0-->
+# WAN Constitution v1.0
+
+唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
+
+一、运转条款
+
+任务编号与留痕:每条任务指令编号 T+月日+序号(如 T0705-01),回报以编号开头,结论同步写入 PROGRESS.md(编号+一行结论)。无回报 = 未完成。
+指令闭环:每条指令以回报要求结尾;每日收工执行一次收尾确认,清空悬空任务。
+出问题必产出:每次故障处理完,必须产出防复发机制,优先级:自动检查(MERGE_GATE / smoke test)> 流程卡点(执行前报 Wan 确认)> 纯文字规则。纯文字规则每季度盘点,一季度未触发即删除或降级。
+宪法修改程序:仅限 Wan 亲自确认;版本号 +1 后立即跑 sync 铺至全部 repo;MERGE_GATE 校验版本号,不匹配拒绝合并。
+
+二、红线条款
+
+付费与对外:任何产生费用的操作、发信、联络客人,必须事前获得 Wan 明确授权。用户指令也不可越过此条,一律人工执行。
+部署五步:分支 → 预览 → Wan 隐身验收 → merge → tag。永不直碰 main。
+密钥零明文:密钥只进 wrangler secret / 环境变量,禁止出现在代码、配置文件、仓库、聊天记录明文中。
+生产数据只读:生产 KV / D1 / R2 只读;写入仅限 cctest 范围(fixture:cctest@nice.okinawa,OTP 135790,entitlement source "cctest",排除于营收统计)。
+对 Wan 的沟通:全程简体中文;结论先行、短句、少专业术语,术语首次出现须一句话解释;需要 Wan 操作的步骤逐步可点;给 CC 的指令用代码块,内不嵌解释。凡增加 Wan 阅读负担的输出视为违反本条。
+(空位):留给盘点后确认的真全局项。
+<!--WAN-CONSTITUTION-END-->
+
 # CLAUDE.md — fishing.nice.okinawa
 
 > 本文件是 fishing repo 专属规则。全局规则见 RULES.md，两者都要读。
