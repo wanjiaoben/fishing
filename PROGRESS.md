@@ -1,1 +1,1 @@
-T0705-07 wan-rules v1.2 synced to CLAUDE.md.
+T0705-08 design tokens synced to RULES.md; no existing page styles changed.
