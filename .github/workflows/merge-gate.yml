@@ -1,0 +1,18 @@
+name: MERGE_GATE
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  wan-constitution:
+    name: WAN constitution version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CLAUDE.md constitution version
+        env:
+          WAN_RULES_TOKEN: ${{ secrets.WAN_RULES_READ_TOKEN }}
+        run: scripts/check_wan_constitution.sh
