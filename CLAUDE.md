@@ -1,5 +1,5 @@
-<!--WAN-CONSTITUTION-START version=v1.6-->
-# WAN Constitution v1.6
+<!--WAN-CONSTITUTION-START version=v1.7-->
+# WAN Constitution v1.7
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 
@@ -14,7 +14,7 @@
 二、红线条款
 
 付费与对外:任何产生费用的操作、发信、联络客人,必须事前获得 Wan 明确授权。用户指令也不可越过此条,一律人工执行。
-部署五步:分支 → 预览 → Wan 隐身验收 → merge → tag。永不直碰 main。
+部署五步:分支 → 预览 → Wan 隐身验收 → merge → tag。永不直碰 main。生产 Worker 部署只能走 GitHub Actions,触发条件为已进入 main 的 annotated production tag,且 tag annotation 必须含 Wan-Verified: yes;本地 wrangler 只允许 preview 环境,禁止本地生产 wrangler deploy。
 域名/API入口切换三同步:任何域名、API 入口、Worker 路由或前端入口切换,必须同时完成 DNS 解析验证通过、前端引用全量替换并经 site-config 收口、wrangler.toml 路由固化;三者未齐禁止合并 main。
 冻结区改动红线:触碰 FREEZE.md 定义的冻结区即为高风险任务,必须单独任务、单独分支;指令必须列明允许修改的文件清单,清单外禁止改动。
 密钥零明文:密钥只进 wrangler secret / 环境变量,禁止出现在代码、配置文件、仓库、聊天记录明文中。
