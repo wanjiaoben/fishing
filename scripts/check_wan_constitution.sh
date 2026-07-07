@@ -56,4 +56,54 @@ if [[ "${local_version}" != "${latest_version}" ]]; then
   fail "CLAUDE.md has ${local_version}, wan-rules has ${latest_version}"
 fi
 
-echo "PASS wan constitution ${local_version}"
+check_no_external_prompt_or_script_refs() {
+  local offender
+  offender="$(
+    git -C "${ROOT}" grep -nE \
+      '(/Users/|/private/tmp/|/tmp/|~/|file://)[^[:space:]]*((prompt|Prompt|PROMPT)[^[:space:]]*|[^[:space:]]*\.(sh|js|mjs|cjs|ts|tsx|py|rb|pl)([[:space:]]|$))' \
+      -- \
+      '*.md' \
+      '*.txt' \
+      '*.yml' \
+      '*.yaml' \
+      '*.sh' \
+      '*.js' \
+      '*.mjs' \
+      '*.cjs' \
+      '*.ts' \
+      '*.tsx' \
+      '*.html' \
+      ':!node_modules' \
+      ':!.git' \
+      ':!.wrangler' \
+      ':!docs/REVIEW_2026-0707_SYSTEM_DESIGN.md' \
+      ':!rules/ANTI_PATTERNS.md' \
+      ':!scripts/check_wan_constitution.sh' \
+      2>/dev/null || true
+  )"
+  if [[ -n "${offender}" ]]; then
+    fail "external prompt/script reference found; prompts and scripts must live in repo: ${offender%%$'\n'*}"
+  fi
+}
+
+check_no_product_platform_schema() {
+  if [[ "$(basename "${ROOT}")" == "wan-rules" ]]; then
+    return
+  fi
+
+  local offender
+  offender="$(
+    git -C "${ROOT}" ls-files \
+      | grep -E '(^|/)(shared|platform)[-_]?(schema|schemas)|(^|/)(entitlement|order|audit|access)[-_]?(platform[-_]?)?schema\.(md|ya?ml|json|ts|js)$|(^|/)product[-_]?template[-_]?schema\.(md|ya?ml|json|ts|js)$' \
+      | grep -Ev '^(content|data|assets|rules/packs)/|(^|/)schema\.json$|^constitution/decisions/' \
+      || true
+  )"
+  if [[ -n "${offender}" ]]; then
+    fail "platform schema appears in product repo; define platform schema in wan-rules shared layer: ${offender%%$'\n'*}"
+  fi
+}
+
+check_no_external_prompt_or_script_refs
+check_no_product_platform_schema
+
+echo "PASS wan constitution ${local_version}; anti-pattern gates"
