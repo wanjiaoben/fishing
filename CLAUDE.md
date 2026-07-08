@@ -1,5 +1,5 @@
-<!--WAN-CONSTITUTION-START version=v1.8-->
-# WAN Constitution v1.8
+<!--WAN-CONSTITUTION-START version=v1.9-->
+# WAN Constitution v1.9
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 设计背景参考:docs/REVIEW_2026-0707_SYSTEM_DESIGN.md;CC 开工前必读 rules/ANTI_PATTERNS.md。该引用为 v1.8 设计背景与执法清单,非新增宪法条文。
@@ -28,7 +28,9 @@ Needs pool 门禁:新条目必填 reuse/auto/compound 三布尔 + platform|produ
 对 Wan 的沟通:全程简体中文;结论先行、短句、少专业术语,术语首次出现须一句话解释;需要 Wan 操作的步骤逐步可点;给 CC 的指令用代码块,内不嵌解释。凡增加 Wan 阅读负担的输出视为违反本条。方案一次给全、给最优解,禁止发出后追加补丁式选项。任务指令固定格式:代码块首行为 T编号+仓库名+一句话任务;回报首行为同一编号。
 CC 交付固定六栏:所有 CC 交付必须包含且仅清晰呈现六栏:改了什么 / 修改文件 / 明确未改 / 自测结果 / 风险点 / 回滚方式。
 Preview 交付双链接:CC 交付任何 preview 审核页时,必须同时提供①本地 file:// 绝对路径 ②Cloudflare Pages 公网 URL 两个链接,Wan 在电脑用本地、手机用公网。禁止只给 file:// 本地路径(Wan 手机无法访问)。
+Preview 链接铁律:主链接必须是 Cloudflare Pages 真实 deployment URL(hash 子域),从部署记录复制,禁止手拼分支子域。必须是手机浏览器可直接点开的公网 https;给出前 CC 必须 curl 一次并贴 HTTP 状态码,证明非 404 且 success。file:// 仅作附加,不得作唯一或主验证链接。多页面改动时每页各给一条完整可点链接。违反即交付不合格,Wan 可直接打回,不进入 Wan-Verified。
 核心链路保护:核心用户链路(登录、取题/取词、作答、判分、复盘、支付)的改动必须独立分支、独立验收,禁止与新功能混合合并;每类内容(题目/单词/音频)入库必须通过对应校验脚本,无校验脚本的内容类型不得批量入库;大规模推广前,监控+备份+核心链路探测必须全部在位。
+电子书权益命名 SOP:电子书权益 ID 格式为 book_<书名英文>-<语言>。语言段小写且必带:简体=zh,英文=en,繁中=tradition。书名英文固定为 script(台本),lipstick(润唇膏),480(480+ 去 + 号)。权益 ID 一经上线不可改名,改名即已购用户权限失效。
 Exit Rule:资产默认可删。每季度清点 shared 层资产:90天零引用移入 /deprecated/,保留一个版本周期后物理删除。Repo/Product 级退出由 Wan 单独裁决。FREEZE.md 覆盖区不适用。禁止以"历史兼容"为由无限期保留;确需兼容者写明截止日。
 (空位):留给盘点后确认的真全局项。
 <!--WAN-CONSTITUTION-END-->
