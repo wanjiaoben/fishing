@@ -75,7 +75,7 @@
 
 **实现规则**
 
-- 检测顺序：`localStorage('preferred-lang')` → `navigator.language` → fallback `en`
+- 语言判定以 CONSTITUTION v1.12 为准，本文件不重复算法
 - HTML 属性：`data-en` / `data-zh` / `data-zhtw` / `data-ja` / `data-ko` / `data-th`
 - JS 数据字段：`name_en` / `name_zh` / `name_zhtw` / `name_ja` / `name_ko` / `name_th`
 - CSS 防闪烁代码必须在 `<head>` 最顶部
