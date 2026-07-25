@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-06-29
+- **最后更新**：2026-07-25
 - **负责人**：Wan
 
 ---
@@ -17,6 +17,7 @@
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
 | 2026-06-13 | sg | 在 `index.html`、`robots.txt`、`sitemap.xml` 补充公开页 SEO metadata 与站点地图配置 |
+| 2026-07-25 | Codex | M0724-19 增强 fishing 首页 AI 引擎可读性：FAQ 六主题重组、FAQPage/LocalBusiness JSON-LD、`llms.txt`、AI crawler robots 放行 |
 | 2026-06-13 | sg | 在 `index.html` 补充公开页 `hreflang` metadata |
 | 2026-06-12 | sg | 接入 shared analytics tracking，统一站点埋点能力 |
 | 2026-06-09 | Codex | 新增 `CLAUDE.md`、`RULES.md` 和 `records.md` |
@@ -56,6 +57,7 @@
 - 不在站内处理支付。
 - 中文用户不得用中国、台湾、中国香港、香港或对应旗帜区分；使用 `简体中文`、`繁体中文`、`中文圈`。
 - 旅行活动页面必须说明现场活动保险、自行购买海外旅行保险、翻译协调边界和联系担当。
+- M0724-19 FAQ 事实只引用站内已有内容；拼船体验价格仍为咨询，未新增未确认价格。
 
 ---
 
@@ -63,6 +65,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-07-25 | Codex | M0724-19 修改首页 FAQ/JSON-LD，新增 `llms.txt`，更新 `robots.txt` 放行 OAI-SearchBot / ChatGPT-User / PerplexityBot；本地 JSON-LD、静态 smoke、diff 检查通过，待 PR preview 给 Wan 复核 | ✅ |
 | 2026-06-29 | Codex | 运行 Daily repo records updater，核对 2026-06-28 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |
 | 2026-06-28 | Codex | 运行 Daily repo records updater，核对 2026-06-27 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |
 | 2026-06-27 | Codex | 运行 Daily repo records updater，核对 2026-06-26 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |

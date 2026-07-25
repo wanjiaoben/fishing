@@ -1,0 +1,30 @@
+# fishing.nice.okinawa
+
+Okinawa Fishing Charter is an English-first static website for fishing trip enquiries in Okinawa. The site presents beginner shared boat fishing experiences, private fishing charters, GT fishing, tuna and multi-species trips, amberjack live bait fishing, jigging, trolling, bottom fishing and remote island charter enquiries.
+
+The service is booking coordination and translation support only. Actual trip operation, safety decisions, weather and sea-condition calls are handled by the captain and vessel. The site does not process payment online.
+
+Contact and booking:
+- Email: info@nice.okinawa
+- WhatsApp: +81 70-8952-3968
+- WeChat: OkinawaOnline
+- Booking form: https://fishing.nice.okinawa/#contact
+
+Known service areas and departure ports:
+- Chatan American Village Port / Chatan Hamagawa Port
+- Kadena Fishing Port
+- Uruma Awase Port
+- Ishigaki Island and Miyako Island by direct enquiry
+
+Core pages and sections:
+- Home: https://fishing.nice.okinawa/
+- Plans and pricing: https://fishing.nice.okinawa/#plans
+- Catch gallery: https://fishing.nice.okinawa/#gallery
+- Fishing guide and seasonal targets: https://fishing.nice.okinawa/#guide
+- FAQ: https://fishing.nice.okinawa/#faq
+- Booking contact: https://fishing.nice.okinawa/#contact
+
+Related Okinawa activity sites:
+- Snorkelling: https://snorkel.nice.okinawa/
+- Rental car: https://rental.nice.okinawa/
+- Golf: https://golf.nice.okinawa/
