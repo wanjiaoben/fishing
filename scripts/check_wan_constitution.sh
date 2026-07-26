@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLAUDE="${ROOT}/CLAUDE.md"
+SOURCE_CONSTITUTION="${ROOT}/CONSTITUTION.md"
 TMP_DIR=""
 
 cleanup() {
@@ -17,21 +18,32 @@ fail() {
   exit 1
 }
 
-if [[ ! -f "${CLAUDE}" ]]; then
-  fail "CLAUDE.md missing"
-fi
-
-local_version="$(sed -nE 's/^<!--WAN-CONSTITUTION-START version=(v[0-9]+(\.[0-9]+)*)-->$/\1/p' "${CLAUDE}" | head -n 1)"
-if [[ -z "${local_version}" ]]; then
-  fail "version marker missing in CLAUDE.md"
-fi
-
+local_version=""
 latest_version=""
-if [[ -n "${WAN_RULES_LOCAL_PATH:-}" ]]; then
+source_repo=false
+
+remote_url="$(git -C "${ROOT}" remote get-url origin 2>/dev/null || true)"
+if [[ "${GITHUB_REPOSITORY:-}" == "wanjiaoben/wan-rules" \
+  || "${remote_url}" =~ (github\.com[:/])wanjiaoben/wan-rules(\.git)?$ ]]; then
+  source_repo=true
+fi
+
+if [[ ! -f "${CLAUDE}" && "${source_repo}" == true && -f "${SOURCE_CONSTITUTION}" ]]; then
+  local_version="$(sed -nE 's/^# WAN Constitution (v[0-9]+(\.[0-9]+)*)$/\1/p' "${SOURCE_CONSTITUTION}" | head -n 1)"
+  [[ -n "${local_version}" ]] || fail "version heading missing in source CONSTITUTION.md"
+  latest_version="${local_version}"
+elif [[ ! -f "${CLAUDE}" ]]; then
+  fail "CLAUDE.md missing"
+else
+  local_version="$(sed -nE 's/^<!--WAN-CONSTITUTION-START version=(v[0-9]+(\.[0-9]+)*)-->$/\1/p' "${CLAUDE}" | head -n 1)"
+  [[ -n "${local_version}" ]] || fail "version marker missing in CLAUDE.md"
+fi
+
+if [[ -z "${latest_version}" && -n "${WAN_RULES_LOCAL_PATH:-}" ]]; then
   constitution="${WAN_RULES_LOCAL_PATH}/CONSTITUTION.md"
   [[ -f "${constitution}" ]] || fail "WAN_RULES_LOCAL_PATH does not contain CONSTITUTION.md"
   latest_version="$(sed -nE 's/^# WAN Constitution (v[0-9]+(\.[0-9]+)*)$/\1/p' "${constitution}" | head -n 1)"
-else
+elif [[ -z "${latest_version}" ]]; then
   if [[ -n "${WAN_RULES_TOKEN:-}" ]]; then
     constitution="$(curl -fsSL \
       -H "Authorization: Bearer ${WAN_RULES_TOKEN}" \
