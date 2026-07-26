@@ -1776,7 +1776,112 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 <link rel="canonical" href="https://fishing.nice.okinawa/">
 <link rel="alternate" hreflang="x-default" href="https://fishing.nice.okinawa/">
 <link rel="alternate" hreflang="en" href="https://fishing.nice.okinawa/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Okinawa Fishing Charter | fishing.nice.okinawa","description":"Book private Okinawa fishing charters from Chatan: GT, tuna, amberjack, jigging and live bait trips with local captains.","url":"https://fishing.nice.okinawa/"}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["LocalBusiness", "Organization"],
+      "@id": "https://fishing.nice.okinawa/#business",
+      "name": "Okinawa Fishing Charter | fishing.nice.okinawa",
+      "description": "Book Okinawa fishing charters from Chatan, Kadena and Awase: beginner shared boats, private charters, GT, tuna, amberjack, jigging, live bait and remote island trips.",
+      "url": "https://fishing.nice.okinawa/",
+      "email": "info@nice.okinawa",
+      "telephone": "+817089523968",
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "booking",
+          "email": "info@nice.okinawa",
+          "telephone": "+817089523968",
+          "availableLanguage": ["English", "Mandarin Chinese", "Japanese"]
+        },
+        {
+          "@type": "ContactPoint",
+          "contactType": "booking",
+          "identifier": "WeChat: OkinawaOnline",
+          "availableLanguage": ["Mandarin Chinese"]
+        }
+      ],
+      "areaServed": {
+        "@type": "AdministrativeArea",
+        "name": "Okinawa"
+      },
+      "makesOffer": [
+        {
+          "@type": "Offer",
+          "name": "Beginner shared boat fishing experience",
+          "description": "A relaxed 2-hour shared boat fishing experience from Kadena Fishing Port."
+        },
+        {
+          "@type": "Offer",
+          "name": "Private Okinawa fishing charter",
+          "description": "Private charter fishing for amberjack, tuna, GT, jigging, live bait, bottom fishing and remote island trips."
+        }
+      ],
+      "potentialAction": {
+        "@type": "ReserveAction",
+        "target": "https://fishing.nice.okinawa/#contact",
+        "instrument": ["WhatsApp", "WeChat", "Email"]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faqpage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much are the boat fees and private charter prices?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Published private charter examples include Amberjack Live Bait at JPY 131,000, Tuna & Multi-Species at JPY 90,000-150,000, GT Fishing at JPY 90,000-100,000, day-trip expeditions from JPY 120,000, and other methods from JPY 80,000. The beginner shared boat experience is listed as contact for pricing. Final plans and prices depend on fishing method, distance and captain arrangement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where do we meet for departure in Chatan?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The page lists Chatan American Village Port and Chatan Hamagawa Port on Okinawa's west coast for Chatan departures. Kadena Fishing Port and Uruma Awase Port are also used depending on the plan. The final meeting point is arranged according to the actual captain and trip."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What months are best for GT and tuna in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The guide lists GT as year-round, with peaks in April-July and October-December, and also describes GT season as spring-summer. Yellowfin tuna is listed as spring-summer in the species guide, and tuna jigging appears in the spring seasonal guide."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can beginners join Okinawa fishing trips?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The shared boat experience from Kadena Fishing Port is designed for first-timers, families, couples and tourists, with equipment, life jackets and instruction provided. Most plans do not require prior experience, but GT fishing is for experienced anglers because it requires heavy tackle and long-distance casting."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the cancellation rule?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For private charters, the current page states that cancellations 2 or more weeks before departure refund the charter fee minus fees, while the coordination fee is non-refundable. If the captain cancels because of typhoon or sea conditions, the page states a full refund including the coordination fee."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use the contact section to enquire by WhatsApp, WeChat or email, or send the booking form with your preferred date, group size, fishing style and contact details. The site lists WhatsApp +81 70-8952-3968, WeChat OkinawaOnline and email info@nice.okinawa."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style id="nice-screenshot-mark-style">
 .nice-screenshot-mark {
   position: fixed;
@@ -2936,102 +3041,88 @@ function switchGuideTab(panel, btn) {
 // ── FAQ ───────────────────────────────────────────────────
 const FAQS = [
   {
-    q_en: "Is this a private charter — no shared boats?",
-    q_zh: "是完全包船吗？不会和陌生人拼船？",
-    'q_zh-TW': "是完全包船嗎？不會和陌生人拼船？",
-    q_ja: "完全チャーター（貸切）ですか？",
-    q_ko: "전세 차터인가요 — 합승은 없나요?",
-    q_th: "นี่คือการเช่าเหมาลำส่วนตัวใช่ไหม — ไม่มีเรือร่วม?",
-    a_en: "The private charters are your group only — no strangers. We also offer shared boat experience tours for beginners departing from Kadena port.",
-    a_zh: "专业包船行程均为整船包，只有你们的团队。我们也提供嘉手纳渔港出发的拼船体验团。",
-    'a_zh-TW': "專業包船行程均為整船包，只有您們的團隊。我們也提供嘉手納漁港出發的拼船體驗團。",
-    a_ja: "プライベートチャーターはグループ専用です。嘉手納漁港からの乗合体験ツアーもご用意しています。",
-    a_ko: "전세 차터는 귀하의 그룹만 이용합니다 — 낯선 사람 없음. 가데나 항구에서 출발하는 초보자용 합승 체험 투어도 제공합니다.",
-    a_th: "การเช่าเหมาลำส่วนตัวเป็นของกลุ่มคุณเท่านั้น — ไม่มีคนแปลกหน้า เรายังมีทัวร์เรือร่วมสำหรับผู้เริ่มต้นออกจากท่าเรือ Kadena"
+    q_en: "How much are the boat fees and private charter prices?",
+    q_zh: "船费与包船价格是多少？",
+    'q_zh-TW': "船費與包船價格是多少？",
+    q_ja: "船代・チャーター料金はいくらですか？",
+    q_ko: "보트 요금과 전세 차터 가격은 얼마인가요?",
+    q_th: "ค่าเรือและราคาเช่าเหมาลำส่วนตัวเท่าไร?",
+    a_en: "Private charter examples currently shown on this page include Amberjack Live Bait at JPY 131,000, Tuna & Multi-Species at JPY 90,000-150,000, GT Fishing at JPY 90,000-100,000, day-trip expeditions from JPY 120,000, and other methods from JPY 80,000. The beginner shared boat experience is contact-for-pricing. Final price depends on method, fishing ground distance and captain arrangement.",
+    a_zh: "页面目前列出的包船示例包括：活饵钓红甘鲹 JPY 131,000、金枪鱼/多鱼种 JPY 90,000-150,000、GT JPY 90,000-100,000、远征日归 JPY 120,000 起、其他钓法 JPY 80,000 起。初学者拼船体验价格需咨询。最终价格按钓法、钓点距离和船长安排确认。",
+    'a_zh-TW': "頁面目前列出的包船示例包括：活餌釣紅甘鰺 JPY 131,000、鮪魚/多魚種 JPY 90,000-150,000、GT JPY 90,000-100,000、遠征日歸 JPY 120,000 起、其他釣法 JPY 80,000 起。初學者拼船體驗價格需詢問。最終價格按釣法、釣點距離和船長安排確認。",
+    a_ja: "現在ページに掲載している貸切例は、カンパチ泳がせ JPY 131,000、マグロ・マルチターゲット JPY 90,000-150,000、GT JPY 90,000-100,000、遠征日帰り JPY 120,000から、その他プラン JPY 80,000からです。初心者向け乗合体験は料金お問い合わせです。最終料金は釣法、ポイント距離、船長手配により確認します。",
+    a_ko: "현재 페이지의 전세 예시는 Amberjack Live Bait JPY 131,000, Tuna & Multi-Species JPY 90,000-150,000, GT Fishing JPY 90,000-100,000, 당일 원정 JPY 120,000부터, 기타 방법 JPY 80,000부터입니다. 초보자 합승 체험은 가격 문의입니다. 최종 가격은 방법, 낚시터 거리, 선장 배정에 따라 확인됩니다.",
+    a_th: "ตัวอย่างราคาเช่าเหมาลำที่แสดงในหน้านี้ ได้แก่ Amberjack Live Bait JPY 131,000, Tuna & Multi-Species JPY 90,000-150,000, GT Fishing JPY 90,000-100,000, ทริปสำรวจแบบวันเดียวเริ่ม JPY 120,000 และวิธีอื่นๆ เริ่ม JPY 80,000 ทริปเรือร่วมสำหรับผู้เริ่มต้นให้สอบถามราคา ราคาสุดท้ายขึ้นอยู่กับวิธี ระยะทางแหล่งตกปลา และการจัดเรือ"
   },
   {
-    q_en: "Do I need prior fishing experience?",
-    q_zh: "需要有钓鱼经验吗？",
-    'q_zh-TW': "需要有釣魚經驗嗎？",
-    q_ja: "釣りの経験がなくても大丈夫ですか？",
-    q_ko: "사전 낚시 경험이 필요한가요?",
-    q_th: "ต้องมีประสบการณ์ตกปลามาก่อนไหม?",
-    a_en: "For most plans, no experience needed. GT fishing is the exception — it requires heavy tackle and long-distance casting experience. Chat with us first if unsure.",
-    a_zh: "大多数方案无需钓鱼经验。GT钓鱼是例外——需要重型装备和远距离抛投经验，不确定请先联系我们。",
-    'a_zh-TW': "大多數方案無需釣魚經驗。GT釣魚是例外——需要重型裝備和遠距離拋投經驗，不確定請先聯絡我們。",
-    a_ja: "ほとんどのプランは未経験でも大丈夫。GTフィッシングは例外で、重いタックルと遠投の経験が必要です。",
-    a_ko: "대부분의 플랜은 경험이 필요 없습니다. GT 낚시는 예외 — 무거운 장비와 원거리 캐스팅 경험이 필요합니다. 불확실하면 먼저 문의해 주세요.",
-    a_th: "สำหรับแผนส่วนใหญ่ ไม่ต้องมีประสบการณ์ การตกปลา GT เป็นข้อยกเว้น — ต้องใช้อุปกรณ์หนักและประสบการณ์การโยนระยะไกล"
+    q_en: "Where do we meet for departure in Chatan?",
+    q_zh: "北谷集合地点在哪里？",
+    'q_zh-TW': "北谷集合地點在哪裡？",
+    q_ja: "北谷の集合場所はどこですか？",
+    q_ko: "차탄 출발 시 어디에서 만나나요?",
+    q_th: "จุดนัดพบที่ Chatan อยู่ที่ไหน?",
+    a_en: "For Chatan departures, this page lists Chatan American Village Port and Chatan Hamagawa Port on Okinawa's west coast. Kadena Fishing Port and Uruma Awase Port are also used depending on the plan. The final meeting point is arranged according to the actual captain and trip.",
+    a_zh: "北谷出发目前页面列出北谷美国村渔港与北谷滨川渔港。按方案也可能使用嘉手纳渔港或泡瀬漁港。最终集合地点以实际船长和行程安排为准。",
+    'a_zh-TW': "北谷出發目前頁面列出北谷美國村漁港與北谷濱川漁港。按方案也可能使用嘉手納漁港或泡瀬漁港。最終集合地點以實際船長和行程安排為準。",
+    a_ja: "北谷発は、ページ上では北谷アメリカンビレッジ漁港と北谷浜川漁港を掲載しています。プランにより嘉手納漁港・泡瀬漁港も使用します。最終集合場所は実際の船長と行程に合わせて決定します。",
+    a_ko: "차탄 출발은 이 페이지에 Chatan American Village Port와 Chatan Hamagawa Port가 표시되어 있습니다. 플랜에 따라 Kadena Fishing Port나 Uruma Awase Port도 사용됩니다. 최종 집합 장소는 실제 선장과 일정에 따라 정해집니다.",
+    a_th: "สำหรับการออกเดินทางจาก Chatan หน้านี้ระบุ Chatan American Village Port และ Chatan Hamagawa Port ฝั่งตะวันตกของโอกินาวะ บางแผนอาจใช้ Kadena Fishing Port หรือ Uruma Awase Port จุดนัดพบสุดท้ายจัดตามกัปตันและทริปจริง"
   },
   {
-    q_en: "Do I need to bring fishing gear?",
-    q_zh: "需要自带钓鱼装备吗？",
-    'q_zh-TW': "需要自帶釣魚裝備嗎？",
-    q_ja: "釣り道具は持参する必要がありますか？",
-    q_ko: "낚시 장비를 가져와야 하나요?",
-    q_th: "ต้องนำอุปกรณ์ตกปลามาเองไหม?",
-    a_en: "No — all tackle is provided or available to rent. Bring your own if you prefer, just let us know in advance.",
-    a_zh: "不需要，全套装备提供或可租赁。如想自带，提前告知即可。",
-    'a_zh-TW': "不需要，全套裝備提供或可租借。如想自帶，提前告知即可。",
-    a_ja: "不要です。全タックル提供またはレンタル可能。持参希望の場合は事前にご連絡ください。",
-    a_ko: "아니요 — 모든 장비가 제공되거나 대여 가능합니다. 원하시면 직접 가져오셔도 됩니다. 미리 알려주세요.",
-    a_th: "ไม่ — อุปกรณ์ทั้งหมดจัดเตรียมให้หรือเช่าได้ นำมาเองได้หากต้องการ แค่แจ้งล่วงหน้า"
+    q_en: "What months are best for GT and tuna in Okinawa?",
+    q_zh: "GT 和金枪鱼什么月份适合？",
+    'q_zh-TW': "GT 和鮪魚什麼月份適合？",
+    q_ja: "GT・マグロのおすすめ時期はいつですか？",
+    q_ko: "오키나와에서 GT와 참치는 어느 달이 좋나요?",
+    q_th: "เดือนไหนเหมาะกับ GT และทูน่าในโอกินาวะ?",
+    a_en: "The guide lists GT as year-round, with peak windows in Apr-Jul and Oct-Dec, and also describes GT season as spring-summer. Yellowfin tuna is listed as spring-summer in the species guide, with tuna jigging included in the spring seasonal guide.",
+    a_zh: "站内指南写明 GT 全年可钓，高峰为 4-7 月和 10-12 月，同时鱼种卡也写为春夏。黄鳍金枪鱼在鱼种指南中写为春夏，春季季节指南也包含金枪鱼铁板钓。",
+    'a_zh-TW': "站內指南寫明 GT 全年可釣，高峰為 4-7 月和 10-12 月，同時魚種卡也寫為春夏。黃鰭鮪魚在魚種指南中寫為春夏，春季季節指南也包含鮪魚鐵板釣。",
+    a_ja: "ガイドではGTは通年、ピークは4-7月と10-12月、魚種カードでは春から夏と記載しています。キハダマグロは魚種ガイドで春から夏、春の季節ガイドにもマグロジギングを掲載しています。",
+    a_ko: "가이드에는 GT가 연중 가능하며 피크는 4-7월 및 10-12월로 표시되어 있고, 어종 카드에는 봄-여름으로도 설명되어 있습니다. 황다랑어는 어종 가이드에서 봄-여름으로 표시되며, 봄 시즌 가이드에도 참치 지깅이 포함되어 있습니다.",
+    a_th: "คู่มือระบุว่า GT ตกได้ตลอดปี โดยช่วงพีคคือ Apr-Jul และ Oct-Dec และยังระบุฤดู GT เป็น spring-summer ส่วน Yellowfin tuna ระบุเป็น spring-summer ในคู่มือชนิดปลา และมี tuna jigging ในคู่มือฤดูใบไม้ผลิ"
   },
   {
-    q_en: "What if the weather is bad?",
-    q_zh: "天气不好怎么办？",
-    'q_zh-TW': "天氣不好怎麼辦？",
-    q_ja: "天候が悪い場合はどうなりますか？",
-    q_ko: "날씨가 나쁘면 어떻게 되나요?",
-    q_th: "ถ้าอากาศไม่ดีจะเป็นอย่างไร?",
-    a_en: "Safety first. If the captain calls it unsafe, the trip is cancelled and you get a full refund — including the coordination fee.",
-    a_zh: "安全第一。船长判断海况不安全则取消行程，全额退款，含协调费。",
-    'a_zh-TW': "安全第一。船長判斷海況不安全則取消行程，全額退款，含協調費。",
-    a_ja: "安全最優先。船長が危険と判断した場合は中止・全額返金（コーディネート料含む）。",
-    a_ko: "안전 최우선. 선장이 위험하다고 판단하면 여행이 취소되고 전액 환불됩니다 — 코디네이션 비용 포함.",
-    a_th: "ความปลอดภัยเป็นอันดับแรก หากกัปตันตัดสินว่าไม่ปลอดภัย ทริปจะถูกยกเลิกและคืนเงินเต็มจำนวน รวมค่าประสานงาน"
+    q_en: "Can beginners join Okinawa fishing trips?",
+    q_zh: "新手可以参加冲绳钓鱼吗？",
+    'q_zh-TW': "新手可以參加沖繩釣魚嗎？",
+    q_ja: "初心者でも沖縄釣りに参加できますか？",
+    q_ko: "초보자도 오키나와 낚시 여행에 참여할 수 있나요?",
+    q_th: "ผู้เริ่มต้นเข้าร่วมทริปตกปลาโอกินาวะได้ไหม?",
+    a_en: "Yes. The shared boat experience from Kadena Fishing Port is designed for first-timers, families, couples and tourists, with equipment, life jackets and instruction provided. Most plans do not require prior experience, but GT fishing is for experienced anglers because it requires heavy tackle and long-distance casting.",
+    a_zh: "可以。嘉手纳渔港出发的拼船体验面向初次体验者、家庭、情侣和游客，提供装备、救生衣和现场指导。多数方案不需要经验，但 GT 钓鱼需要重型装备和远距离抛投经验，适合有经验钓手。",
+    'a_zh-TW': "可以。嘉手納漁港出發的拼船體驗面向初次體驗者、家庭、情侶和遊客，提供裝備、救生衣和現場指導。多數方案不需要經驗，但 GT 釣魚需要重型裝備和遠距離拋投經驗，適合有經驗釣手。",
+    a_ja: "参加できます。嘉手納漁港発の乗合体験は、初めての方・ご家族・カップル・旅行者向けで、装備・ライフジャケット・当日の説明があります。多くのプランは未経験でも可能ですが、GTは重いタックルと遠投経験が必要なため経験者向けです。",
+    a_ko: "가능합니다. 가데나 어항 출발 합승 체험은 처음 오시는 분, 가족, 커플, 관광객을 위해 설계되었고 장비, 구명조끼, 안내가 제공됩니다. 대부분의 플랜은 경험이 필요 없지만 GT 낚시는 무거운 장비와 원거리 캐스팅 경험이 필요해 경험자용입니다.",
+    a_th: "ได้ ทริปเรือร่วมจาก Kadena Fishing Port เหมาะสำหรับผู้เริ่มต้น ครอบครัว คู่รัก และนักท่องเที่ยว พร้อมอุปกรณ์ เสื้อชูชีพ และคำแนะนำ แผนส่วนใหญ่ไม่ต้องมีประสบการณ์ แต่ GT fishing เหมาะกับผู้มีประสบการณ์เพราะต้องใช้อุปกรณ์หนักและการตีเหยื่อระยะไกล"
   },
   {
-    q_en: "Can children join?",
-    q_zh: "孩子可以参加吗？",
-    'q_zh-TW': "小孩可以參加嗎？",
-    q_ja: "子どもは参加できますか？",
-    q_ko: "어린이도 참여할 수 있나요?",
-    q_th: "เด็กๆ เข้าร่วมได้ไหม?",
-    a_en: "Yes! Let us know their ages when booking. Life jackets are provided for everyone. The shared boat experience is especially great for kids.",
-    a_zh: "可以！预约时告知年龄，所有人提供救生衣。拼船体验特别适合带孩子参加。",
-    'a_zh-TW': "可以！預約時告知年齡，所有人提供救生衣。拼船體驗特別適合帶小孩參加。",
-    a_ja: "はい！ご予約時に年齢をお知らせください。ライフジャケットは全員分ご用意します。",
-    a_ko: "네! 예약 시 나이를 알려주세요. 구명조끼는 모든 분께 제공됩니다. 합승 체험은 아이들에게 특히 좋습니다.",
-    a_th: "ได้! แจ้งอายุตอนจองด้วย เสื้อชูชีพมีให้ทุกคน การตกปลาแบบเรือร่วมเหมาะกับเด็กเป็นพิเศษ"
+    q_en: "What is the cancellation rule?",
+    q_zh: "取消规则是什么？",
+    'q_zh-TW': "取消規則是什麼？",
+    q_ja: "キャンセル規定はどうなっていますか？",
+    q_ko: "취소 규정은 어떻게 되나요?",
+    q_th: "นโยบายการยกเลิกเป็นอย่างไร?",
+    a_en: "For private charters, the current page states that cancellations 2 or more weeks before departure refund the charter fee minus fees, while the coordination fee is non-refundable. If the captain cancels because of typhoon or sea conditions, the page states a full refund including the coordination fee.",
+    a_zh: "包船取消规则按页面现有说明：出发 2 周前以上取消，退还船费但扣除手续费，协调费不退。因台风或海况由船长判断取消时，全额退款，包含协调费。",
+    'a_zh-TW': "包船取消規則按頁面現有說明：出發 2 週前以上取消，退還船費但扣除手續費，協調費不退。因颱風或海況由船長判斷取消時，全額退款，包含協調費。",
+    a_ja: "貸切チャーターは現在ページ記載の通り、出発2週間以上前のキャンセルは手数料差引後に船代返金、コーディネート料は返金不可です。台風・海況により船長判断で中止の場合は、コーディネート料を含め全額返金と記載しています。",
+    a_ko: "전세 차터의 현재 페이지 기준은 출발 2주 이상 전 취소 시 수수료를 제외한 차터 요금 환불, 코디네이션비 불환입니다. 태풍 또는 해상 상태로 선장이 취소를 결정하면 코디네이션비 포함 전액 환불로 표시되어 있습니다.",
+    a_th: "สำหรับเช่าเหมาลำส่วนตัว หน้านี้ระบุว่าหากยกเลิกก่อนออกเดินทาง 2 สัปดาห์ขึ้นไป จะคืนค่าเช่าเรือโดยหักค่าธรรมเนียม และค่าประสานงานไม่คืน หากกัปตันยกเลิกเพราะพายุไต้ฝุ่นหรือสภาพทะเล จะคืนเต็มจำนวนรวมค่าประสานงาน"
   },
   {
-    q_en: "How do I prevent seasickness?",
-    q_zh: "如何预防晕船？",
-    'q_zh-TW': "如何預防暈船？",
-    q_ja: "船酔いを防ぐには？",
-    q_ko: "뱃멀미를 어떻게 예방하나요?",
-    q_th: "จะป้องกันอาการเมาเรือได้อย่างไร?",
-    a_en: "Take motion sickness tablets 1–2 hours before, stay hydrated, eat light, and keep your eyes on the horizon. We can recommend what to grab locally.",
-    a_zh: "出发前1-2小时服用晕船药，保持补水，吃清淡食物，眼望地平线。我们可以推荐当地的晕船药（成人推荐大白兔）。",
-    'a_zh-TW': "出發前1-2小時服用暈船藥，保持補水，吃清淡食物，眼望地平線。我們可以推薦當地的暈船藥。",
-    a_ja: "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。",
-    a_ko: "출발 1~2시간 전 멀미약 복용, 수분 보충, 가벼운 식사, 수평선을 바라보세요. 현지에서 구할 수 있는 것을 추천해 드릴 수 있습니다.",
-    a_th: "รับประทานยาแก้เมาเรือ 1-2 ชั่วโมงก่อน ดื่มน้ำให้เพียงพอ ทานอาหารเบาๆ และมองที่ขอบฟ้า เราแนะนำยาที่หาได้ในท้องถิ่นได้"
-  },
-  {
-    q_en: "What languages do you support?",
-    q_zh: "提供哪些语言服务？",
-    'q_zh-TW': "提供哪些語言服務？",
-    q_ja: "言語サポートはどうなりますか？",
-    q_ko: "어떤 언어를 지원하나요?",
-    q_th: "รองรับภาษาอะไรบ้าง?",
-    a_en: "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you.",
-    a_zh: "我们支持中文、英语和日语。船长是日本人，有基本英语和部分中文能力，我们负责所有沟通。",
-    'a_zh-TW': "我們支援中文、英語和日語。船長是日本人，有基本英語和部分中文能力，我們負責所有溝通。",
-    a_ja: "英語・中国語・日本語に対応。船長は日本語メインですが、英語・中国語も少々対応可能。コミュニケーションはすべて当方がサポートします。",
-    a_ko: "영어, 중국어, 일본어를 지원합니다. 선장은 일본인이지만 기본 영어와 일부 중국어가 가능합니다. 모든 소통은 저희가 대신합니다.",
-    a_th: "เรารองรับภาษาอังกฤษ จีนกลาง และญี่ปุ่น กัปตันเป็นคนญี่ปุ่นแต่มีภาษาอังกฤษพื้นฐานและจีนบ้าง เราจัดการการสื่อสารทั้งหมดให้คุณ"
+    q_en: "How do I book a fishing charter?",
+    q_zh: "如何预约钓鱼包船？",
+    'q_zh-TW': "如何預約釣魚包船？",
+    q_ja: "釣りチャーターはどう予約しますか？",
+    q_ko: "낚시 차터는 어떻게 예약하나요?",
+    q_th: "จะจองเรือตกปลาได้อย่างไร?",
+    a_en: "Use the contact section to enquire by WhatsApp, WeChat or email, or send the booking form with your preferred date, group size, fishing style and contact details. The site lists WhatsApp +81 70-8952-3968, WeChat OkinawaOnline and email info@nice.okinawa.",
+    a_zh: "可在联系区通过 WhatsApp、微信或邮件咨询，也可以填写预约表单，写明希望日期、人数、钓法和联系方式。站内联系方式：WhatsApp +81 70-8952-3968、WeChat OkinawaOnline、Email info@nice.okinawa。",
+    'a_zh-TW': "可在聯絡區透過 WhatsApp、微信或郵件詢問，也可以填寫預約表單，寫明希望日期、人數、釣法和聯絡方式。站內聯絡方式：WhatsApp +81 70-8952-3968、WeChat OkinawaOnline、Email info@nice.okinawa。",
+    a_ja: "お問い合わせ欄からWhatsApp、WeChat、メールでご相談いただくか、希望日・人数・釣法・連絡先をフォームで送ってください。掲載連絡先は WhatsApp +81 70-8952-3968、WeChat OkinawaOnline、Email info@nice.okinawa です。",
+    a_ko: "문의 섹션에서 WhatsApp, WeChat 또는 이메일로 문의하거나 희망 날짜, 인원, 낚시 스타일, 연락처를 예약 양식으로 보내주세요. 사이트 연락처는 WhatsApp +81 70-8952-3968, WeChat OkinawaOnline, Email info@nice.okinawa 입니다.",
+    a_th: "สอบถามผ่านส่วนติดต่อทาง WhatsApp, WeChat หรือ email หรือส่งแบบฟอร์มพร้อมวันที่ต้องการ จำนวนคน รูปแบบตกปลา และข้อมูลติดต่อ เว็บไซต์ระบุ WhatsApp +81 70-8952-3968, WeChat OkinawaOnline และ email info@nice.okinawa"
   }
 ];
 
