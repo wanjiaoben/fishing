@@ -1,0 +1,37 @@
+# Fishing Nice Okinawa
+
+> English-first information and inquiry site for Okinawa fishing charters and related fishing experiences.
+
+Canonical URL: https://fishing.nice.okinawa/
+Booking email: info@nice.okinawa
+Service area: Okinawa, Japan
+
+## Services
+
+- Shared boat fishing experiences for beginners departing from Kadena Fishing Port
+- Private fishing charters for your group only
+- GT, Tuna, Amberjack, Jigging, Live Bait, Trolling, FAD (Payao), Bottom Fishing and seasonal species
+- Overnight expeditions and remote island charter enquiries for Ishigaki Island and Miyako Island
+- Booking coordination, Chinese/English/Japanese translation and trip support
+- Related activity coordination, including snorkeling, SUP, kayaking and car rental
+
+Prices, departure ports, fishing methods, weather decisions, cancellation terms and final trip details vary by plan and must be confirmed before booking.
+
+## Page index
+
+- [Home and charter overview](https://fishing.nice.okinawa/)
+- [Plans and pricing](https://fishing.nice.okinawa/#plans)
+- [Catch gallery](https://fishing.nice.okinawa/#gallery)
+- [Okinawa fishing guide](https://fishing.nice.okinawa/#guide)
+- [Frequently asked questions](https://fishing.nice.okinawa/#faq)
+- [Booking inquiry and contact](https://fishing.nice.okinawa/#contact)
+- [XML sitemap](https://fishing.nice.okinawa/sitemap.xml)
+- [Crawler policy](https://fishing.nice.okinawa/robots.txt)
+
+## FAQ excerpt
+
+The FAQ section covers private charters and shared boats, prior fishing experience, fishing gear, bad weather, children, seasickness and supported languages.
+
+## Booking information to provide
+
+Send the preferred date, group size, preferred fishing style, contact method and any details needed for the captain to arrange the trip. A booking is not confirmed until availability and plan details are agreed.
