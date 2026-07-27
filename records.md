@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-06-29
+- **最后更新**：2026-07-27
 - **负责人**：Wan
 
 ---
@@ -19,6 +19,7 @@
 | 2026-06-13 | sg | 在 `index.html`、`robots.txt`、`sitemap.xml` 补充公开页 SEO metadata 与站点地图配置 |
 | 2026-06-13 | sg | 在 `index.html` 补充公开页 `hreflang` metadata |
 | 2026-06-12 | sg | 接入 shared analytics tracking，统一站点埋点能力 |
+| 2026-07-27 | Codex | M0727-17 按 snorkel 样板补齐 fishing 的 AI bot robots 显式 Allow 与 OG/Twitter 站内分享图；核查 llms、真人区块与 FAQ 结构化数据 |
 | 2026-06-09 | Codex | 新增 `CLAUDE.md`、`RULES.md` 和 `records.md` |
 | 2026-06-09 | Codex | 填入 fishing 专属港口和服务信息 |
 | 2026-06-09 | Codex | 清理首页中文客群地域标签，改为 `中文圈` / `Chinese-speaking visitors` |
@@ -63,6 +64,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-07-27 | Codex | M0727-17 在干净临时 worktree 从 `origin/main` 起工；只改 fishing，补 `robots.txt` 的 GPTBot/ClaudeBot 显式 Allow，新增 `img/og-fishing.jpg` 并在首页补 OG/Twitter 图卡；llms.txt 与真人区块只读核查 | ✅ |
 | 2026-06-29 | Codex | 运行 Daily repo records updater，核对 2026-06-28 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |
 | 2026-06-28 | Codex | 运行 Daily repo records updater，核对 2026-06-27 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |
 | 2026-06-27 | Codex | 运行 Daily repo records updater，核对 2026-06-26 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |
