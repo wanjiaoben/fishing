@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-07-31 | Codex | M0731-18 为 fishing 真提交补 `site=fishing` / `sourceSite=fishing.nice.okinawa` 自动校验，并与三站 Worker 精确 CORS 门禁对齐 |
 | 2026-06-13 | sg | 在 `index.html`、`robots.txt`、`sitemap.xml` 补充公开页 SEO metadata 与站点地图配置 |
 | 2026-06-13 | sg | 在 `index.html` 补充公开页 `hreflang` metadata |
 | 2026-06-12 | sg | 接入 shared analytics tracking，统一站点埋点能力 |
@@ -65,6 +66,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-07-31 | Codex | M0731-18 承接 M0731-15 真提交分支，新增静态回归测试；共享 Worker 已在独立分支补 fishing 精确 origin 与来源落库测试 | ✅ |
 | 2026-07-31 | Codex | M0731-15 在干净临时 worktree 从 `origin/main` 起工；复核 snorkel inquiry Worker/Resend/D1 链路，只改 fishing 前端提交与 records；发现 Worker CORS 尚未允许 `https://fishing.nice.okinawa`，合并前需处理 | ⚠️ |
 | 2026-07-27 | Codex | M0727-17 在干净临时 worktree 从 `origin/main` 起工；只改 fishing，补 `robots.txt` 的 GPTBot/ClaudeBot 显式 Allow，新增 `img/og-fishing.jpg` 并在首页补 OG/Twitter 图卡；llms.txt 与真人区块只读核查 | ✅ |
 | 2026-06-29 | Codex | 运行 Daily repo records updater，核对 2026-06-28 提交与当前工作区；未发现昨日提交，`.gitignore` 与已跟踪 `.DS_Store` 清理仍在进行中 | ✅ |
