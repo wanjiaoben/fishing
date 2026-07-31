@@ -63,6 +63,7 @@
   gtag('js', new Date());
   gtag('config', 'G-371420585');
 </script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1664,6 +1665,10 @@ section { padding:5.5rem 0; }
   transition:all .3s;
 }
 .form-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,164,74,.4); }
+.form-submit:disabled { opacity:.65; cursor:not-allowed; transform:none; box-shadow:none; }
+.inquiry-status { min-height:1.4rem; font-size:.78rem; line-height:1.6; color:var(--muted); }
+.inquiry-status.ok { color:var(--teal); }
+.inquiry-status.err { color:var(--coral); }
 
 /* ── FOOTER ── */
 footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem 0 1.75rem; }
@@ -2063,7 +2068,9 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
             <label class="form-label" data-ja>メッセージ・ご質問</label>
             <textarea class="form-textarea" id="f-msg"></textarea>
           </div>
-          <button class="form-submit" onclick="submitForm()">
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAADvhTRK9Z-f9ydQ1" data-action="fishing-inquiry-v1"></div>
+          <div class="inquiry-status" id="inquiry-status" aria-live="polite"></div>
+          <button class="form-submit" id="inquiry-submit" onclick="submitForm(event)">
             <span data-en>📩 Send Inquiry</span>
             <span data-zh>📩 发送询问</span>
             <span data-ja>📩 問い合わせを送る</span>
@@ -3134,15 +3141,136 @@ function toggleFaq(i) {
 }
 
 // ── Form ──────────────────────────────────────────────────
-function submitForm() {
+const INQUIRY_ENDPOINT = 'https://inquiry-nice-okinawa-preview.gerheidicn.workers.dev/api/inquiries';
+
+function inquiryText(key) {
   const lang = L();
-  const msg = {
-    en: 'Thank you! We will be in touch within 24 hours.',
-    zh: '感谢您的询问！我们将在24小时内联系您。',
-    ja: 'お問い合わせありがとうございます。24時間以内にご連絡いたします。'
+  const messages = {
+    sending: {
+      en: 'Sending your inquiry...',
+      zh: '正在发送您的询问...',
+      'zh-TW': '正在發送您的詢問...',
+      ja: 'お問い合わせを送信中...'
+    },
+    ok: {
+      en: 'Thank you! We received your inquiry and will reply within 24 hours.',
+      zh: '感谢您的询问！我们已收到，将在24小时内回复。',
+      'zh-TW': '感謝您的詢問！我們已收到，將在24小時內回覆。',
+      ja: 'お問い合わせありがとうございます。受信しましたので24時間以内に返信します。'
+    },
+    missingContact: {
+      en: 'Please enter your contact method. If this keeps failing, email info@nice.okinawa.',
+      zh: '请填写联系方式。如仍无法发送，请改用邮件 info@nice.okinawa。',
+      'zh-TW': '請填寫聯絡方式。如仍無法發送，請改用 Email：info@nice.okinawa。',
+      ja: '連絡先を入力してください。送信できない場合は info@nice.okinawa へメールしてください。'
+    },
+    missingTurnstile: {
+      en: 'Please complete the security check. If this keeps failing, email info@nice.okinawa.',
+      zh: '请先完成安全验证。如仍无法发送，请改用邮件 info@nice.okinawa。',
+      'zh-TW': '請先完成安全驗證。如仍無法發送，請改用 Email：info@nice.okinawa。',
+      ja: 'セキュリティ確認を完了してください。送信できない場合は info@nice.okinawa へメールしてください。'
+    },
+    error: {
+      en: 'Could not send. Please email info@nice.okinawa or use WhatsApp instead.',
+      zh: '发送失败。请改用邮件 info@nice.okinawa 或 WhatsApp 联系。',
+      'zh-TW': '發送失敗。請改用 Email：info@nice.okinawa 或 WhatsApp 聯絡。',
+      ja: '送信できませんでした。info@nice.okinawa へメール、またはWhatsAppをご利用ください。'
+    }
   };
-  alert(msg[lang]||msg['en']);
-  gtag('event', 'inquiry_submitted', { event_category: 'lead', event_label: lang });
+  const group = messages[key] || messages.error;
+  return group[lang] || group.en;
+}
+
+function setInquiryStatus(key, type) {
+  const status = document.getElementById('inquiry-status');
+  if (!status) return;
+  status.className = `inquiry-status ${type || ''}`.trim();
+  status.textContent = inquiryText(key);
+}
+
+function getField(id) {
+  const el = document.getElementById(id);
+  return el ? String(el.value || '').trim() : '';
+}
+
+function resetTurnstile() {
+  if (window.turnstile && typeof window.turnstile.reset === 'function') {
+    window.turnstile.reset();
+  }
+}
+
+function firstInteger(value) {
+  const match = String(value || '').match(/\d+/);
+  return match ? Number(match[0]) : '';
+}
+
+function buildInquiryPayload(turnstileToken) {
+  const name = getField('f-name');
+  const contact = getField('f-contact');
+  const plan = getField('f-plan');
+  const size = getField('f-size');
+  const dates = getField('f-dates');
+  const message = getField('f-msg');
+  return {
+    site: 'fishing',
+    sourceSite: 'fishing.nice.okinawa',
+    date: dates,
+    guests: firstInteger(size),
+    project: plan || 'Fishing inquiry',
+    contact,
+    remarks: [
+      name ? `Name: ${name}` : '',
+      size ? `Group size: ${size}` : '',
+      dates ? `Preferred dates: ${dates}` : '',
+      message ? `Message: ${message}` : ''
+    ].filter(Boolean).join('\n'),
+    language: L(),
+    turnstileToken
+  };
+}
+
+async function submitForm(event) {
+  if (event && event.preventDefault) event.preventDefault();
+  const contact = getField('f-contact');
+  if (!contact) {
+    setInquiryStatus('missingContact', 'err');
+    return false;
+  }
+
+  const tokenInput = document.querySelector('[name="cf-turnstile-response"]');
+  const turnstileToken = tokenInput && tokenInput.value;
+  if (!turnstileToken) {
+    setInquiryStatus('missingTurnstile', 'err');
+    return false;
+  }
+
+  const submit = document.getElementById('inquiry-submit');
+  if (submit) submit.disabled = true;
+  setInquiryStatus('sending');
+
+  try {
+    const response = await fetch(INQUIRY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(buildInquiryPayload(turnstileToken))
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.ok) throw new Error(result.error || 'submit_failed');
+    ['f-name','f-contact','f-plan','f-size','f-dates','f-msg'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    resetTurnstile();
+    setInquiryStatus('ok', 'ok');
+    gtag('event', 'inquiry_submitted', { event_category: 'lead', event_label: L() });
+    return true;
+  } catch (error) {
+    resetTurnstile();
+    setInquiryStatus('error', 'err');
+    return false;
+  } finally {
+    if (submit) submit.disabled = false;
+  }
 }
 
 // ── i18n stub (handled by JS render functions)
