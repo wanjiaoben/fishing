@@ -29,3 +29,11 @@ test('fishing only reports success after an ok backend response', () => {
   assert.ok(errorStatus > successStatus);
   assert.doesNotMatch(html, /function submitForm\(\)\s*\{[^}]*alert\(/s);
 });
+
+test('fishing uses only the first-party analytics beacon', () => {
+  const googleAnalyticsPattern = new RegExp(['g', 'tag'].join('') + '|google' + 'tagmanager|G-[A-Z0-9]+');
+  assert.doesNotMatch(html, googleAnalyticsPattern);
+  const beaconMatches = html.match(/https:\/\/analytics\.nice\.okinawa\/beacon\.js/g) || [];
+  assert.equal(beaconMatches.length, 1);
+  assert.match(html, /data-site=["']fishing["']/);
+});
