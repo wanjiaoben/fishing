@@ -63,6 +63,7 @@
 - 中文用户不得用中国、台湾、中国香港、香港或对应旗帜区分；使用 `简体中文`、`繁体中文`、`中文圈`。
 - 旅行活动页面必须说明现场活动保险、自行购买海外旅行保险、翻译协调边界和联系担当。
 - M0805-06 生产发车回滚锚：合并前 `origin/main` 为 `b28d112754b3904d4c6929e4a3ab837795741a66`，#24 原始施工提交为 `5bba9bc288ec47fbb13db0b04f3e75c5a868bb85`。如需回滚，revert #24 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
+- M0805-15 生产发车回滚锚：合并前 `origin/main` 为 `d2d58362f25e90a6798c028eaf73dba7fe5a45d3`，#25 原始施工提交为 `9fb75a476c2f34e19a6ea6cc05d6a4ae6c55e966`。如需回滚，revert #25 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 
 ---
 
