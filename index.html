@@ -56,8 +56,6 @@
   document.documentElement.setAttribute('lang', langAttr);
 })();
 </script>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
@@ -1638,30 +1636,29 @@ section { padding:5.5rem 0; }
 .ch-arrow { margin-left:auto; color:var(--muted); font-size:1.1rem; transition:transform .2s; }
 .channel:hover .ch-arrow { transform:translateX(4px); color:var(--white); }
 
-.form { display:flex; flex-direction:column; gap:.85rem; }
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; }
-.form-group { display:flex; flex-direction:column; gap:.35rem; }
-.form-label { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
-.form-input, .form-select, .form-textarea {
-  background:var(--glass); border:1px solid var(--glass-b); border-radius:5px;
-  padding:.75rem .9rem; color:var(--white); font-size:.875rem; font-family:var(--font-b);
-  transition:border-color .2s; outline:none; width:100%;
+.direct-contact {
+  background:linear-gradient(135deg,rgba(200,164,74,.12),rgba(0,180,200,.08));
+  border:1px solid rgba(200,164,74,.35);
+  border-radius:10px;
+  padding:1.25rem;
+  box-shadow:0 16px 40px rgba(0,0,0,.22);
 }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--teal); }
-.form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
-.form-select { appearance:none; cursor:pointer; }
-.form-textarea { resize:vertical; min-height:90px; }
-.form-submit {
-  background:linear-gradient(135deg,var(--gold),var(--gold-lt)); color:var(--deep);
-  border:none; border-radius:5px; padding:.9rem; font-size:.85rem; font-weight:700;
-  letter-spacing:.05em; text-transform:uppercase; cursor:pointer; font-family:var(--font-b);
-  transition:all .3s;
+.direct-contact-title { font-family:var(--font-d); font-size:1.35rem; font-weight:700; color:var(--white); line-height:1.35; margin-bottom:.45rem; }
+.direct-contact-copy { font-size:.86rem; color:rgba(255,255,255,.66); line-height:1.7; margin-bottom:1rem; }
+.direct-contact-actions { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+.direct-contact-link {
+  display:flex; align-items:center; justify-content:center; gap:.55rem;
+  min-width:0; min-height:54px; padding:.9rem .75rem;
+  border-radius:5px; background:var(--gold); color:var(--deep);
+  border:1px solid rgba(255,255,255,.12); text-decoration:none;
+  font-size:.86rem; font-weight:800; letter-spacing:.02em; white-space:nowrap;
+  box-shadow:0 8px 24px rgba(200,164,74,.25); transition:all .25s;
+  user-select:text;
 }
-.form-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,164,74,.4); }
-.form-submit:disabled { opacity:.65; cursor:not-allowed; transform:none; box-shadow:none; }
-.inquiry-status { min-height:1.4rem; font-size:.78rem; line-height:1.6; color:var(--muted); }
-.inquiry-status.ok { color:var(--teal); }
-.inquiry-status.err { color:var(--coral); }
+.direct-contact-link:hover { background:var(--gold-lt); transform:translateY(-2px); }
+.direct-contact-link.whatsapp { background:#25d366; color:#052315; box-shadow:0 8px 24px rgba(37,211,102,.2); }
+.direct-contact-link.whatsapp:hover { background:#41e27b; }
+.direct-contact-value { user-select:text; }
 
 /* ── FOOTER ── */
 footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem 0 1.75rem; }
@@ -1770,13 +1767,15 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
   .plans-grid { grid-template-columns:1fr; }
   .footer-inner { grid-template-columns:1fr; gap:1.5rem; }
   .steps { grid-template-columns:1fr 1fr; gap:1.25rem; }
-  .form-row { grid-template-columns:1fr; }
+  .direct-contact-actions { grid-template-columns:1fr; }
   .log-details { grid-template-columns:1fr 1fr; }
   .hero-stats { gap:1.5rem; }
 }
 @media(max-width:480px) {
   .gallery-grid { columns:1; }
   .nav-cta { display:none; }
+  .direct-contact { padding:.9rem; }
+  .direct-contact-link { font-size:.84rem; min-height:50px; }
 }
 </style>
 <link rel="canonical" href="https://fishing.nice.okinawa/">
@@ -1981,9 +1980,9 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 
     <div class="contact-grid">
       <div>
-        <p class="s-desc" data-en>Reach us instantly via WhatsApp, WeChat or email — or fill in the form and we'll reply within 24 hours.</p>
-        <p class="s-desc" data-zh>通过 WhatsApp、微信或邮件即时联系我们，或填写表格，我们将在24小时内回复。</p>
-        <p class="s-desc" data-ja>WhatsApp、WeChat、メールでお気軽にご連絡ください。またはフォームにご記入いただければ24時間以内にご返信します。</p>
+        <p class="s-desc" data-en>Reach us instantly via WhatsApp, WeChat or email — we'll reply within 24 hours.</p>
+        <p class="s-desc" data-zh>通过 WhatsApp、微信或邮件即时联系我们，我们将在24小时内回复。</p>
+        <p class="s-desc" data-ja>WhatsApp、WeChat、メールでお気軽にご連絡ください。24時間以内にご返信します。</p>
 
         <div class="channels">
           <a href="https://wa.me/817089523968" class="channel" target="_blank" rel="noopener">
@@ -2006,68 +2005,19 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       </div>
 
       <div>
-        <div class="form">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" data-en>Name</label>
-              <label class="form-label" data-zh>姓名</label>
-              <label class="form-label" data-ja>お名前</label>
-              <input type="text" class="form-input" id="f-name">
-            </div>
-            <div class="form-group">
-              <label class="form-label" data-en>Contact (WhatsApp / WeChat / Email)</label>
-              <label class="form-label" data-zh>联系方式</label>
-              <label class="form-label" data-ja>連絡先</label>
-              <input type="text" class="form-input" id="f-contact">
-            </div>
+        <div class="direct-contact" aria-label="Direct contact options">
+          <div class="direct-contact-title">Email or WhatsApp us directly</div>
+          <div class="direct-contact-copy">Tell us your preferred dates, group size and fishing style — we reply within 24 hours.</div>
+          <div class="direct-contact-actions">
+            <a href="mailto:info@nice.okinawa" class="direct-contact-link" data-contact="email">
+              <span>✉️</span>
+              <span class="direct-contact-value">info@nice.okinawa</span>
+            </a>
+            <a href="https://wa.me/817089523968" class="direct-contact-link whatsapp" data-contact="whatsapp" target="_blank" rel="noopener">
+              <span>💬</span>
+              <span class="direct-contact-value">+81 70-8952-3968</span>
+            </a>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" data-en>Plan</label>
-              <label class="form-label" data-zh>方案</label>
-              <label class="form-label" data-ja>ご希望のプラン</label>
-              <select class="form-select" id="f-plan">
-                <option value="" data-en>Select plan...</option>
-                <option value="" data-zh>选择方案...</option>
-                <option value="" data-ja>プランを選択...</option>
-                <option>Amberjack Live Bait / カンパチ泳饵钓</option>
-                <option>Tuna & Multi-Species / マグロ・マルチターゲット</option>
-                <option>GT Fishing / GTフィッシング</option>
-                <option>Expedition / 遠征釣行</option>
-                <option>Jigging / ジギング</option>
-                <option>Trolling / トローリング</option>
-                <option>FAD / パヤオ</option>
-                <option data-en>Not sure — please advise</option>
-                <option data-zh>不确定，请推荐</option>
-                <option data-ja>未定・ご提案ください</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" data-en>Group Size</label>
-              <label class="form-label" data-zh>团队人数</label>
-              <label class="form-label" data-ja>参加人数</label>
-              <input type="text" class="form-input" id="f-size" placeholder="e.g. 3 adults">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-en>Preferred Dates</label>
-            <label class="form-label" data-zh>希望日期</label>
-            <label class="form-label" data-ja>ご希望の日程</label>
-            <input type="text" class="form-input" id="f-dates" placeholder="e.g. July 10–15, flexible">
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-en>Message / Questions</label>
-            <label class="form-label" data-zh>留言/问题</label>
-            <label class="form-label" data-ja>メッセージ・ご質問</label>
-            <textarea class="form-textarea" id="f-msg"></textarea>
-          </div>
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAADvhTRK9Z-f9ydQ1" data-action="fishing-inquiry-v1"></div>
-          <div class="inquiry-status" id="inquiry-status" aria-live="polite"></div>
-          <button class="form-submit" id="inquiry-submit" onclick="submitForm(event)">
-            <span data-en>📩 Send Inquiry</span>
-            <span data-zh>📩 发送询问</span>
-            <span data-ja>📩 問い合わせを送る</span>
-          </button>
         </div>
       </div>
     </div>
@@ -3131,197 +3081,6 @@ function toggleFaq(i) {
   const isOpen = item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
   if (!isOpen) item.classList.add('open');
-}
-
-// ── Form ──────────────────────────────────────────────────
-const INQUIRY_ENDPOINT = 'https://inquiry-nice-okinawa-preview.gerheidicn.workers.dev/api/inquiries';
-
-function inquiryText(key) {
-  const lang = L();
-  const messages = {
-    sending: {
-      en: 'Sending your inquiry...',
-      zh: '正在发送您的询问...',
-      'zh-TW': '正在發送您的詢問...',
-      ja: 'お問い合わせを送信中...'
-    },
-    ok: {
-      en: 'Thank you! We received your inquiry and will reply within 24 hours.',
-      zh: '感谢您的询问！我们已收到，将在24小时内回复。',
-      'zh-TW': '感謝您的詢問！我們已收到，將在24小時內回覆。',
-      ja: 'お問い合わせありがとうございます。受信しましたので24時間以内に返信します。'
-    },
-    missingContact: {
-      en: 'Please enter your contact method. If this keeps failing, email info@nice.okinawa.',
-      zh: '请填写联系方式。如仍无法发送，请改用邮件 info@nice.okinawa。',
-      'zh-TW': '請填寫聯絡方式。如仍無法發送，請改用 Email：info@nice.okinawa。',
-      ja: '連絡先を入力してください。送信できない場合は info@nice.okinawa へメールしてください。'
-    },
-    missingTurnstile: {
-      en: 'Please complete the security check. If this keeps failing, email info@nice.okinawa.',
-      zh: '请先完成安全验证。如仍无法发送，请改用邮件 info@nice.okinawa。',
-      'zh-TW': '請先完成安全驗證。如仍無法發送，請改用 Email：info@nice.okinawa。',
-      ja: 'セキュリティ確認を完了してください。送信できない場合は info@nice.okinawa へメールしてください。'
-    },
-    error: {
-      en: 'Could not send. Please email info@nice.okinawa or use WhatsApp instead.',
-      zh: '发送失败。请改用邮件 info@nice.okinawa 或 WhatsApp 联系。',
-      'zh-TW': '發送失敗。請改用 Email：info@nice.okinawa 或 WhatsApp 聯絡。',
-      ja: '送信できませんでした。info@nice.okinawa へメール、またはWhatsAppをご利用ください。'
-    }
-  };
-  const group = messages[key] || messages.error;
-  return group[lang] || group.en;
-}
-
-function setInquiryStatus(key, type) {
-  const status = document.getElementById('inquiry-status');
-  if (!status) return;
-  status.className = `inquiry-status ${type || ''}`.trim();
-  status.textContent = inquiryText(key);
-}
-
-function getField(id) {
-  const el = document.getElementById(id);
-  return el ? String(el.value || '').trim() : '';
-}
-
-function resetTurnstile() {
-  if (window.turnstile && typeof window.turnstile.reset === 'function') {
-    window.turnstile.reset();
-  }
-}
-
-function firstInteger(value) {
-  const match = String(value || '').match(/\d+/);
-  return match ? Number(match[0]) : '';
-}
-
-function analyticsIdentity(storage, key) {
-  try {
-    var value = storage.getItem(key);
-    if (!value) {
-      value = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
-      storage.setItem(key, value);
-    }
-    return value;
-  } catch (error) {
-    return String(Date.now()) + '-' + Math.random().toString(36).slice(2);
-  }
-}
-
-function analyticsLandingUrl() {
-  try {
-    var query = new URLSearchParams(location.search);
-    var kept = new URLSearchParams();
-    ['utm_source', 'utm_medium', 'utm_campaign'].forEach(function(key) {
-      var value = query.get(key);
-      if (value) kept.set(key, value);
-    });
-    var qs = kept.toString();
-    return location.pathname + (qs ? '?' + qs : '');
-  } catch (error) {
-    return location.pathname || '/';
-  }
-}
-
-function sendFirstPartyInquiryEvent() {
-  try {
-    var payload = {
-      site_id: 'fishing',
-      event_type: 'contact_click',
-      visitor_id: analyticsIdentity(localStorage, 'nice_analytics_visitor_id'),
-      session_id: analyticsIdentity(sessionStorage, 'nice_analytics_session_id'),
-      ts: new Date().toISOString(),
-      landing_url: analyticsLandingUrl(),
-      referrer: document.referrer || '',
-      ui_lang: L(),
-      browser_lang: navigator.language || '',
-      contact_channel: 'form'
-    };
-    var body = JSON.stringify(payload);
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon('https://analytics.nice.okinawa/events', new Blob([body], { type: 'text/plain' }));
-      return;
-    }
-    fetch('https://analytics.nice.okinawa/events', {
-      method: 'POST',
-      headers: { 'content-type': 'text/plain' },
-      body,
-      keepalive: true
-    }).catch(function(){});
-  } catch (error) {}
-}
-
-function buildInquiryPayload(turnstileToken) {
-  const name = getField('f-name');
-  const contact = getField('f-contact');
-  const plan = getField('f-plan');
-  const size = getField('f-size');
-  const dates = getField('f-dates');
-  const message = getField('f-msg');
-  return {
-    site: 'fishing',
-    sourceSite: 'fishing.nice.okinawa',
-    date: dates,
-    guests: firstInteger(size),
-    project: plan || 'Fishing inquiry',
-    contact,
-    remarks: [
-      name ? `Name: ${name}` : '',
-      size ? `Group size: ${size}` : '',
-      dates ? `Preferred dates: ${dates}` : '',
-      message ? `Message: ${message}` : ''
-    ].filter(Boolean).join('\n'),
-    language: L(),
-    turnstileToken
-  };
-}
-
-async function submitForm(event) {
-  if (event && event.preventDefault) event.preventDefault();
-  const contact = getField('f-contact');
-  if (!contact) {
-    setInquiryStatus('missingContact', 'err');
-    return false;
-  }
-
-  const tokenInput = document.querySelector('[name="cf-turnstile-response"]');
-  const turnstileToken = tokenInput && tokenInput.value;
-  if (!turnstileToken) {
-    setInquiryStatus('missingTurnstile', 'err');
-    return false;
-  }
-
-  const submit = document.getElementById('inquiry-submit');
-  if (submit) submit.disabled = true;
-  setInquiryStatus('sending');
-
-  try {
-    const response = await fetch(INQUIRY_ENDPOINT, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(buildInquiryPayload(turnstileToken))
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok || !result.ok) throw new Error(result.error || 'submit_failed');
-    ['f-name','f-contact','f-plan','f-size','f-dates','f-msg'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-    resetTurnstile();
-    setInquiryStatus('ok', 'ok');
-    sendFirstPartyInquiryEvent();
-    return true;
-  } catch (error) {
-    resetTurnstile();
-    setInquiryStatus('error', 'err');
-    return false;
-  } finally {
-    if (submit) submit.disabled = false;
-  }
 }
 
 // ── i18n stub (handled by JS render functions)
