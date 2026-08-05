@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-08-01
+- **最后更新**：2026-08-05
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-05 | Codex | M0805-03 确认 fishing 无 GA 残留，保留唯一第一方 `analytics.nice.okinawa` beacon，并将表单成功事件接入第一方信标 |
 | 2026-07-31 | Codex | M0731-18 为 fishing 真提交补 `site=fishing` / `sourceSite=fishing.nice.okinawa` 自动校验，并与三站 Worker 精确 CORS 门禁对齐 |
 | 2026-08-01 | Codex | M0731-15 移除 fishing 的 GA 代码，保留唯一第一方 `analytics.nice.okinawa` beacon，并补回归测试 |
 | 2026-06-13 | sg | 在 `index.html`、`robots.txt`、`sitemap.xml` 补充公开页 SEO metadata 与站点地图配置 |
@@ -67,6 +68,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-05 | Codex | M0805-03 在 `origin/main` 干净临时 worktree 起工；保留现有真实提交链路与失败提示，只在提交成功后通过第一方 analytics endpoint 上报 `contact_click` / `form`；补成功/失败路径回归测试 | ✅ |
 | 2026-08-01 | Codex | M0731-15 从 `origin/main` 干净临时 worktree 起工；移除 GA 初始化与表单成功后的 GA 事件副作用，保留 M0731 真提交 endpoint/payload/失败处理；确认第一方 beacon 唯一 | ✅ |
 | 2026-07-31 | Codex | M0731-18 承接 M0731-15 真提交分支，新增静态回归测试；共享 Worker 已在独立分支补 fishing 精确 origin 与来源落库测试 | ✅ |
 | 2026-07-31 | Codex | M0731-15 在干净临时 worktree 从 `origin/main` 起工；复核 snorkel inquiry Worker/Resend/D1 链路，只改 fishing 前端提交与 records；发现 Worker CORS 尚未允许 `https://fishing.nice.okinawa`，合并前需处理 | ⚠️ |
