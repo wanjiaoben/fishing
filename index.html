@@ -3197,6 +3197,64 @@ function firstInteger(value) {
   return match ? Number(match[0]) : '';
 }
 
+function analyticsIdentity(storage, key) {
+  try {
+    var value = storage.getItem(key);
+    if (!value) {
+      value = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+      storage.setItem(key, value);
+    }
+    return value;
+  } catch (error) {
+    return String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+  }
+}
+
+function analyticsLandingUrl() {
+  try {
+    var query = new URLSearchParams(location.search);
+    var kept = new URLSearchParams();
+    ['utm_source', 'utm_medium', 'utm_campaign'].forEach(function(key) {
+      var value = query.get(key);
+      if (value) kept.set(key, value);
+    });
+    var qs = kept.toString();
+    return location.pathname + (qs ? '?' + qs : '');
+  } catch (error) {
+    return location.pathname || '/';
+  }
+}
+
+function sendFirstPartyInquiryEvent() {
+  try {
+    var payload = {
+      site_id: 'fishing',
+      event_type: 'contact_click',
+      visitor_id: analyticsIdentity(localStorage, 'nice_analytics_visitor_id'),
+      session_id: analyticsIdentity(sessionStorage, 'nice_analytics_session_id'),
+      ts: new Date().toISOString(),
+      landing_url: analyticsLandingUrl(),
+      referrer: document.referrer || '',
+      ui_lang: L(),
+      browser_lang: navigator.language || '',
+      contact_channel: 'form'
+    };
+    var body = JSON.stringify(payload);
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('https://analytics.nice.okinawa/events', new Blob([body], { type: 'text/plain' }));
+      return;
+    }
+    fetch('https://analytics.nice.okinawa/events', {
+      method: 'POST',
+      headers: { 'content-type': 'text/plain' },
+      body,
+      keepalive: true
+    }).catch(function(){});
+  } catch (error) {}
+}
+
 function buildInquiryPayload(turnstileToken) {
   const name = getField('f-name');
   const contact = getField('f-contact');
@@ -3255,6 +3313,7 @@ async function submitForm(event) {
     });
     resetTurnstile();
     setInquiryStatus('ok', 'ok');
+    sendFirstPartyInquiryEvent();
     return true;
   } catch (error) {
     resetTurnstile();
