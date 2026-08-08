@@ -73,6 +73,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-08 | Codex | M0808-19 从内容稿新建 `/fishing-seasons/` 英文季节页；追加 sitemap/llms 索引、首页 guide 末尾入口，并补 LocalBusiness telephone/image/priceRange 结构化字段 | ✅ |
 | 2026-08-08 | Codex | M0808-17 发车前追加 schema.org 官方校验与 Google Rich Results Test；修正 #26 中 Service/Offer JSON-LD 关系到零 error 后发车 | ✅ |
 | 2026-08-08 | Codex | M0808-14 从 `origin/main` 干净临时 worktree 起工；不改页面可见文案、plan、FAQ、robots、表单或 GA；仅结构化暴露既有事实并压缩 `img/exp-fishing-2.jpg` | ✅ |
 | 2026-08-05 | Codex | M0805-13 rev2 从 `origin/main` 干净临时 worktree 起工；移除首页询盘表单、Turnstile 与 inquiry endpoint 前端引用；未改 inquiry Worker、D1 与其他站 | ✅ |
