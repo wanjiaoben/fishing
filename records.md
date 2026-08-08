@@ -66,6 +66,7 @@
 - M0805-06 生产发车回滚锚：合并前 `origin/main` 为 `b28d112754b3904d4c6929e4a3ab837795741a66`，#24 原始施工提交为 `5bba9bc288ec47fbb13db0b04f3e75c5a868bb85`。如需回滚，revert #24 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0805-15 生产发车回滚锚：合并前 `origin/main` 为 `d2d58362f25e90a6798c028eaf73dba7fe5a45d3`，#25 原始施工提交为 `9fb75a476c2f34e19a6ea6cc05d6a4ae6c55e966`。如需回滚，revert #25 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0808-17 生产发车回滚锚：合并前 `origin/main` 为 `fc8a79b97354eee99db5f733a23a9965e127d98a`，#26 发车校验提交为 `2afb1e4ba47be8e0faacb59170724093719897d1`。如需回滚，revert #26 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
+- M0808-26 生产发车回滚锚：合并前 `origin/main` 为 `4de81e333470d51f42e03e08744ffad5689bacc6`，#27 squash merge commit 为 `00f889a38713a9aa9e11ed0de9643f6c39fa1c7a`。如需回滚，revert #27 squash merge commit，并复验 `https://fishing.nice.okinawa/` 与 `https://fishing.nice.okinawa/fishing-seasons/`。
 
 ---
 
@@ -73,6 +74,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-08 | Codex | M0808-26 经 Wan 授权将 #27 转 Ready 并 squash merge，上线 `/fishing-seasons/`；GitHub Pages 部署 `31249259089` success，生产十项点验 PASS | ✅ |
 | 2026-08-08 | Codex | M0808-19 从内容稿新建 `/fishing-seasons/` 英文季节页；追加 sitemap/llms 索引、首页 guide 末尾入口，并补 LocalBusiness telephone/image/priceRange 结构化字段 | ✅ |
 | 2026-08-08 | Codex | M0808-17 发车前追加 schema.org 官方校验与 Google Rich Results Test；修正 #26 中 Service/Offer JSON-LD 关系到零 error 后发车 | ✅ |
 | 2026-08-08 | Codex | M0808-14 从 `origin/main` 干净临时 worktree 起工；不改页面可见文案、plan、FAQ、robots、表单或 GA；仅结构化暴露既有事实并压缩 `img/exp-fishing-2.jpg` | ✅ |
