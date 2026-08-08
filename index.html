@@ -1781,7 +1781,177 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 <link rel="canonical" href="https://fishing.nice.okinawa/">
 <link rel="alternate" hreflang="x-default" href="https://fishing.nice.okinawa/">
 <link rel="alternate" hreflang="en" href="https://fishing.nice.okinawa/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Okinawa Fishing Charter | fishing.nice.okinawa","description":"Book private Okinawa fishing charters from Chatan: GT, tuna, amberjack, jigging and live bait trips with local captains.","url":"https://fishing.nice.okinawa/"}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://fishing.nice.okinawa/#business",
+      "name": "Okinawa Fishing Charter | fishing.nice.okinawa",
+      "description": "Book private Okinawa fishing charters from Chatan: GT, tuna, amberjack, jigging and live bait trips with local captains.",
+      "url": "https://fishing.nice.okinawa/",
+      "email": "info@nice.okinawa",
+      "areaServed": "Okinawa, Japan",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Okinawa fishing plans and pricing",
+        "itemListElement": [
+          { "@id": "https://fishing.nice.okinawa/#offer-experience-fishing" },
+          { "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait" },
+          { "@id": "https://fishing.nice.okinawa/#offer-tuna-multi-species" },
+          { "@id": "https://fishing.nice.okinawa/#offer-gt-fishing" },
+          { "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition" },
+          { "@id": "https://fishing.nice.okinawa/#offer-other-methods" },
+          { "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter" }
+        ]
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-experience-fishing",
+      "name": "Experience Fishing — Shared Boat",
+      "description": "A relaxed 2-hour sea fishing experience from Kadena Fishing Port. Perfect for first-timers, families, couples and tourists. All equipment provided. Up to 35 people per boat. We act as booking coordinator.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "Kadena Fishing Port",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-experience-fishing" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-experience-fishing",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-experience-fishing" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "description": "Contact for pricing"
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-amberjack-live-bait",
+      "name": "Amberjack Live Bait",
+      "description": "Captain's top recommendation. Live bait fishing for Greater Amberjack (カンパチ). Hotel-to-port transfer available. Fresh catch can be prepared as sashimi on request.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "Chatan Hamagawa Port (West Coast)",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-amberjack-live-bait" },
+      "price": 131000,
+      "priceCurrency": "JPY",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 131000,
+        "priceCurrency": "JPY",
+        "description": "from ¥131,000, transfer included. Tackle rental +¥10,000 per person."
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-tuna-multi-species",
+      "name": "Tuna & Multi-Species",
+      "description": "Live bait for Yellowfin Tuna, Grouper, Amberjack and more. Price varies by fishing ground distance.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "West or East Coast by arrangement",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-tuna-multi-species" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-tuna-multi-species",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-tuna-multi-species" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "minPrice": 90000,
+        "maxPrice": 150000,
+        "description": "¥90,000–150,000. Tackle rental +¥10,000 per person."
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-gt-fishing",
+      "name": "GT Fishing (Giant Trevally)",
+      "description": "Max 4 casters simultaneously. Experienced anglers only — large lures and long-distance casting required. Please advise if first GT experience.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "West or East Coast by arrangement",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-gt-fishing" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-gt-fishing",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-gt-fishing" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "minPrice": 90000,
+        "maxPrice": 100000,
+        "description": "¥90,000–100,000. Maximum 4 casters. Tackle rental ¥5,000 per set."
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-overnight-expedition",
+      "name": "Overnight Expedition & Remote Islands",
+      "description": "Multi-day offshore expeditions for the biggest fish. Boat or island guesthouse. Ishigaki & Miyako Island charters by direct enquiry.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "Chatan / Kadena / 泡瀬 · Remote islands by enquiry",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-overnight-expedition" },
+      "priceSpecification": [
+        { "@type": "PriceSpecification", "name": "Day trip", "priceCurrency": "JPY", "minPrice": 120000, "maxPrice": 150000, "description": "day trip ¥120,000–150,000" },
+        { "@type": "PriceSpecification", "name": "1 night 2 days", "priceCurrency": "JPY", "minPrice": 240000, "maxPrice": 300000, "description": "one night two days ¥240,000–300,000" },
+        { "@type": "PriceSpecification", "name": "2 nights 3 days", "priceCurrency": "JPY", "minPrice": 360000, "maxPrice": 450000, "description": "two nights three days ¥360,000–450,000" },
+        { "@type": "PriceSpecification", "name": "Island stay +", "priceCurrency": "JPY", "minPrice": 7000, "maxPrice": 9000, "description": "+¥7,000–9,000 per person" }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-other-methods",
+      "name": "Other Methods",
+      "description": "Jigging, Trolling, FAD (Payao), Bottom Fishing, Seasonal species. Contact us to discuss.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "West Coast, East Coast or by arrangement",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-other-methods" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-other-methods",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-other-methods" },
+      "priceSpecification": [
+        { "@type": "PriceSpecification", "name": "Jigging / Live Bait / GT", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 130000, "description": "jigging / live bait / GT ¥80,000–130,000" },
+        { "@type": "UnitPriceSpecification", "name": "FAD (Payao)", "price": 100000, "priceCurrency": "JPY", "description": "FAD (Payao) ¥100,000" },
+        { "@type": "UnitPriceSpecification", "name": "Trolling (tackle included)", "price": 140000, "priceCurrency": "JPY", "description": "trolling ¥140,000 (tackle included)" },
+        { "@type": "PriceSpecification", "name": "Bottom / Grouper", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 90000, "description": "bottom / grouper ¥80,000–90,000" }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-remote-island-charter",
+      "name": "Remote Island Charter",
+      "description": "Planning a fishing trip around Ishigaki Island or Miyako Island? We coordinate remote island charters — just get in touch and we'll sort out the details.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "Ishigaki Island · Miyako Island",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-remote-island-charter" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "description": "By enquiry"
+      }
+    }
+  ]
+}
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -2403,12 +2573,12 @@ function buildServiceA(lang) {
   ];
   const alsoHtml = alsoCards.map(c => `
     <a href="https://snorkel.nice.okinawa" class="also-card" target="_blank" rel="noopener" style="height:120px">
-      <img src="${c.img}" alt="${c.title[lang]||c.title.en}" style="height:120px" onerror="this.outerHTML='<div class=\'also-placeholder\'>${c.emoji}</div>'" style="object-fit:cover;display:block">
+      <img src="${c.img}" alt="${c.title[lang]||c.title.en}" loading="lazy" width="1478" height="1108" style="height:120px" onerror="this.outerHTML='<div class=\'also-placeholder\'>${c.emoji}</div>'" style="object-fit:cover;display:block">
       <div class="also-overlay"><div><div class="also-card-title" style="font-size:.85rem">${c.title[lang]||c.title.en}</div></div></div>
     </a>`).join('');
 
   // One img only - compact
-  const img = `<img src="${a.images[0]}" alt="${t(a.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+  const img = `<img src="${a.images[0]}" alt="${t(a.title)}" loading="lazy" width="1479" height="1109" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
 
   return `
   <div class="service-a-grid">
@@ -2503,10 +2673,10 @@ function buildServiceB(lang) {
     <div class="service-b-header">
       <!-- Photos -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
-        <img src="img/boat-fishing.jpg" alt="fishing charter boat" loading="lazy"
+        <img src="img/boat-fishing.jpg" alt="fishing charter boat" loading="lazy" width="1108" height="1478"
           style="width:100%;height:200px;object-fit:cover;display:block"
           onerror="this.style.display='none'">
-        <img src="img/captain-bigfish.jpg" alt="captain with big catch" loading="lazy"
+        <img src="img/captain-bigfish.jpg" alt="captain with big catch" loading="lazy" width="980" height="1225"
           style="width:100%;height:200px;object-fit:cover;display:block"
           onerror="this.style.display='none'">
       </div>
@@ -2556,7 +2726,7 @@ function buildAlsoSection(lang) {
   ];
   const cardHtml = cards.map(a => `
     <a href="${a.link}" class="also-card" target="_blank" rel="noopener">
-      <img src="${a.img}" alt="${t(a.title)}" onerror="this.outerHTML='<div class=\'also-placeholder\'>${a.emoji}</div>'">
+      <img src="${a.img}" alt="${t(a.title)}" loading="lazy" width="1478" height="1108" onerror="this.outerHTML='<div class=\'also-placeholder\'>${a.emoji}</div>'">
       <div class="also-overlay"><div><div class="also-card-title">${t(a.title)}</div><div class="also-card-sub">${a.sub[lang]||a.sub.en}</div></div></div>
     </a>`).join('');
   return `
@@ -2668,6 +2838,38 @@ function buildHero() {
 // ── Gallery ───────────────────────────────────────────────
 let currentFilter = 'all';
 
+const GALLERY_IMAGE_DIMENSIONS = {
+  "2025-03-01-001.jpg": [1080, 1350],
+  "2025-03-01-002.jpg": [1080, 1350],
+  "2025-03-19-001.jpg": [1080, 1350],
+  "2025-03-23-001.jpg": [1080, 1350],
+  "2025-04-01-001.jpg": [1080, 1350],
+  "2025-05-12-001.jpg": [1080, 1350],
+  "2025-05-22-001.jpg": [1080, 1350],
+  "2025-11-01-001.jpg": [1080, 1350],
+  "2025-11-18-001.jpg": [1080, 1440],
+  "2025-11-18-002.jpg": [1080, 1440],
+  "2025-11-18-003.jpg": [1080, 1440],
+  "2025-11-18-004.jpg": [1080, 1440],
+  "2025-11-24-001.jpg": [1080, 1440],
+  "2025-11-24-002.jpg": [1080, 1440],
+  "2025-11-24-003.jpg": [1080, 1440],
+  "2025-12-22-001.jpg": [1080, 1440],
+  "2026-02-22-001.jpg": [1080, 1440],
+  "2026-02-22-002.jpg": [1080, 1440],
+  "2026-03-13-001.jpg": [1080, 1440],
+  "2026-03-13-002.jpg": [1080, 1440],
+  "2026-03-13-003.jpg": [1080, 1440],
+  "2026-04-01-001.jpg": [1080, 1440],
+  "2026-04-03-001.jpg": [1080, 1440],
+  "2026-04-12-001.jpg": [1080, 1440],
+  "2026-04-21-001.jpg": [1080, 1440],
+  "2026-05-05-001.jpg": [1080, 1440],
+  "2026-05-06-001.jpg": [1080, 1440],
+  "2026-05-11-001.jpg": [1080, 1440],
+  "2026-05-mid-001.jpg": [1080, 1440]
+};
+
 function buildGalleryFilters() {
   const months = getAllMonths();
   const container = document.getElementById('gallery-filters');
@@ -2703,12 +2905,15 @@ function buildGallery(filter, btn) {
       lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja-JP' : 'en-US',
       { year:'numeric', month:'short' }
     );
+    const dims = GALLERY_IMAGE_DIMENSIONS[p.image] || [1080, 1440];
     return `
     <div class="gallery-item">
       <img
         src="img/gallery/${p.image}"
         alt="${fish}"
         loading="lazy"
+        width="${dims[0]}"
+        height="${dims[1]}"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
       >
       <div class="gallery-placeholder" style="display:none">🐟</div>

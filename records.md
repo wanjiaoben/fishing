@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-08-05
+- **最后更新**：2026-08-08
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-08 | Codex | M0808-14 将 fishing 既有价格、港口、季节鱼种、取消政策等事实写入 `llms.txt`，补 Service/Offer JSON-LD 价格结构化，并轻量优化图片属性与体验图体积 |
 | 2026-08-05 | Codex | M0805-13 rev2 下线 fishing 首页询盘表单，原位置改为 Email / WhatsApp 明文直连块，并接入第一方 contact_click 渠道统计 |
 | 2026-08-05 | Codex | M0805-03 确认 fishing 无 GA 残留，保留唯一第一方 `analytics.nice.okinawa` beacon，并将表单成功事件接入第一方信标 |
 | 2026-07-31 | Codex | M0731-18 为 fishing 真提交补 `site=fishing` / `sourceSite=fishing.nice.okinawa` 自动校验，并与三站 Worker 精确 CORS 门禁对齐 |
@@ -64,6 +65,7 @@
 - 旅行活动页面必须说明现场活动保险、自行购买海外旅行保险、翻译协调边界和联系担当。
 - M0805-06 生产发车回滚锚：合并前 `origin/main` 为 `b28d112754b3904d4c6929e4a3ab837795741a66`，#24 原始施工提交为 `5bba9bc288ec47fbb13db0b04f3e75c5a868bb85`。如需回滚，revert #24 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0805-15 生产发车回滚锚：合并前 `origin/main` 为 `d2d58362f25e90a6798c028eaf73dba7fe5a45d3`，#25 原始施工提交为 `9fb75a476c2f34e19a6ea6cc05d6a4ae6c55e966`。如需回滚，revert #25 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
+- M0808-17 生产发车回滚锚：合并前 `origin/main` 为 `fc8a79b97354eee99db5f733a23a9965e127d98a`，#26 发车校验提交为 `2afb1e4ba47be8e0faacb59170724093719897d1`。如需回滚，revert #26 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 
 ---
 
@@ -71,6 +73,8 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-08 | Codex | M0808-17 发车前追加 schema.org 官方校验与 Google Rich Results Test；修正 #26 中 Service/Offer JSON-LD 关系到零 error 后发车 | ✅ |
+| 2026-08-08 | Codex | M0808-14 从 `origin/main` 干净临时 worktree 起工；不改页面可见文案、plan、FAQ、robots、表单或 GA；仅结构化暴露既有事实并压缩 `img/exp-fishing-2.jpg` | ✅ |
 | 2026-08-05 | Codex | M0805-13 rev2 从 `origin/main` 干净临时 worktree 起工；移除首页询盘表单、Turnstile 与 inquiry endpoint 前端引用；未改 inquiry Worker、D1 与其他站 | ✅ |
 | 2026-08-05 | Codex | M0805-03 在 `origin/main` 干净临时 worktree 起工；保留现有真实提交链路与失败提示，只在提交成功后通过第一方 analytics endpoint 上报 `contact_click` / `form`；补成功/失败路径回归测试 | ✅ |
 | 2026-08-01 | Codex | M0731-15 从 `origin/main` 干净临时 worktree 起工；移除 GA 初始化与表单成功后的 GA 事件副作用，保留 M0731 真提交 endpoint/payload/失败处理；确认第一方 beacon 唯一 | ✅ |
