@@ -1792,6 +1792,9 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Book private Okinawa fishing charters from Chatan: GT, tuna, amberjack, jigging and live bait trips with local captains.",
       "url": "https://fishing.nice.okinawa/",
       "email": "info@nice.okinawa",
+      "telephone": "+81 70-8952-3968",
+      "image": "https://fishing.nice.okinawa/img/gallery/2026-04-03-001.jpg",
+      "priceRange": "¥80,000–450,000",
       "areaServed": "Okinawa, Japan",
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -3151,7 +3154,10 @@ function buildGuide() {
 
   document.getElementById('guide-calendar').innerHTML = `
     <div class="s-label" style="margin-bottom:.75rem">${labels.calendar[lang]||labels.calendar['zh']||labels.calendar.en}</div>
-    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden">${calRows}</div>`;
+    <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden">${calRows}</div>
+    <div style="margin-top:1.25rem">
+      <a href="/fishing-seasons/" class="exp-cta">Okinawa fishing seasons month by month →</a>
+    </div>`;
 }
 
 let activeGuidePanel = 'species';
