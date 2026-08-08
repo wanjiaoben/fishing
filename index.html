@@ -1793,15 +1793,19 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "url": "https://fishing.nice.okinawa/",
       "email": "info@nice.okinawa",
       "areaServed": "Okinawa, Japan",
-      "makesOffer": [
-        { "@id": "https://fishing.nice.okinawa/#service-experience-fishing" },
-        { "@id": "https://fishing.nice.okinawa/#service-amberjack-live-bait" },
-        { "@id": "https://fishing.nice.okinawa/#service-tuna-multi-species" },
-        { "@id": "https://fishing.nice.okinawa/#service-gt-fishing" },
-        { "@id": "https://fishing.nice.okinawa/#service-overnight-expedition" },
-        { "@id": "https://fishing.nice.okinawa/#service-other-methods" },
-        { "@id": "https://fishing.nice.okinawa/#service-remote-island-charter" }
-      ]
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Okinawa fishing plans and pricing",
+        "itemListElement": [
+          { "@id": "https://fishing.nice.okinawa/#offer-experience-fishing" },
+          { "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait" },
+          { "@id": "https://fishing.nice.okinawa/#offer-tuna-multi-species" },
+          { "@id": "https://fishing.nice.okinawa/#offer-gt-fishing" },
+          { "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition" },
+          { "@id": "https://fishing.nice.okinawa/#offer-other-methods" },
+          { "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter" }
+        ]
+      }
     },
     {
       "@type": "Service",
@@ -1810,13 +1814,16 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "A relaxed 2-hour sea fishing experience from Kadena Fishing Port. Perfect for first-timers, families, couples and tourists. All equipment provided. Up to 35 people per boat. We act as booking coordinator.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "Kadena Fishing Port",
-      "offers": {
-        "@type": "Offer",
-        "priceSpecification": {
-          "@type": "PriceSpecification",
-          "priceCurrency": "JPY",
-          "description": "Contact for pricing"
-        }
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-experience-fishing" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-experience-fishing",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-experience-fishing" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "description": "Contact for pricing"
       }
     },
     {
@@ -1826,17 +1833,19 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Captain's top recommendation. Live bait fishing for Greater Amberjack (カンパチ). Hotel-to-port transfer available. Fresh catch can be prepared as sashimi on request.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "Chatan Hamagawa Port (West Coast)",
-      "offers": {
-        "@type": "Offer",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-amberjack-live-bait" },
+      "price": 131000,
+      "priceCurrency": "JPY",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
         "price": 131000,
         "priceCurrency": "JPY",
-        "priceRange": "from ¥131,000",
-        "priceSpecification": {
-          "@type": "UnitPriceSpecification",
-          "price": 131000,
-          "priceCurrency": "JPY",
-          "description": "from ¥131,000, transfer included. Tackle rental +¥10,000 per person."
-        }
+        "description": "from ¥131,000, transfer included. Tackle rental +¥10,000 per person."
       }
     },
     {
@@ -1846,16 +1855,18 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Live bait for Yellowfin Tuna, Grouper, Amberjack and more. Price varies by fishing ground distance.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "West or East Coast by arrangement",
-      "offers": {
-        "@type": "Offer",
-        "priceRange": "¥90,000–150,000",
-        "priceSpecification": {
-          "@type": "PriceSpecification",
-          "priceCurrency": "JPY",
-          "minPrice": 90000,
-          "maxPrice": 150000,
-          "description": "¥90,000–150,000. Tackle rental +¥10,000 per person."
-        }
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-tuna-multi-species" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-tuna-multi-species",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-tuna-multi-species" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "minPrice": 90000,
+        "maxPrice": 150000,
+        "description": "¥90,000–150,000. Tackle rental +¥10,000 per person."
       }
     },
     {
@@ -1865,16 +1876,18 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Max 4 casters simultaneously. Experienced anglers only — large lures and long-distance casting required. Please advise if first GT experience.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "West or East Coast by arrangement",
-      "offers": {
-        "@type": "Offer",
-        "priceRange": "¥90,000–100,000",
-        "priceSpecification": {
-          "@type": "PriceSpecification",
-          "priceCurrency": "JPY",
-          "minPrice": 90000,
-          "maxPrice": 100000,
-          "description": "¥90,000–100,000. Maximum 4 casters. Tackle rental ¥5,000 per set."
-        }
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-gt-fishing" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-gt-fishing",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-gt-fishing" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "minPrice": 90000,
+        "maxPrice": 100000,
+        "description": "¥90,000–100,000. Maximum 4 casters. Tackle rental ¥5,000 per set."
       }
     },
     {
@@ -1884,16 +1897,18 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Multi-day offshore expeditions for the biggest fish. Boat or island guesthouse. Ishigaki & Miyako Island charters by direct enquiry.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "Chatan / Kadena / 泡瀬 · Remote islands by enquiry",
-      "offers": {
-        "@type": "Offer",
-        "priceRange": "day trip ¥120,000–150,000, one night two days ¥240,000–300,000, two nights three days ¥360,000–450,000. Island stay +¥7,000–9,000 per person.",
-        "priceSpecification": [
-          { "@type": "PriceSpecification", "name": "Day trip", "priceCurrency": "JPY", "minPrice": 120000, "maxPrice": 150000 },
-          { "@type": "PriceSpecification", "name": "1 night 2 days", "priceCurrency": "JPY", "minPrice": 240000, "maxPrice": 300000 },
-          { "@type": "PriceSpecification", "name": "2 nights 3 days", "priceCurrency": "JPY", "minPrice": 360000, "maxPrice": 450000 },
-          { "@type": "PriceSpecification", "name": "Island stay +", "priceCurrency": "JPY", "minPrice": 7000, "maxPrice": 9000, "description": "+¥7,000–9,000 per person" }
-        ]
-      }
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-overnight-expedition" },
+      "priceSpecification": [
+        { "@type": "PriceSpecification", "name": "Day trip", "priceCurrency": "JPY", "minPrice": 120000, "maxPrice": 150000, "description": "day trip ¥120,000–150,000" },
+        { "@type": "PriceSpecification", "name": "1 night 2 days", "priceCurrency": "JPY", "minPrice": 240000, "maxPrice": 300000, "description": "one night two days ¥240,000–300,000" },
+        { "@type": "PriceSpecification", "name": "2 nights 3 days", "priceCurrency": "JPY", "minPrice": 360000, "maxPrice": 450000, "description": "two nights three days ¥360,000–450,000" },
+        { "@type": "PriceSpecification", "name": "Island stay +", "priceCurrency": "JPY", "minPrice": 7000, "maxPrice": 9000, "description": "+¥7,000–9,000 per person" }
+      ]
     },
     {
       "@type": "Service",
@@ -1902,16 +1917,18 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Jigging, Trolling, FAD (Payao), Bottom Fishing, Seasonal species. Contact us to discuss.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "West Coast, East Coast or by arrangement",
-      "offers": {
-        "@type": "Offer",
-        "priceRange": "jigging / live bait / GT ¥80,000–130,000, FAD (Payao) ¥100,000, trolling ¥140,000 (tackle included), bottom / grouper ¥80,000–90,000.",
-        "priceSpecification": [
-          { "@type": "PriceSpecification", "name": "Jigging / Live Bait / GT", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 130000 },
-          { "@type": "UnitPriceSpecification", "name": "FAD (Payao)", "price": 100000, "priceCurrency": "JPY" },
-          { "@type": "UnitPriceSpecification", "name": "Trolling (tackle included)", "price": 140000, "priceCurrency": "JPY" },
-          { "@type": "PriceSpecification", "name": "Bottom / Grouper", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 90000 }
-        ]
-      }
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-other-methods" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-other-methods",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-other-methods" },
+      "priceSpecification": [
+        { "@type": "PriceSpecification", "name": "Jigging / Live Bait / GT", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 130000, "description": "jigging / live bait / GT ¥80,000–130,000" },
+        { "@type": "UnitPriceSpecification", "name": "FAD (Payao)", "price": 100000, "priceCurrency": "JPY", "description": "FAD (Payao) ¥100,000" },
+        { "@type": "UnitPriceSpecification", "name": "Trolling (tackle included)", "price": 140000, "priceCurrency": "JPY", "description": "trolling ¥140,000 (tackle included)" },
+        { "@type": "PriceSpecification", "name": "Bottom / Grouper", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 90000, "description": "bottom / grouper ¥80,000–90,000" }
+      ]
     },
     {
       "@type": "Service",
@@ -1920,13 +1937,16 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "description": "Planning a fishing trip around Ishigaki Island or Miyako Island? We coordinate remote island charters — just get in touch and we'll sort out the details.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "Ishigaki Island · Miyako Island",
-      "offers": {
-        "@type": "Offer",
-        "priceSpecification": {
-          "@type": "PriceSpecification",
-          "priceCurrency": "JPY",
-          "description": "By enquiry"
-        }
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-remote-island-charter" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "description": "By enquiry"
       }
     }
   ]
