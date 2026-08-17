@@ -88,3 +88,7 @@ Send the preferred date, group size, preferred fishing style, contact method and
 ## Fishing seasons page
 
 - [Okinawa fishing seasons month by month](https://fishing.nice.okinawa/fishing-seasons/): English guide organized by January through December, with six methods covered: GT Fishing (Giant Trevally), Deep Sea Jigging, Tip Run (Squid), Giant Hairtail (Tachiuo), SLJ (Super Light Jigging) and Gomeoku Tenya. It also explains that visitors do not have to pick the method themselves — send dates and fishing experience, and the captain recommends what to target.
+
+## Stay area guide
+
+- [Where to stay in Okinawa for fishing charters](https://fishing.nice.okinawa/en/guides/where-to-stay-fishing/): English guide for matching accommodation areas to the real fishing departure ports used on this site. Chatan American Village Port and Chatan Hamagawa Port are west-coast options, Kadena Fishing Port is used for the shared fishing boat experience, and Uruma Awase Port is an east-coast option. The guide explains that Okinawa is large and the wrong stay area can add a one to two hour one-way transfer before an early fishing departure.
