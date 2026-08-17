@@ -1248,8 +1248,16 @@ html:not([data-lang]) [data-ja] { display:none; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 .hero-title { font-family:var(--font-d); font-size:clamp(3.2rem,7.5vw,7rem); font-weight:700; line-height:1; letter-spacing:-.02em; margin-bottom:1.5rem; }
 .hero-title em { font-style:italic; color:var(--teal); display:block; }
-.hero-sub { font-size:clamp(.95rem,1.8vw,1.15rem); color:rgba(255,255,255,.62); font-weight:300; max-width:460px; margin-bottom:2.5rem; line-height:1.75; }
-.hero-btns { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:3.5rem; }
+.hero-sub { font-size:clamp(.95rem,1.8vw,1.15rem); color:rgba(255,255,255,.62); font-weight:300; max-width:560px; margin-bottom:1.5rem; line-height:1.75; }
+.hero-path-card { display:none; max-width:620px; margin:0 0 1.4rem; padding:1rem; border:1px solid rgba(255,255,255,.14); border-radius:10px; background:rgba(6,13,24,.46); backdrop-filter:blur(10px); }
+.hero-path-card.is-visible { display:block; }
+.hero-path-title { color:var(--white); font-size:.82rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.75rem; }
+.hero-path-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem; }
+.hero-path-item { border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:.7rem; background:rgba(255,255,255,.04); }
+.hero-path-label { color:var(--teal); font-size:.62rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; margin-bottom:.3rem; }
+.hero-path-value { color:rgba(255,255,255,.82); font-size:.78rem; line-height:1.45; }
+.hero-path-note { color:rgba(255,255,255,.54); font-size:.72rem; line-height:1.55; margin-top:.75rem; }
+.hero-btns { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2.5rem; }
 .btn-gold { background:var(--gold); color:var(--deep); padding:.9rem 1.8rem; border-radius:4px; font-weight:700; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border:none; cursor:pointer; font-family:var(--font-b); transition:all .3s; display:inline-flex; align-items:center; gap:.5rem; }
 .btn-gold:hover { background:var(--gold-lt); transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,164,74,.35); }
 .btn-ghost { background:transparent; color:var(--white); padding:.9rem 1.8rem; border-radius:4px; font-weight:600; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border:1px solid rgba(255,255,255,.3); transition:all .3s; display:inline-flex; align-items:center; gap:.5rem; cursor:pointer; font-family:var(--font-b); }
@@ -1770,12 +1778,24 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
   .direct-contact-actions { grid-template-columns:1fr; }
   .log-details { grid-template-columns:1fr 1fr; }
   .hero-stats { gap:1.5rem; }
+  .hero-content { padding:1.35rem 1.25rem 4.5rem; }
+  .hero-title { font-size:clamp(2.8rem,14vw,4.2rem); margin-bottom:1rem; }
+  .hero-sub { margin-bottom:1rem; }
+  .hero-path-grid { grid-template-columns:1fr; gap:.5rem; }
+  .hero-path-card { padding:.8rem; margin-bottom:1rem; }
+  .hero-btns { margin-bottom:1.5rem; }
 }
 @media(max-width:480px) {
   .gallery-grid { columns:1; }
   .nav-cta { display:none; }
   .direct-contact { padding:.9rem; }
   .direct-contact-link { font-size:.84rem; min-height:50px; }
+  .hero-eyebrow { margin-bottom:1rem; font-size:.62rem; }
+  .hero-sub { font-size:.9rem; line-height:1.55; }
+  .hero-path-title { font-size:.72rem; margin-bottom:.5rem; }
+  .hero-path-item { padding:.55rem .65rem; }
+  .hero-path-note { display:none; }
+  .btn-gold,.btn-ghost { padding:.78rem 1rem; font-size:.74rem; }
 }
 </style>
 <link rel="canonical" href="https://fishing.nice.okinawa/">
@@ -2016,6 +2036,30 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
         "@type": "Answer",
         "text": "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "How many people can join a private fishing charter?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples start from ¥80,000 total, depending on the method and fishing ground."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the shared fishing boat work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The shared fishing boat Okinawa experience departs from Kadena Fishing Port, runs about 2 hours and can take up to 35 people. It is built for first-timers and families; contact us for current shared-boat pricing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where do we meet for the fishing trip?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Meeting points depend on the plan: Chatan American Village Port or Chatan Hamagawa Port on the west coast, Uruma Awase Port on the east coast, and Kadena Fishing Port for the shared boat experience. We confirm the exact port before booking."
+      }
     }
   ]
 }
@@ -2165,7 +2209,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
           </a>
           <a href="weixin://dl/chat?OkinawaOnline" class="channel" onclick="copyWechat(event);return false;">
             <div class="ch-icon wechat">💬</div>
-            <div><div class="ch-name">WeChat / 微信</div><div class="ch-sub" data-en>Chat in Chinese</div><div class="ch-sub" data-zh>中文服务</div><div class="ch-sub" data-ja>中国語対応</div></div>
+            <div><div class="ch-name">WeChat / 微信</div><div class="ch-sub" data-en>Chat in Chinese</div><div class="ch-sub" data-zh>中文服务</div><div class="ch-sub" data-ja>中文対応</div></div>
             <div class="ch-arrow">→</div>
           </a>
         </div>
@@ -2791,7 +2835,7 @@ const HERO_CONTENT = {
     th:    'โอกินาว่า<br><em>ตกปลา</em>'
   },
   sub: {
-    en:    'Group tours for beginners to full-day private charters for serious anglers — GT, Tuna, Amberjack, Jigging & more. Departing from Chatan, Kadena and Awase ports. Ishigaki & Miyako Island trips by enquiry.',
+    en:    'Shared fishing boat Okinawa trips for beginners and private fishing charter for 2-3 people or larger groups — GT, Tuna, Amberjack, Jigging & more. Departing from Chatan, Kadena and Awase ports. Ishigaki & Miyako Island trips by enquiry.',
     zh:    '从初学者体验拼船到全天专业包船，再到离岛过夜钓爽——GT、金枪鱼、红甘鲹、铁板钓等均可。从北谷美国村渔港、嘉手纳及泡瀬漁港出发。离岛（石垣岛／宫古岛）请直接咨询。',
     'zh-TW': '從初學者體驗拼船到全天專業包船，再到離島過夜釣爽——GT、鮪魚、紅甘鰺、鐵板釣等均可。從北谷美國村漁港、嘉手納及泡瀬漁港出發。離島（石垣島／宮古島）請直接詢問。',
     ja:    '初心者向け体験ツアーからプロ向けフルデイチャーターまで——GT・マグロ・カンパチ・ジギングなど。北谷・嘉手納・泡瀬漁港から出船。離島（石垣島・宮古島）はお問い合わせください。',
@@ -2799,7 +2843,7 @@ const HERO_CONTENT = {
     th:    'ทัวร์กลุ่มสำหรับผู้เริ่มต้นถึงเช่าเหมาลำเต็มวันสำหรับนักตกปลาจริงจัง — GT ทูน่า แอมเบอร์แจ็ค จิ๊กกิ้ง และอื่นๆ ออกเดินทางจากท่าเรือ Chatan Kadena และ Awase'
   },
   btn1: {
-    en:    '📩 Book Now',
+    en:    'WhatsApp your dates',
     zh:    '📩 立即预约',
     'zh-TW': '📩 立即預約',
     ja:    '📩 今すぐ予約',
@@ -2822,15 +2866,56 @@ const HERO_CONTENT = {
   ]
 };
 
+function yen(n) {
+  return '¥' + Number(n).toLocaleString('en-US');
+}
+
+function getPrivateCharterBasePrice() {
+  const otherMethods = SERVICE_B_PLANS.find(p => p.name && p.name.en === 'Other Methods');
+  const match = otherMethods && otherMethods.price && otherMethods.price.match(/¥([\d,]+)/);
+  return match ? Number(match[1].replace(/,/g, '')) : null;
+}
+
+function heroPathCard(lang) {
+  if (lang !== 'en') return '';
+  const base = getPrivateCharterBasePrice();
+  if (!base) return '';
+  const twoEach = Math.round(base / 2);
+  const threeEach = Math.round(base / 3);
+  return `
+    <div class="hero-path-card is-visible">
+      <div class="hero-path-title">Fast facts for booking from ChatGPT</div>
+      <div class="hero-path-grid">
+        <div class="hero-path-item">
+          <div class="hero-path-label">Meet / depart</div>
+          <div class="hero-path-value">Chatan, Kadena or Awase ports — exact meeting point confirmed by plan.</div>
+        </div>
+        <div class="hero-path-item">
+          <div class="hero-path-label">2 people example</div>
+          <div class="hero-path-value">Private charter from ${yen(base)} total (${yen(twoEach)} each), based on current Other Methods pricing.</div>
+        </div>
+        <div class="hero-path-item">
+          <div class="hero-path-label">3 people example</div>
+          <div class="hero-path-value">Private charter from ${yen(base)} total (about ${yen(threeEach)} each), based on current Other Methods pricing.</div>
+        </div>
+      </div>
+      <div class="hero-path-note">Shared fishing boat Okinawa from Kadena is contact-for-pricing; private charters are your group only.</div>
+    </div>`;
+}
+
 function buildHero() {
   const lang = L();
   const h = HERO_CONTENT;
+  const whatsappText = encodeURIComponent('Hi, I am looking for an Okinawa fishing charter for 2-3 people. Dates: ');
+  const primaryHref = lang === 'en' ? `https://wa.me/817089523968?text=${whatsappText}` : '#contact';
+  const primaryAttrs = lang === 'en' ? ' target="_blank" rel="noopener" data-contact="whatsapp"' : '';
   document.getElementById('hero-dynamic').innerHTML = `
     <div class="hero-eyebrow">${h.eyebrow[lang]||h.eyebrow['zh']||h.eyebrow['en']}</div>
     <h1 class="hero-title">${h.title[lang]||h.title['zh']||h.title['en']}</h1>
     <p class="hero-sub">${h.sub[lang]||h.sub['zh']||h.sub['en']}</p>
+    ${heroPathCard(lang)}
     <div class="hero-btns">
-      <a href="#contact" class="btn-gold">${h.btn1[lang]||h.btn1['zh']||h.btn1['en']}</a>
+      <a href="${primaryHref}" class="btn-gold"${primaryAttrs}>${h.btn1[lang]||h.btn1['zh']||h.btn1['en']}</a>
       <a href="#plans" class="btn-ghost">${h.btn2[lang]||h.btn2['zh']||h.btn2['en']}</a>
     </div>
     <div class="hero-stats">
@@ -3157,6 +3242,7 @@ function buildGuide() {
     <div style="background:var(--glass);border:1px solid var(--glass-b);border-radius:10px;overflow:hidden">${calRows}</div>
     <div style="margin-top:1.25rem">
       <a href="/fishing-seasons/" class="exp-cta">Okinawa fishing seasons month by month →</a>
+      <a href="/en/guides/where-to-stay-fishing/" class="exp-cta" style="margin-left:.75rem">Where to stay for Okinawa fishing →</a>
     </div>`;
 }
 
@@ -3263,9 +3349,51 @@ const FAQS = [
     a_en: "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you.",
     a_zh: "我们支持中文、英语和日语。船长是日本人，有基本英语和部分中文能力，我们负责所有沟通。",
     'a_zh-TW': "我們支援中文、英語和日語。船長是日本人，有基本英語和部分中文能力，我們負責所有溝通。",
-    a_ja: "英語・中国語・日本語に対応。船長は日本語メインですが、英語・中国語も少々対応可能。コミュニケーションはすべて当方がサポートします。",
+    a_ja: "英語・中文・日本語に対応。船長は日本語メインですが、英語・中文も少々対応可能。コミュニケーションはすべて当方がサポートします。",
     a_ko: "영어, 중국어, 일본어를 지원합니다. 선장은 일본인이지만 기본 영어와 일부 중국어가 가능합니다. 모든 소통은 저희가 대신합니다.",
     a_th: "เรารองรับภาษาอังกฤษ จีนกลาง และญี่ปุ่น กัปตันเป็นคนญี่ปุ่นแต่มีภาษาอังกฤษพื้นฐานและจีนบ้าง เราจัดการการสื่อสารทั้งหมดให้คุณ"
+  },
+  {
+    q_en: "How many people can join a private fishing charter?",
+    q_zh: "包船最多可以几个人参加？",
+    'q_zh-TW': "包船最多可以幾個人參加？",
+    q_ja: "貸切チャーターは何名まで参加できますか？",
+    q_ko: "전세 낚시 차터는 몇 명까지 참여할 수 있나요?",
+    q_th: "เรือเช่าเหมาลำส่วนตัวเข้าร่วมได้กี่คน?",
+    a_en: "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples start from ¥80,000 total, depending on the method and fishing ground.",
+    a_zh: "包船只接待你们一组，最多 12 人。2–3 人参加时，包船价按整船价格由同行人数分摊；现有私人包船示例从整船 ¥80,000 起，具体取决于钓法与钓点。",
+    'a_zh-TW': "包船只接待您們一組，最多 12 人。2–3 人參加時，包船價按整船價格由同行人數分攤；現有私人包船示例從整船 ¥80,000 起，具體取決於釣法與釣點。",
+    a_ja: "貸切チャーターはグループ専用で、最大12名まで参加できます。2〜3名の場合は船単位の料金を人数で割る形です。現在の貸切例は、釣法とポイントにより1船¥80,000〜です。",
+    a_ko: "전세 차터는 귀하의 그룹만 이용하며 최대 12명까지 가능합니다. 2~3명은 선박 전체 요금을 그룹 인원으로 나누는 방식이며, 현재 전세 예시는 방법과 포인트에 따라 총 ¥80,000부터입니다.",
+    a_th: "เรือเช่าเหมาลำเป็นของกลุ่มคุณเท่านั้น รองรับได้สูงสุด 12 คน สำหรับ 2–3 คน ค่าเช่าเหมาลำเป็นราคารวมทั้งลำแล้วแบ่งกันในกลุ่ม ตัวอย่างเรือเหมาลำส่วนตัวปัจจุบันเริ่มต้นที่ ¥80,000 รวม ขึ้นอยู่กับวิธีและแหล่งตกปลา"
+  },
+  {
+    q_en: "How does the shared fishing boat work?",
+    q_zh: "拼船海钓体验是怎么安排的？",
+    'q_zh-TW': "拼船海釣體驗是怎麼安排的？",
+    q_ja: "乗合の釣り体験はどのような内容ですか？",
+    q_ko: "합승 낚시 보트는 어떻게 운영되나요?",
+    q_th: "เรือตกปลาร่วมทำงานอย่างไร?",
+    a_en: "The shared fishing boat Okinawa experience departs from Kadena Fishing Port, runs about 2 hours and can take up to 35 people. It is built for first-timers and families; contact us for current shared-boat pricing.",
+    a_zh: "Okinawa 拼船海钓体验从嘉手纳渔港出发，约 2 小时，最多 35 人。适合初学者和家庭；当前拼船价格请直接咨询。",
+    'a_zh-TW': "Okinawa 拼船海釣體驗從嘉手納漁港出發，約 2 小時，最多 35 人。適合初學者和家庭；目前拼船價格請直接詢問。",
+    a_ja: "沖縄の乗合釣り体験は嘉手納漁港発、約2時間、最大35名までです。初心者や家族向けです。現在の乗合料金はお問い合わせください。",
+    a_ko: "오키나와 합승 낚시 보트 체험은 가데나 어항에서 출발하며 약 2시간, 최대 35명까지 가능합니다. 초보자와 가족에게 적합하며 현재 합승 보트 요금은 문의해 주세요.",
+    a_th: "ประสบการณ์เรือตกปลาร่วม Okinawa ออกจากท่าเรือประมง Kadena ใช้เวลาประมาณ 2 ชั่วโมง รองรับได้สูงสุด 35 คน เหมาะสำหรับผู้เริ่มต้นและครอบครัว โปรดติดต่อเราเพื่อสอบถามราคาเรือร่วมปัจจุบัน"
+  },
+  {
+    q_en: "Where do we meet for the fishing trip?",
+    q_zh: "海钓行程在哪里集合？",
+    'q_zh-TW': "海釣行程在哪裡集合？",
+    q_ja: "釣りツアーの集合場所はどこですか？",
+    q_ko: "낚시 여행은 어디에서 만나나요?",
+    q_th: "เราจะนัดพบกันที่ไหนสำหรับทริปตกปลา?",
+    a_en: "Meeting points depend on the plan: Chatan American Village Port or Chatan Hamagawa Port on the west coast, Uruma Awase Port on the east coast, and Kadena Fishing Port for the shared boat experience. We confirm the exact port before booking.",
+    a_zh: "集合点按方案而定：西海岸为北谷美国村港或北谷滨川港，东海岸为 Uruma Awase 港，拼船体验为嘉手纳渔港。预约前会确认准确港口。",
+    'a_zh-TW': "集合點按方案而定：西海岸為北谷美國村港或北谷濱川港，東海岸為 Uruma Awase 港，拼船體驗為嘉手納漁港。預約前會確認準確港口。",
+    a_ja: "集合場所はプランにより異なります。西海岸は北谷アメリカンビレッジ港または北谷浜川港、東海岸はうるま泡瀬港、乗合体験は嘉手納漁港です。予約前に正確な港を確認します。",
+    a_ko: "집합 장소는 플랜에 따라 다릅니다. 서해안은 차탄 아메리칸 빌리지 항구 또는 차탄 하마가와 항구, 동해안은 우루마 아와세 항구, 합승 보트 체험은 가데나 어항입니다. 예약 전 정확한 항구를 확인합니다.",
+    a_th: "จุดนัดพบขึ้นอยู่กับแผน: ท่าเรือ Chatan American Village หรือ Chatan Hamagawa ทางฝั่งตะวันตก, ท่าเรือ Uruma Awase ทางฝั่งตะวันออก และท่าเรือประมง Kadena สำหรับประสบการณ์เรือร่วม เราจะยืนยันท่าเรือที่แน่นอนก่อนจอง"
   }
 ];
 
