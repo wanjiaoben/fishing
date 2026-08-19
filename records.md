@@ -74,6 +74,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-19 | Codex | FISH-0819-01 新增 `/en/guides/okinawa-fishing-packages/` 英文引流内容页：Chatan 私人船钓 4h 与 Kadena Kayak/SUP+Fishing 两套餐，CTA 导 WhatsApp/email 询盘，并收录 sitemap/llms | ✅ |
 | 2026-08-17 | Codex | FISH-0817-01 强化英文首页 AI 询盘路径：前置真实出发港、2/3 人包船示例与 WhatsApp CTA；新增 `/en/guides/where-to-stay-fishing/` 住宿区域指南并收录 sitemap/llms | ✅ |
 | 2026-08-08 | Codex | M0808-26 经 Wan 授权将 #27 转 Ready 并 squash merge，上线 `/fishing-seasons/`；GitHub Pages 部署 `31249259089` success，生产十项点验 PASS | ✅ |
 | 2026-08-08 | Codex | M0808-19 从内容稿新建 `/fishing-seasons/` 英文季节页；追加 sitemap/llms 索引、首页 guide 末尾入口，并补 LocalBusiness telephone/image/priceRange 结构化字段 | ✅ |
