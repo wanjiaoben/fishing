@@ -1,0 +1,38 @@
+name = "fishing-paypal-auth"
+main = "worker/src/index.js"
+compatibility_date = "2026-08-20"
+workers_dev = false
+
+[[routes]]
+pattern = "fishing.nice.okinawa/payment/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/api/paypal/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/api/admin/*"
+zone_name = "nice.okinawa"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fishing-paypal-auth"
+database_id = "b86a0510-35dd-43f4-9bda-f1f9e5e7e6d2"
+migrations_dir = "worker/migrations"
+
+[vars]
+PAYPAL_ENV = "production"
+PAYPAL_AUTH_POLICY_VERSION = "fishing-paypal-auth-v2026-08-20"
+PAYPAL_AUTH_PRODUCT = "Private Fishing Charter"
+PAYPAL_AUTH_ACTIVITY_DATE = "2026-08-24"
+PAYPAL_AUTH_AMOUNT = "66000"
+PAYPAL_AUTH_CURRENCY = "JPY"
+PAYPAL_AUTH_VALIDITY_REMINDER_DAYS = "3"
+PAYPAL_AUTH_WORKER_ORIGIN = "https://fishing.nice.okinawa"
+
+# Secrets are injected by Wan, never committed:
+# npx wrangler secret put PAYPAL_PRODUCTION_CLIENT_ID --config wrangler.production.toml
+# npx wrangler secret put PAYPAL_PRODUCTION_CLIENT_SECRET --config wrangler.production.toml
+# npx wrangler secret put ADMIN_TOKEN --config wrangler.production.toml
+# npx wrangler secret put PAYPAL_WEBHOOK_ID --config wrangler.production.toml

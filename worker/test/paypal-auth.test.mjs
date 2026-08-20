@@ -222,3 +222,31 @@ test("admin list displays AUTHORIZED – NOT CHARGED and reminder fields", async
   assert.equal(data.authorizations[0].reminder, "AUTHORIZATION_EXPIRING_SOON");
   assert.equal(data.authorizations[0].in_honor_period, true);
 });
+
+test("admin custom order endpoint is admin-only and fixes currency to JPY", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
+    if (String(url).endsWith("/v2/checkout/orders")) return Response.json({ id: "ORDER-CUSTOM", status: "CREATED" });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ env: { PAYPAL_AUTH_WORKER_ORIGIN: "https://fishing.nice.okinawa" } });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/orders", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ activity: "Test Charter", activity_date: "2026-08-24", amount: 100, currency: "USD" })
+  }), e);
+  const data = await response.json();
+  assert.equal(data.ok, false);
+  assert.equal(data.error, "INVALID_ORDER_FIELDS");
+  const good = await handleRequest(new Request("https://worker.test/api/admin/orders", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ activity: "Test Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY" })
+  }), e);
+  const goodData = await good.json();
+  assert.equal(goodData.ok, true);
+  assert.match(goodData.authorize_url, /fishing\.nice\.okinawa\/payment\/authorize\?order=ORDER-CUSTOM/);
+  const payload = JSON.parse(captured.find(c => c.url.endsWith("/v2/checkout/orders")).init.body);
+  assert.equal(payload.purchase_units[0].amount.currency_code, "JPY");
+  assert.equal(payload.purchase_units[0].amount.value, "100");
+});

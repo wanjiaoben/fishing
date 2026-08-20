@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-08-08
+- **最后更新**：2026-08-20
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-20 | Codex | FISH-0820-05 合并 PayPal Authorization Sandbox 基线 #31（merge `b0a61a66696ff26f748ae0ae21e0db74c2769083`）；创建独立生产 D1 `fishing-paypal-auth`（`b86a0510-35dd-43f4-9bda-f1f9e5e7e6d2`）、生产配置、任意 JPY 授权单后台入口与 tag/Wan-Verified 发布门禁；未注入 Live secret、未发 PayPal 请求、未部署生产 |
 | 2026-08-08 | Codex | M0808-14 将 fishing 既有价格、港口、季节鱼种、取消政策等事实写入 `llms.txt`，补 Service/Offer JSON-LD 价格结构化，并轻量优化图片属性与体验图体积 |
 | 2026-08-05 | Codex | M0805-13 rev2 下线 fishing 首页询盘表单，原位置改为 Email / WhatsApp 明文直连块，并接入第一方 contact_click 渠道统计 |
 | 2026-08-05 | Codex | M0805-03 确认 fishing 无 GA 残留，保留唯一第一方 `analytics.nice.okinawa` beacon，并将表单成功事件接入第一方信标 |
@@ -74,6 +75,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-20 | Codex | FISH-0820-05：合并 #31；新建生产 D1 并应用五表 migration；补生产 wrangler 配置、任意订单 API/客户专属授权页、后台新建单 UI、生产 tag 发布 workflow；未注入 Live secrets、未部署 | ✅ 前置施工完成，待 FISH-0820-06 |
 | 2026-08-20 | Codex | FISH-0820-02 新增 isolated PayPal Authorization Sandbox Worker/D1 施工稿：AUTHORIZE 订单、客户授权页、后台 void/capture、webhook 验签、audit log 与 Sandbox runbook；未上生产 | ⚠️ |
 | 2026-08-19 | Codex | FISH-0819-01 新增 `/en/guides/okinawa-fishing-packages/` 英文引流内容页：Chatan 私人船钓 4h 与 Kadena Kayak/SUP+Fishing 两套餐，CTA 导 WhatsApp/email 询盘，并收录 sitemap/llms | ✅ |
 | 2026-08-17 | Codex | FISH-0817-01 强化英文首页 AI 询盘路径：前置真实出发港、2/3 人包船示例与 WhatsApp CTA；新增 `/en/guides/where-to-stay-fishing/` 住宿区域指南并收录 sitemap/llms | ✅ |
