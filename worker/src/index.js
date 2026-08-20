@@ -334,7 +334,7 @@ async function authorizeOrder(request, env) {
 function sandboxTestCardPaymentSource() {
   return {
     card: {
-      number: "4111111111111111",
+      number: "1111111111111111",
       expiry: "2030-12",
       security_code: "123",
       name: "Sandbox Buyer",

@@ -154,7 +154,7 @@ test("sandbox test-card authorize endpoint is admin-only and sends payment_sourc
   assert.equal(data.charged, false);
   const authorizeCall = captured.find(c => c.url.includes("/v2/checkout/orders/ORDER-1/authorize"));
   const payload = JSON.parse(authorizeCall.init.body);
-  assert.equal(payload.payment_source.card.number, "4111111111111111");
+  assert.equal(payload.payment_source.card.number, "1111111111111111");
   assert.equal(authorizeCall.init.headers["PayPal-Request-Id"], "sandbox-card-test");
 });
 
