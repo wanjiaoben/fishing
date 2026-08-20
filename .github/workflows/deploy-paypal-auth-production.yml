@@ -21,6 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
           tag_sha="$(git rev-list -n 1 "$GITHUB_REF_NAME")"
           main_sha="$(git rev-parse origin/main)"
           if [[ "$tag_sha" != "$main_sha" ]]; then
