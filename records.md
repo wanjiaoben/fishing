@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-08-20
+- **最后更新**：2026-08-21
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-21 | Codex | FISH-0820-08 全站价格改为五档 all-inclusive 套餐，首页与英文套餐页同步 FAQ/Offer JSON-LD、llms.txt 与协调口径；待 PR 合并后记录生产 merge SHA |
 | 2026-08-20 | Codex | FISH-0820-05 合并 PayPal Authorization Sandbox 基线 #31（merge `b0a61a66696ff26f748ae0ae21e0db74c2769083`）；创建独立生产 D1 `fishing-paypal-auth`（`b86a0510-35dd-43f4-9bda-f1f9e5e7e6d2`）、生产配置、任意 JPY 授权单后台入口与 tag/Wan-Verified 发布门禁；未注入 Live secret、未发 PayPal 请求、未部署生产 |
 | 2026-08-08 | Codex | M0808-14 将 fishing 既有价格、港口、季节鱼种、取消政策等事实写入 `llms.txt`，补 Service/Offer JSON-LD 价格结构化，并轻量优化图片属性与体验图体积 |
 | 2026-08-05 | Codex | M0805-13 rev2 下线 fishing 首页询盘表单，原位置改为 Email / WhatsApp 明文直连块，并接入第一方 contact_click 渠道统计 |
