@@ -1,0 +1,30 @@
+name = "fishing-paypal-auth-sandbox"
+main = "worker/src/index.js"
+compatibility_date = "2026-08-20"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fishing-paypal-auth-sandbox"
+database_id = "d531a7bf-d79b-4544-91c8-6baa5a83de0f"
+migrations_dir = "worker/migrations"
+
+[vars]
+PAYPAL_ENV = "sandbox"
+PAYPAL_AUTH_POLICY_VERSION = "fishing-paypal-auth-v2026-08-20"
+PAYPAL_AUTH_PRODUCT = "Private Fishing Charter"
+PAYPAL_AUTH_ACTIVITY_DATE = "2026-08-24"
+PAYPAL_AUTH_AMOUNT = "66000"
+PAYPAL_AUTH_CURRENCY = "JPY"
+PAYPAL_AUTH_VALIDITY_REMINDER_DAYS = "3"
+PAYPAL_AUTH_WORKER_ORIGIN = "https://fishing-paypal-auth-sandbox.gerheidicn.workers.dev"
+
+# Secrets, never commit values:
+# wrangler secret put PAYPAL_SANDBOX_CLIENT_ID
+# wrangler secret put PAYPAL_SANDBOX_CLIENT_SECRET
+# wrangler secret put PAYPAL_WEBHOOK_ID
+# wrangler secret put ADMIN_TOKEN
+#
+# Production credentials must be separate if/when Wan authorizes production:
+# wrangler secret put PAYPAL_PRODUCTION_CLIENT_ID
+# wrangler secret put PAYPAL_PRODUCTION_CLIENT_SECRET
