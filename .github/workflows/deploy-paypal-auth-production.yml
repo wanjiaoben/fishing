@@ -27,7 +27,7 @@ jobs:
             echo "Production tag must point at origin/main: tag=$tag_sha main=$main_sha" >&2
             exit 1
           fi
-          tag_annotation="$(git for-each-ref --format='%(contents)' "refs/tags/$GITHUB_REF_NAME")"
+          tag_annotation="$(git cat-file -p "refs/tags/$GITHUB_REF_NAME")"
           if ! grep -q 'Wan-Verified: yes' <<< "$tag_annotation"; then
             echo 'Missing required Wan-Verified: yes annotation' >&2
             exit 1
