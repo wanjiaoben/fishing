@@ -328,6 +328,74 @@ async function authorizeOrder(request, env) {
     body: "{}"
   });
 
+  return await storeAuthorizedOrder(env, row, orderId, paypalAuth);
+}
+
+function sandboxTestCardPaymentSource() {
+  return {
+    card: {
+      number: "4111111111111111",
+      expiry: "2030-12",
+      security_code: "123",
+      name: "Sandbox Buyer",
+      billing_address: {
+        address_line_1: "2211 N First Street",
+        admin_area_2: "San Jose",
+        admin_area_1: "CA",
+        postal_code: "95131",
+        country_code: "US"
+      },
+      attributes: {
+        verification: {
+          method: "SCA_WHEN_REQUIRED"
+        },
+        customer: {
+          email_address: "sandbox-buyer@example.com"
+        }
+      }
+    }
+  };
+}
+
+async function authorizeOrderWithSandboxTestCard(request, env) {
+  const c = config(env);
+  if (c.paypalEnv !== "sandbox") {
+    return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
+  }
+  if (!requireAdmin(request, env)) {
+    return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  }
+  const body = await readJson(request);
+  const orderId = body.order_id;
+  if (!orderId) {
+    return json({ ok: false, error: "ORDER_ID_REQUIRED" }, { status: 400 });
+  }
+  const idempotencyKey = body.idempotency_key || `sandbox-card-authorize-${orderId}`;
+  const row = await getAuthorizationByOrder(env, orderId);
+  if (!row) {
+    return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+  }
+  if (row.authorization_status === "AUTHORIZED" && row.paypal_authorization_id) {
+    return json({
+      ok: true,
+      idempotent: true,
+      status: "AUTHORIZED",
+      charged: false,
+      message: "AUTHORIZED – NOT CHARGED",
+      paypal_order_id: row.paypal_order_id,
+      paypal_authorization_id: row.paypal_authorization_id
+    });
+  }
+  const paypalAuth = await paypalFetch(env, `/v2/checkout/orders/${encodeURIComponent(orderId)}/authorize`, {
+    method: "POST",
+    headers: { "PayPal-Request-Id": idempotencyKey },
+    body: JSON.stringify({ payment_source: sandboxTestCardPaymentSource() })
+  });
+
+  return await storeAuthorizedOrder(env, row, orderId, paypalAuth);
+}
+
+async function storeAuthorizedOrder(env, row, orderId, paypalAuth) {
   const authorization = paypalAuth.purchase_units?.[0]?.payments?.authorizations?.[0] || {};
   const authorizationId = authorization.id;
   const authCreateTime = authorization.create_time || nowIso();
@@ -852,6 +920,7 @@ async function handleRequest(request, env) {
     }
     if (url.pathname === "/api/paypal/create-order" && request.method === "POST") return await createOrder(request, env);
     if (url.pathname === "/api/paypal/authorize-order" && request.method === "POST") return await authorizeOrder(request, env);
+    if (url.pathname === "/api/paypal/sandbox/authorize-test-card" && request.method === "POST") return await authorizeOrderWithSandboxTestCard(request, env);
     if (url.pathname === "/api/paypal/webhook" && request.method === "POST") return await handleWebhook(request, env);
     if (url.pathname === "/api/admin/authorizations" && request.method === "GET") return await listAuthorizations(request, env);
     const voidMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/void$/);

@@ -121,6 +121,53 @@ test("authorize-order returns AUTHORIZED – NOT CHARGED and stores expiration f
   assert.equal(data.honor_period_ends_at, "2026-08-23T00:00:00.000Z");
 });
 
+test("sandbox test-card authorize endpoint is admin-only and sends payment_source card", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
+    if (String(url).includes("/v2/checkout/orders/ORDER-1/authorize")) {
+      return Response.json({
+        status: "COMPLETED",
+        purchase_units: [{ payments: { authorizations: [{ id: "AUTH-1", status: "CREATED", create_time: "2026-08-20T00:00:00Z" }] } }]
+      });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+
+  const e = env({ rows: { byOrder: { id: "auth_local", paypal_order_id: "ORDER-1", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED" } } });
+  const noAdmin = await handleRequest(new Request("https://worker.test/api/paypal/sandbox/authorize-test-card", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-1", idempotency_key: "sandbox-card-test" })
+  }), e);
+  assert.equal(noAdmin.status, 401);
+
+  const response = await handleRequest(new Request("https://worker.test/api/paypal/sandbox/authorize-test-card", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ order_id: "ORDER-1", idempotency_key: "sandbox-card-test" })
+  }), e);
+  const data = await response.json();
+  assert.equal(data.ok, true);
+  assert.equal(data.status, "AUTHORIZED");
+  assert.equal(data.charged, false);
+  const authorizeCall = captured.find(c => c.url.includes("/v2/checkout/orders/ORDER-1/authorize"));
+  const payload = JSON.parse(authorizeCall.init.body);
+  assert.equal(payload.payment_source.card.number, "4111111111111111");
+  assert.equal(authorizeCall.init.headers["PayPal-Request-Id"], "sandbox-card-test");
+});
+
+test("sandbox test-card authorize endpoint is unavailable outside sandbox", async () => {
+  const e = env({ env: { PAYPAL_ENV: "production" } });
+  const response = await handleRequest(new Request("https://worker.test/api/paypal/sandbox/authorize-test-card", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ order_id: "ORDER-1" })
+  }), e);
+  assert.equal(response.status, 404);
+});
+
 test("capture requires admin token, amount and exact second-confirmation text", async () => {
   const e = env({ rows: { byId: { id: "auth_local", paypal_authorization_id: "AUTH-1", amount: 66000, currency: "JPY", authorization_status: "AUTHORIZED" } } });
   const noAdmin = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth_local/capture", {
