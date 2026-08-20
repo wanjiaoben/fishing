@@ -1,0 +1,8 @@
+{
+  "name": "fishing-paypal-authorization",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test worker/test/*.test.mjs"
+  }
+}

@@ -74,6 +74,7 @@
 
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
+| 2026-08-20 | Codex | FISH-0820-02 新增 isolated PayPal Authorization Sandbox Worker/D1 施工稿：AUTHORIZE 订单、客户授权页、后台 void/capture、webhook 验签、audit log 与 Sandbox runbook；未上生产 | ⚠️ |
 | 2026-08-19 | Codex | FISH-0819-01 新增 `/en/guides/okinawa-fishing-packages/` 英文引流内容页：Chatan 私人船钓 4h 与 Kadena Kayak/SUP+Fishing 两套餐，CTA 导 WhatsApp/email 询盘，并收录 sitemap/llms | ✅ |
 | 2026-08-17 | Codex | FISH-0817-01 强化英文首页 AI 询盘路径：前置真实出发港、2/3 人包船示例与 WhatsApp CTA；新增 `/en/guides/where-to-stay-fishing/` 住宿区域指南并收录 sitemap/llms | ✅ |
 | 2026-08-08 | Codex | M0808-26 经 Wan 授权将 #27 转 Ready 并 squash merge，上线 `/fishing-seasons/`；GitHub Pages 部署 `31249259089` success，生产十项点验 PASS | ✅ |
