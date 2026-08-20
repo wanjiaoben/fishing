@@ -300,6 +300,95 @@ async function createOrder(request, env) {
   });
 }
 
+async function createOrderWithSandboxTestCard(request, env) {
+  const c = requireServerConfig(env);
+  if (c.paypalEnv !== "sandbox") {
+    return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
+  }
+  if (!requireAdmin(request, env)) {
+    return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  }
+  const body = await readJson(request);
+  const agreementId = id("agree");
+  const authId = id("auth");
+  const createdAt = nowIso();
+  const idempotencyKey = body.idempotency_key || id("sandbox_card_order_req");
+  const orderPayload = {
+    intent: "AUTHORIZE",
+    purchase_units: [
+      {
+        reference_id: authId,
+        description: `${c.product} ${c.activityDate}`,
+        amount: {
+          currency_code: c.currency,
+          value: String(c.amount)
+        }
+      }
+    ],
+    payment_source: sandboxTestCardPaymentSource()
+  };
+
+  const paypalOrder = await paypalFetch(env, "/v2/checkout/orders", {
+    method: "POST",
+    headers: { "PayPal-Request-Id": idempotencyKey },
+    body: JSON.stringify(orderPayload)
+  });
+
+  await env.DB.prepare(
+    `INSERT INTO paypal_authorizations
+     (id, paypal_order_id, activity, activity_date, amount, currency, authorization_status, paypal_status,
+      paypal_create_response, policy_version, agreed_at, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    authId,
+    paypalOrder.id,
+    c.product,
+    c.activityDate,
+    c.amount,
+    c.currency,
+    "ORDER_CREATED",
+    paypalOrder.status || null,
+    JSON.stringify(paypalOrder),
+    c.policyVersion,
+    createdAt,
+    createdAt,
+    createdAt
+  ).run();
+
+  await env.DB.prepare(
+    `INSERT INTO payment_policy_agreements
+     (id, authorization_id, paypal_order_id, activity, activity_date, amount, currency, policy_version, agreed_at, client_ip_hash, user_agent)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    agreementId,
+    authId,
+    paypalOrder.id,
+    c.product,
+    c.activityDate,
+    c.amount,
+    c.currency,
+    c.policyVersion,
+    createdAt,
+    await sha256Hex(clientIp(request)),
+    request.headers.get("user-agent") || ""
+  ).run();
+
+  await insertEvent(env, {
+    authorization_id: authId,
+    paypal_order_id: paypalOrder.id,
+    event_type: "SANDBOX_CARD_ORDER_CREATED",
+    event_status: paypalOrder.status,
+    payload: paypalOrder
+  });
+
+  return await storeAuthorizedOrder(env, {
+    id: authId,
+    paypal_order_id: paypalOrder.id,
+    amount: c.amount,
+    currency: c.currency
+  }, paypalOrder.id, paypalOrder);
+}
+
 async function authorizeOrder(request, env) {
   const body = await readJson(request);
   const orderId = body.order_id;
@@ -398,6 +487,14 @@ async function authorizeOrderWithSandboxTestCard(request, env) {
 async function storeAuthorizedOrder(env, row, orderId, paypalAuth) {
   const authorization = paypalAuth.purchase_units?.[0]?.payments?.authorizations?.[0] || {};
   const authorizationId = authorization.id;
+  if (!authorizationId) {
+    return json({
+      ok: false,
+      error: "AUTHORIZATION_ID_NOT_RETURNED",
+      paypal_order_id: orderId,
+      paypal_status: paypalAuth.status || null
+    }, { status: 502 });
+  }
   const authCreateTime = authorization.create_time || nowIso();
   const expiration = authorization.expiration_time || addDaysIso(authCreateTime, 29);
   const honorPeriod = addDaysIso(authCreateTime, 3);
@@ -919,6 +1016,7 @@ async function handleRequest(request, env) {
       });
     }
     if (url.pathname === "/api/paypal/create-order" && request.method === "POST") return await createOrder(request, env);
+    if (url.pathname === "/api/paypal/sandbox/create-authorize-test-card" && request.method === "POST") return await createOrderWithSandboxTestCard(request, env);
     if (url.pathname === "/api/paypal/authorize-order" && request.method === "POST") return await authorizeOrder(request, env);
     if (url.pathname === "/api/paypal/sandbox/authorize-test-card" && request.method === "POST") return await authorizeOrderWithSandboxTestCard(request, env);
     if (url.pathname === "/api/paypal/webhook" && request.method === "POST") return await handleWebhook(request, env);
