@@ -1814,7 +1814,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "email": "info@nice.okinawa",
       "telephone": "+81 70-8952-3968",
       "image": "https://fishing.nice.okinawa/img/gallery/2026-04-03-001.jpg",
-      "priceRange": "¥80,000–450,000",
+      "priceRange": "¥8,000–108,000",
       "areaServed": "Okinawa, Japan",
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -1834,7 +1834,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "@type": "Service",
       "@id": "https://fishing.nice.okinawa/#service-experience-fishing",
       "name": "Experience Fishing — Shared Boat",
-      "description": "A relaxed 2-hour sea fishing experience from Kadena Fishing Port. Perfect for first-timers, families, couples and tourists. All equipment provided. Up to 35 people per boat. We act as booking coordinator.",
+      "description": "A relaxed shared-boat sea fishing experience from Kadena Fishing Port. Half-day ¥12,000 per person or full-day ¥18,000 per person; under 12 half-day ¥8,000 per person. Perfect for first-timers, families, couples and tourists. All equipment provided. Booking coordinated with the local captain.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "Kadena Fishing Port",
       "offers": { "@id": "https://fishing.nice.okinawa/#offer-experience-fishing" }
@@ -1846,14 +1846,14 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "priceSpecification": {
         "@type": "PriceSpecification",
         "priceCurrency": "JPY",
-        "description": "Contact for pricing"
+        "description": "¥12,000 per person half-day; ¥18,000 per person full-day; under 12 half-day ¥8,000 per person."
       }
     },
     {
       "@type": "Service",
       "@id": "https://fishing.nice.okinawa/#service-amberjack-live-bait",
       "name": "Amberjack Live Bait",
-      "description": "Captain's top recommendation. Live bait fishing for Greater Amberjack (カンパチ). Hotel-to-port transfer available. Fresh catch can be prepared as sashimi on request.",
+      "description": "Trusted local captain's recommendation. Live bait fishing for Greater Amberjack (カンパチ). Hotel-to-port transfer available. Fresh catch can be prepared as sashimi on request.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "Chatan Hamagawa Port (West Coast)",
       "offers": { "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait" }
@@ -1862,13 +1862,13 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "@type": "Offer",
       "@id": "https://fishing.nice.okinawa/#offer-amberjack-live-bait",
       "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-amberjack-live-bait" },
-      "price": 131000,
       "priceCurrency": "JPY",
       "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "price": 131000,
+        "@type": "PriceSpecification",
+        "minPrice": 72000,
+        "maxPrice": 108000,
         "priceCurrency": "JPY",
-        "description": "from ¥131,000, transfer included. Tackle rental +¥10,000 per person."
+        "description": "¥72,000 private half-day (4h) / ¥108,000 private full-day (7–8h), all-inclusive."
       }
     },
     {
@@ -1887,9 +1887,9 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "priceSpecification": {
         "@type": "PriceSpecification",
         "priceCurrency": "JPY",
-        "minPrice": 90000,
-        "maxPrice": 150000,
-        "description": "¥90,000–150,000. Tackle rental +¥10,000 per person."
+        "minPrice": 72000,
+        "maxPrice": 108000,
+        "description": "¥72,000 private half-day (4h) / ¥108,000 private full-day (7–8h), all-inclusive."
       }
     },
     {
@@ -1908,9 +1908,9 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "priceSpecification": {
         "@type": "PriceSpecification",
         "priceCurrency": "JPY",
-        "minPrice": 90000,
-        "maxPrice": 100000,
-        "description": "¥90,000–100,000. Maximum 4 casters. Tackle rental ¥5,000 per set."
+        "minPrice": 72000,
+        "maxPrice": 108000,
+        "description": "¥72,000 private half-day (4h) / ¥108,000 private full-day (7–8h), all-inclusive."
       }
     },
     {
@@ -1926,18 +1926,17 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "@type": "Offer",
       "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition",
       "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-overnight-expedition" },
-      "priceSpecification": [
-        { "@type": "PriceSpecification", "name": "Day trip", "priceCurrency": "JPY", "minPrice": 120000, "maxPrice": 150000, "description": "day trip ¥120,000–150,000" },
-        { "@type": "PriceSpecification", "name": "1 night 2 days", "priceCurrency": "JPY", "minPrice": 240000, "maxPrice": 300000, "description": "one night two days ¥240,000–300,000" },
-        { "@type": "PriceSpecification", "name": "2 nights 3 days", "priceCurrency": "JPY", "minPrice": 360000, "maxPrice": 450000, "description": "two nights three days ¥360,000–450,000" },
-        { "@type": "PriceSpecification", "name": "Island stay +", "priceCurrency": "JPY", "minPrice": 7000, "maxPrice": 9000, "description": "+¥7,000–9,000 per person" }
-      ]
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "priceCurrency": "JPY",
+        "description": "Contact us for a tailored quote."
+      }
     },
     {
       "@type": "Service",
       "@id": "https://fishing.nice.okinawa/#service-other-methods",
-      "name": "Other Methods",
-      "description": "Jigging, Trolling, FAD (Payao), Bottom Fishing, Seasonal species. Contact us to discuss.",
+      "name": "Private Half-day + Snorkeling",
+      "description": "A private half-day fishing and snorkeling combination. All-inclusive package with English booking and WhatsApp support.",
       "provider": { "@id": "https://fishing.nice.okinawa/#business" },
       "areaServed": "West Coast, East Coast or by arrangement",
       "offers": { "@id": "https://fishing.nice.okinawa/#offer-other-methods" }
@@ -1946,12 +1945,12 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "@type": "Offer",
       "@id": "https://fishing.nice.okinawa/#offer-other-methods",
       "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-other-methods" },
-      "priceSpecification": [
-        { "@type": "PriceSpecification", "name": "Jigging / Live Bait / GT", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 130000, "description": "jigging / live bait / GT ¥80,000–130,000" },
-        { "@type": "UnitPriceSpecification", "name": "FAD (Payao)", "price": 100000, "priceCurrency": "JPY", "description": "FAD (Payao) ¥100,000" },
-        { "@type": "UnitPriceSpecification", "name": "Trolling (tackle included)", "price": 140000, "priceCurrency": "JPY", "description": "trolling ¥140,000 (tackle included)" },
-        { "@type": "PriceSpecification", "name": "Bottom / Grouper", "priceCurrency": "JPY", "minPrice": 80000, "maxPrice": 90000, "description": "bottom / grouper ¥80,000–90,000" }
-      ]
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 82000,
+        "priceCurrency": "JPY",
+        "description": "¥82,000 private half-day + snorkeling combination, all-inclusive."
+      }
     },
     {
       "@type": "Service",
@@ -2042,7 +2041,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "name": "How many people can join a private fishing charter?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples start from ¥80,000 total, depending on the method and fishing ground."
+        "text": "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples are ¥72,000 for a half-day or ¥108,000 for a full-day, depending on the selected package."
       }
     },
     {
@@ -2059,6 +2058,14 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Meeting points depend on the plan: Chatan American Village Port or Chatan Hamagawa Port on the west coast, Uruma Awase Port on the east coast, and Kadena Fishing Port for the shared boat experience. We confirm the exact port before booking."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's included in the price?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our price includes the boat charter, English coordination and booking support."
       }
     }
   ]
@@ -2148,7 +2155,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
     <h2 class="s-title" data-en>Catch Gallery</h2>
     <h2 class="s-title" data-zh>渔获画廊</h2>
     <h2 class="s-title" data-ja>キャッチギャラリー</h2>
-    <p class="s-desc" data-en>Real catches from our charters. Updated regularly — follow us for the latest.</p>
+    <p class="s-desc" data-en>Real catches from trips coordinated with trusted local captains. Updated regularly — follow us for the latest.</p>
     <p class="s-desc" data-zh>来自我们包船的真实渔获，定期更新。</p>
     <p class="s-desc" data-ja>実際の釣行での釣果。随時更新中。</p>
 
@@ -2247,7 +2254,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
     <div class="footer-inner">
       <div>
         <div class="footer-logo">fishing<span>.nice.</span>okinawa</div>
-        <div class="footer-tagline" data-en>Private fishing charters in Okinawa. GT, Tuna, Amberjack, Jigging & more. Departure from Chatan port.</div>
+        <div class="footer-tagline" data-en>Private fishing trips coordinated in Okinawa with trusted local captains. GT, Tuna, Amberjack, Jigging & more. Departure from Chatan port.</div>
         <div class="footer-tagline" data-zh>冲绳包船钓鱼服务。GT、金枪鱼、红甘鲹、铁板钓等，从北谷渔港出发。</div>
         <div class="footer-tagline" data-ja>沖縄の完全チャーターフィッシングサービス。北谷漁港発。</div>
       </div>
@@ -2414,7 +2421,7 @@ const SERVICE_A = {
   badge: { en:'Shared Boat · Beginners & Families', zh:'拼船 · 初学者与家庭', 'zh-TW':'拼船 · 初學者與家庭', ja:'乗合 · 初心者・ファミリー歓迎', ko:'합승 보트 · 초보자 & 가족', th:'เรือร่วม · ผู้เริ่มต้น & ครอบครัว' },
   title: { en:'Experience Fishing — Shared Boat', zh:'体验钓鱼（拼船）', 'zh-TW':'體驗釣魚（拼船）', ja:'体験釣り（乗合）', ko:'체험 낚시 — 합승 보트', th:'ประสบการณ์ตกปลา — เรือร่วม' },
   desc: {
-    en: 'A relaxed 2-hour sea fishing experience from Kadena Fishing Port. Perfect for first-timers, families, couples and tourists. All equipment provided. Up to 35 people per boat. We act as booking coordinator.',
+    en: 'A relaxed shared-boat sea fishing experience from Kadena Fishing Port. Half-day ¥12,000 per person or full-day ¥18,000 per person; under 12 half-day ¥8,000 per person. Perfect for first-timers, families, couples and tourists. All equipment provided. We coordinate booking with the local captain.',
     zh: '从嘉手纳渔港出发，轻松愉快的2小时拼船体验钓鱼。非常适合初次体验者、家庭、情侣和游客。全装备提供，最多35人。我们负责协调预约。',
     'zh-TW': '從嘉手納漁港出發，輕鬆愉快的2小時拼船體驗釣魚。非常適合初次體驗者、家庭、情侶和遊客。全裝備提供，最多35人。我們負責協調預約。',
     ja: '嘉手納漁港から出船する2時間の乗合釣り体験。初めての方、ご家族、カップル、観光客に最適。全装備提供。最大35名。予約コーディネート対応。',
@@ -2424,7 +2431,7 @@ const SERVICE_A = {
   port:     { en:'Kadena Fishing Port', zh:'嘉手纳渔港', 'zh-TW':'嘉手納漁港', ja:'嘉手納漁港', ko:'가데나 어항', th:'ท่าเรือประมง Kadena' },
   duration: { en:'2 hours', zh:'2小时', 'zh-TW':'2小時', ja:'2時間', ko:'2시간', th:'2 ชั่วโมง' },
   capacity: { en:'Up to 35 people / shared boat', zh:'最多35人 / 拼船', 'zh-TW':'最多35人 / 拼船', ja:'最大35名 / 乗合', ko:'최대 35명 / 합승 보트', th:'สูงสุด 35 คน / เรือร่วม' },
-  price:    { en:'Contact for pricing', zh:'价格请咨询', ja:'料金はお問い合わせください', ko:'가격 문의', th:'สอบถามราคา' },
+  price:    { en:'¥12,000/person half-day · ¥18,000/person full-day · under 12 half-day ¥8,000/person', zh:'半日¥12,000/人 · 全天¥18,000/人 · 12岁以下半日¥8,000/人', ja:'半日¥12,000/人 · 終日¥18,000/人 · 12歳未満は半日¥8,000/人', ko:'반일 ¥12,000/인 · 종일 ¥18,000/인 · 12세 미만 반일 ¥8,000/인', th:'ครึ่งวัน ¥12,000/คน · เต็มวัน ¥18,000/คน · ต่ำกว่า 12 ปีครึ่งวัน ¥8,000/คน' },
   note:     {
     en: 'All equipment, life jackets and instruction provided on the day. We act as booking coordinator only — all on-site activities, safety and operations are the responsibility of the captain and vessel. Please follow the captain\'s instructions at all times.',
     zh: '当天提供全部装备、救生衣和钓鱼指导。本预约由我们协调安排，现场活动、安全及运营责任由现场船家负责，请全程听从船长指挥。',
@@ -2442,20 +2449,20 @@ const SERVICE_B_PLANS = [
     num:'01', featured:true,
     name:{ en:'Amberjack Live Bait', zh:'活饵钓红甘鲹', ja:'カンパチ泳がせ釣り', ko:'방어 살미끼 낚시', th:'ตกปลาแอมเบอร์แจ็คด้วยเหยื่อสด' },
     desc:{
-      en: "Captain's top recommendation. Live bait fishing for Greater Amberjack (カンパチ). Hotel-to-port transfer available. Fresh catch can be prepared as sashimi on request.",
+      en: "Trusted local captain's recommendation. Live bait fishing for Greater Amberjack (カンパチ). Hotel-to-port transfer available. Fresh catch can be prepared as sashimi on request.",
       zh: '船长首推方案。活饵钓大型红甘鲹（カンパチ）。可提供酒店至码头接送。成功钓获后可协助处理刺身（提供酱油、芥末、筷子）。',
       ja: '船長一推しプラン。活餌でカンパチを狙う本格釣行。港までの送迎あり。釣れた場合は刺身処理も可能（醤油・わさび・箸付き）。',
       ko: '선장 최강 추천 플랜. 살미끼로 대형 방어(カンパチ) 낚시. 호텔~항구 픽업 가능. 잡은 물고기를 회로 손질 가능(간장·와사비·젓가락 제공).',
       th: 'คำแนะนำยอดนิยมของกัปตัน ตกปลาแอมเบอร์แจ็คขนาดใหญ่ด้วยเหยื่อสด รับส่งโรงแรม-ท่าเรือ ปลาที่จับได้สามารถทำซาชิมิได้ตามต้องการ'
     },
     port:{ en:'Chatan Hamagawa Port (West Coast)', zh:'北谷滨川渔港（西海岸）', ja:'北谷浜川漁港（西海岸）', ko:'차탄 하마가와 항구 (서해안)', th:'ท่าเรือ Chatan Hamagawa (ชายฝั่งตะวันตก)' },
-    price:'¥131,000',
-    price_note:{ en:'Charter fee incl. transfer · +¥10,000/person tackle rental', zh:'包船含接送 · +¥10,000/人装备租赁', ja:'チャーター・送迎込み · +¥10,000/人タックルレンタル', ko:'차터 요금 픽업 포함 · +¥10,000/인 장비 렌탈', th:'ค่าเช่าเหมาลำรวมรับส่ง · +¥10,000/คน ค่าเช่าอุปกรณ์' },
+    price:'¥72,000 half-day / ¥108,000 full-day',
+    price_note:{ en:'All-inclusive package · English booking and WhatsApp support', zh:'全包套餐 · 英语预约与 WhatsApp 支持', ja:'オールインクルーシブ · 英語予約・WhatsAppサポート', ko:'올인클루시브 패키지 · 영어 예약 및 WhatsApp 지원', th:'แพ็กเกจรวมทุกอย่าง · สนับสนุนการจองภาษาอังกฤษและ WhatsApp' },
     rows:[
       { label:{ en:'Meeting time', zh:'集合时间', ja:'集合時間', ko:'집합 시간', th:'เวลานัดพบ' }, val:'06:00' },
       { label:{ en:'Return', zh:'回港', ja:'帰港', ko:'귀항', th:'กลับ' }, val:{ en:'~18:00', zh:'约18:00', ja:'18:00頃', ko:'약 18:00', th:'ประมาณ 18:00' } },
       { label:{ en:'Target fish', zh:'目标鱼', ja:'ターゲット', ko:'목표 어종', th:'ปลาเป้าหมาย' }, val:{ en:'Amberjack (カンパチ)', zh:'红甘鲹', ja:'カンパチ', ko:'방어 (カンパチ)', th:'ปลาแอมเบอร์แจ็ค' } },
-      { label:{ en:'Tackle rental', zh:'装备租赁', ja:'タックルレンタル', ko:'장비 렌탈', th:'เช่าอุปกรณ์' }, val:'¥10,000/人' },
+      { label:{ en:'Package', zh:'套餐', ja:'パッケージ', ko:'패키지', th:'แพ็กเกจ' }, val:{ en:'All-inclusive', zh:'全包', ja:'オールインクルーシブ', ko:'올인클루시브', th:'รวมทุกอย่าง' } },
     ],
   },
   {
@@ -2463,12 +2470,12 @@ const SERVICE_B_PLANS = [
     name:{ en:'Tuna & Multi-Species', zh:'金枪鱼·多鱼种', ja:'マグロ・マルチターゲット', ko:'참치 & 다종 낚시', th:'ทูน่าและหลายสายพันธุ์' },
     desc:{ en:'Live bait for Yellowfin Tuna, Grouper, Amberjack and more. Price varies by fishing ground distance.', zh:'活饵钓黄鳍金枪鱼、石斑、红甘等多鱼种，价格因钓点距离而异。', ja:'泳がせでマグロ・ハタ・カンパチなどをマルチターゲット。ポイント距離により料金変動。', ko:'살미끼로 황다랑어, 그루퍼, 방어 등 다양한 어종. 낚시터 거리에 따라 가격 변동.', th:'เหยื่อสดสำหรับทูน่าครีบเหลือง ปลากะรัง ปลาแอมเบอร์แจ็ค และอื่นๆ ราคาขึ้นอยู่กับระยะทางแหล่งตกปลา' },
     port:{ en:'West or East Coast by arrangement', zh:'西海岸或东海岸，按需安排', ja:'西海岸・東海岸、要相談', ko:'서해안 또는 동해안 협의', th:'ชายฝั่งตะวันตกหรือตะวันออกตามการจัดเตรียม' },
-    price:'¥90,000〜150,000',
+    price:'¥72,000 half-day / ¥108,000 full-day',
     price_note:{ en:'Varies by distance to fishing ground', zh:'根据钓点距离变动', ja:'ポイント距離による', ko:'낚시터까지 거리에 따라 다름', th:'ขึ้นอยู่กับระยะทางไปยังแหล่งตกปลา' },
     rows:[
       { label:{ en:'Standard', zh:'标准', ja:'通常', ko:'기본', th:'มาตรฐาน' }, val:'06:00 〜 18:00' },
       { label:{ en:'Far ground', zh:'远距离钓点', ja:'遠征ポイント', ko:'원거리 낚시터', th:'แหล่งตกปลาไกล' }, val:'04:00 〜 20:00' },
-      { label:{ en:'Tackle rental', zh:'装备租赁', ja:'タックルレンタル', ko:'장비 렌탈', th:'เช่าอุปกรณ์' }, val:'¥10,000/人' },
+      { label:{ en:'Package', zh:'套餐', ja:'パッケージ', ko:'패키지', th:'แพ็กเกจ' }, val:{ en:'All-inclusive', zh:'全包', ja:'オールインクルーシブ', ko:'올인클루시브', th:'รวมทุกอย่าง' } },
     ],
   },
   {
@@ -2476,11 +2483,11 @@ const SERVICE_B_PLANS = [
     name:{ en:'GT Fishing (Giant Trevally)', zh:'GT钓鱼（旅鲹）', ja:'GTフィッシング', ko:'GT 낚시 (자이언트 트레발리)', th:'ตกปลา GT (Giant Trevally)' },
     desc:{ en:'Max 4 casters simultaneously. Experienced anglers only — large lures and long-distance casting required. Please advise if first GT experience.', zh:'最多4人同时Casting，仅限有经验钓手。需使用大型路亚远距离抛投，请告知是否为初次GT体验。', ja:'同時キャスティング最大4名。上級者向け——大型ルアーの遠投が必要。GT初挑戦の方はお知らせください。', ko:'최대 4명 동시 캐스팅. 경험 있는 낚시꾼만 — 대형 루어 원거리 캐스팅 필요. 첫 GT 경험이라면 미리 알려주세요.', th:'นักตกปลาสูงสุด 4 คนพร้อมกัน สำหรับนักตกปลาที่มีประสบการณ์เท่านั้น ต้องใช้เหยื่อขนาดใหญ่และการโยนระยะไกล' },
     port:{ en:'West or East Coast by arrangement', zh:'西海岸或东海岸，按需安排', ja:'西海岸・東海岸、要相談', ko:'서해안 또는 동해안 협의', th:'ชายฝั่งตะวันตกหรือตะวันออกตามการจัดเตรียม' },
-    price:'¥90,000〜100,000',
+    price:'¥72,000 half-day / ¥108,000 full-day',
     price_note:{ en:'Charter fee / whole boat', zh:'包船费 / 整船', ja:'チャーター料金 / 1船', ko:'차터 요금 / 선박 전체', th:'ค่าเช่าเหมาลำ / ทั้งลำ' },
     rows:[
       { label:{ en:'Max casters', zh:'最多Casting人数', ja:'同時キャスティング', ko:'최대 캐스터', th:'นักตกปลาสูงสุด' }, val:{ en:'4 persons', zh:'4人', ja:'最大4名', ko:'4명', th:'4 คน' } },
-      { label:{ en:'Tackle rental', zh:'装备租赁', ja:'タックルレンタル', ko:'장비 렌탈', th:'เช่าอุปกรณ์' }, val:'¥5,000/套' },
+      { label:{ en:'Package', zh:'套餐', ja:'パッケージ', ko:'패키지', th:'แพ็กเกจ' }, val:{ en:'All-inclusive', zh:'全包', ja:'オールインクルーシブ', ko:'올인클루시브', th:'รวมทุกอย่าง' } },
       { label:{ en:'Level', zh:'难度', ja:'難易度', ko:'난이도', th:'ระดับ' }, val:'★★★★★', coral:true },
     ],
     note:{ en:'⚠️ Other methods and BYO tackle by prior arrangement.', zh:'⚠️ 其他钓法和自带装备请提前协商。', ja:'⚠️ 他の釣り方・持込タックルは要事前相談。', ko:'⚠️ 다른 방법이나 개인 장비 지참은 사전 협의 필요.', th:'⚠️ วิธีอื่นและอุปกรณ์ส่วนตัวต้องนัดหมายล่วงหน้า' },
@@ -2490,28 +2497,23 @@ const SERVICE_B_PLANS = [
     name:{ en:'Overnight Expedition & Remote Islands', zh:'远征过夜 · 离岛', ja:'遠征泊まり・離島', ko:'1박 원정 & 외딴 섬', th:'สำรวจค้างคืนและเกาะห่างไกล' },
     desc:{ en:'Multi-day offshore expeditions for the biggest fish. Boat or island guesthouse. Ishigaki & Miyako Island charters by direct enquiry.', zh:'多日远征钓大物，船上或离岛民宿住宿。石垣岛、宫古岛包船请直接咨询。', ja:'泊まり遠征で大物狙い。船中泊または離島民宿。石垣島・宮古島のチャーターは直接お問い合わせください。', ko:'대물을 위한 다일 원정 낚시. 선상 숙박 또는 섬 게스트하우스. 이시가키·미야코섬 차터는 직접 문의.', th:'สำรวจนอกชายฝั่งหลายวันเพื่อจับปลาตัวใหญ่ พักบนเรือหรือเกสต์เฮาส์บนเกาะ สอบถามทัวร์เกาะอิชิงากิและมิยาโกะโดยตรง' },
     port:{ en:'Chatan / Kadena /泡瀬 · Remote islands by enquiry', zh:'北谷 / 嘉手纳 / 泡瀬 · 离岛请咨询', ja:'北谷・嘉手納・泡瀬 · 離島は要問い合わせ', ko:'차탄 / 가데나 / 아와세 · 외딴 섬은 문의', th:'Chatan / Kadena / Awase · เกาะห่างไกลสอบถาม' },
-    price:'¥120,000〜',
-    price_note:{ en:'Day trip from ¥120,000', zh:'日归从¥120,000起', ja:'日帰り¥120,000〜', ko:'당일치기 ¥120,000부터', th:'ทริปวันเดียวเริ่มต้น ¥120,000' },
+    price:'Contact us',
+    price_note:{ en:'Tailored quote by enquiry', zh:'请咨询定制报价', ja:'お問い合わせでお見積り', ko:'문의 후 맞춤 견적', th:'สอบถามเพื่อรับใบเสนอราคา' },
     rows:[
-      { label:{ en:'Day trip', zh:'日归', ja:'日帰り', ko:'당일치기', th:'ทริปวันเดียว' }, val:'¥120,000〜150,000' },
-      { label:{ en:'1 night 2 days', zh:'1泊2日', ja:'1泊2日', ko:'1박 2일', th:'1 คืน 2 วัน' }, val:'¥240,000〜300,000' },
-      { label:{ en:'2 nights 3 days', zh:'2泊3日', ja:'2泊3日', ko:'2박 3일', th:'2 คืน 3 วัน' }, val:'¥360,000〜450,000' },
-      { label:{ en:'Island stay +', zh:'离岛民宿附加', ja:'離島民宿追加', ko:'섬 숙박 추가', th:'พักเกาะเพิ่ม' }, val:'+¥7,000〜9,000/人' },
+      { label:{ en:'Day trip', zh:'日归', ja:'日帰り', ko:'당일치기', th:'ทริปวันเดียว' }, val:'Contact us' },
+      { label:{ en:'Overnight', zh:'过夜', ja:'泊まり', ko:'숙박', th:'ค้างคืน' }, val:'Contact us' },
     ],
     note:{ en:'🏝️ Ishigaki / Miyako Island fishing — please enquire directly.', zh:'🏝️ 石垣岛／宫古岛附近钓鱼，请直接咨询。', ja:'🏝️ 石垣島・宮古島周辺の釣りはお問い合わせください。', ko:'🏝️ 이시가키/미야코섬 낚시 — 직접 문의해 주세요.', th:'🏝️ ตกปลาที่เกาะอิชิงากิ/มิยาโกะ — กรุณาสอบถามโดยตรง' },
   },
   {
     num:'05', featured:false,
-    name:{ en:'Other Methods', zh:'其他钓法', ja:'その他プラン', ko:'기타 방법', th:'วิธีอื่นๆ' },
-    desc:{ en:'Jigging, Trolling, FAD (Payao), Bottom Fishing, Seasonal species. Contact us to discuss.', zh:'铁板钓、拖钓、浮鱼礁、底物钓、季节鱼种等，欢迎询问。', ja:'ジギング、トローリング、パヤオ、底物釣り、季節魚種など。お気軽にご相談を。', ko:'지깅, 트롤링, FAD(파야오), 바닥 낚시, 계절 어종 등. 문의해 주세요.', th:'จิ๊กกิ้ง ลากเหยื่อ FAD (Payao) ตกปลาก้นทะเล ปลาตามฤดูกาล ติดต่อเราเพื่อหารือ' },
+    name:{ en:'Private Half-day + Snorkeling', zh:'私人半日钓鱼+浮潜', ja:'プライベート半日釣り＋シュノーケリング', ko:'프라이빗 반일 낚시 + 스노클링', th:'ตกปลาส่วนตัวครึ่งวัน + ดำน้ำตื้น' },
+    desc:{ en:'A private half-day fishing and snorkeling combination. Contact us to confirm availability.', zh:'私人半日钓鱼与浮潜组合，请联系我们确认安排。', ja:'プライベート半日釣りとシュノーケリングの組み合わせ。空き状況はお問い合わせください。', ko:'프라이빗 반일 낚시와 스노클링 조합. 가능 여부를 문의해 주세요.', th:'แพ็กเกจตกปลาส่วนตัวครึ่งวันและดำน้ำตื้น ติดต่อเราเพื่อยืนยัน' },
     port:{ en:'West Coast, East Coast or by arrangement', zh:'西海岸、东海岸或按需安排', ja:'西海岸・東海岸・要相談', ko:'서해안, 동해안 또는 협의', th:'ชายฝั่งตะวันตก ตะวันออก หรือตามการจัดเตรียม' },
-    price:'¥80,000〜',
-    price_note:{ en:'From ¥80,000 by method', zh:'从¥80,000起', ja:'¥80,000〜 釣り方による', ko:'방법에 따라 ¥80,000부터', th:'เริ่มต้น ¥80,000 ตามวิธี' },
+    price:'¥82,000',
+    price_note:{ en:'All-inclusive package', zh:'全包套餐', ja:'オールインクルーシブ', ko:'올인클루시브 패키지', th:'แพ็กเกจรวมทุกอย่าง' },
     rows:[
-      { label:{ en:'Jigging / Live Bait / GT', zh:'铁板 / 泳饵 / GT', ja:'ジギング・泳がせ・GT', ko:'지깅 / 살미끼 / GT', th:'จิ๊กกิ้ง / เหยื่อสด / GT' }, val:'¥80,000〜130,000' },
-      { label:'パヤオ (FAD)', val:'¥100,000' },
-      { label:{ en:'Trolling (tackle incl.)', zh:'拖钓（含装备）', ja:'トローリング（機材込）', ko:'트롤링 (장비 포함)', th:'ลากเหยื่อ (รวมอุปกรณ์)' }, val:'¥140,000' },
-      { label:{ en:'Bottom / Grouper', zh:'石斑底物', ja:'グルクン・底物', ko:'바닥낚시 / 그루퍼', th:'ปลาก้นทะเล / ปลากะรัง' }, val:'¥80,000〜90,000' },
+      { label:{ en:'Package', zh:'套餐', ja:'パッケージ', ko:'패키지', th:'แพ็กเกจ' }, val:{ en:'Fishing + snorkeling, all-inclusive', zh:'钓鱼+浮潜，全包', ja:'釣り＋シュノーケリング、オールインクルーシブ', ko:'낚시 + 스노클링, 올인클루시브', th:'ตกปลา + ดำน้ำตื้น รวมทุกอย่าง' } },
     ],
   },
   {
@@ -2542,8 +2544,8 @@ const SERVICE_B_INFO = {
 
 const PRO_GENERAL = {
   coordination: {
-    label: { en:'Coordination & Translation Fee', zh:'翻译协调服务费', 'zh-TW':'翻譯協調服務費', ja:'コーディネート・翻訳料', ko:'코디네이션 및 번역 수수료', th:'ค่าประสานงานและแปลภาษา' },
-    body: { en:'Approx. 10% of total. Covers booking arrangement, full Chinese/English/Japanese translation and trip support.', zh:'约总费用的10%，含预约安排、全程中英日翻译协调服务。', 'zh-TW':'約總費用的10%，含預約安排、全程中英日翻譯協調服務。', ja:'総額の約10%。予約手配・中英日翻訳・コーディネートサービスが含まれます。', ko:'총액의 약 10%. 예약 주선, 중·영·일 번역 및 여행 지원 포함.', th:'ประมาณ 10% ของยอดรวม ครอบคลุมการจัดการจอง การแปลภาษาจีน/อังกฤษ/ญี่ปุ่น' }
+    label: { en:'Included booking support', zh:'包含预约支持', 'zh-TW':'包含預約支援', ja:'予約サポート込み', ko:'예약 지원 포함', th:'รวมการสนับสนุนการจอง' },
+    body: { en:'All-inclusive package: English booking and WhatsApp support with trusted local captains. Secure card hold authorization; no deposit is charged at booking.', zh:'全包套餐：由可信赖的当地船长提供英语预约与 WhatsApp 支持。安全卡片预授权，预约时不收取押金。', 'zh-TW':'全包套餐：由可信賴的當地船長提供英語預約與 WhatsApp 支援。安全卡片預授權，預約時不收取押金。', ja:'オールインクルーシブ：信頼できる地元船長との英語予約・WhatsAppサポート。安全なカードホールド認証で、予約時のデポジット請求はありません。', ko:'올인클루시브 패키지: 신뢰할 수 있는 현지 선장과 영어 예약 및 WhatsApp 지원. 안전한 카드 홀드 승인으로 예약 시 보증금을 청구하지 않습니다.', th:'แพ็กเกจรวมทุกอย่าง: สนับสนุนการจองภาษาอังกฤษและ WhatsApp กับกัปตันท้องถิ่นที่ไว้วางใจได้ การกันวงเงินบัตรอย่างปลอดภัย ไม่มีการเรียกเก็บเงินมัดจำตอนจอง' }
   },
   payment: {
     label: { en:'Payment', zh:'付款', 'zh-TW':'付款方式', ja:'お支払い', ko:'결제', th:'การชำระเงิน' },
@@ -3360,12 +3362,12 @@ const FAQS = [
     q_ja: "貸切チャーターは何名まで参加できますか？",
     q_ko: "전세 낚시 차터는 몇 명까지 참여할 수 있나요?",
     q_th: "เรือเช่าเหมาลำส่วนตัวเข้าร่วมได้กี่คน?",
-    a_en: "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples start from ¥80,000 total, depending on the method and fishing ground.",
-    a_zh: "包船只接待你们一组，最多 12 人。2–3 人参加时，包船价按整船价格由同行人数分摊；现有私人包船示例从整船 ¥80,000 起，具体取决于钓法与钓点。",
-    'a_zh-TW': "包船只接待您們一組，最多 12 人。2–3 人參加時，包船價按整船價格由同行人數分攤；現有私人包船示例從整船 ¥80,000 起，具體取決於釣法與釣點。",
-    a_ja: "貸切チャーターはグループ専用で、最大12名まで参加できます。2〜3名の場合は船単位の料金を人数で割る形です。現在の貸切例は、釣法とポイントにより1船¥80,000〜です。",
-    a_ko: "전세 차터는 귀하의 그룹만 이용하며 최대 12명까지 가능합니다. 2~3명은 선박 전체 요금을 그룹 인원으로 나누는 방식이며, 현재 전세 예시는 방법과 포인트에 따라 총 ¥80,000부터입니다.",
-    a_th: "เรือเช่าเหมาลำเป็นของกลุ่มคุณเท่านั้น รองรับได้สูงสุด 12 คน สำหรับ 2–3 คน ค่าเช่าเหมาลำเป็นราคารวมทั้งลำแล้วแบ่งกันในกลุ่ม ตัวอย่างเรือเหมาลำส่วนตัวปัจจุบันเริ่มต้นที่ ¥80,000 รวม ขึ้นอยู่กับวิธีและแหล่งตกปลา"
+    a_en: "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples are ¥72,000 for a half-day or ¥108,000 for a full-day, depending on the selected package.",
+    a_zh: "包船只接待你们一组，最多 12 人。2–3 人参加时，包船价按整船价格由同行人数分摊；现有私人包船示例为半日 ¥72,000 或全天 ¥108,000，具体取决于所选方案。",
+    'a_zh-TW': "包船只接待您們一組，最多 12 人。2–3 人參加時，包船價按整船價格由同行人數分攤；現有私人包船示例為半日 ¥72,000 或全天 ¥108,000，具體取決於所選方案。",
+    a_ja: "貸切チャーターはグループ専用で、最大12名まで参加できます。2〜3名の場合は船単位の料金を人数で割る形です。現在の貸切例は半日¥72,000、または終日¥108,000です。",
+    a_ko: "전세 차터는 귀하의 그룹만 이용하며 최대 12명까지 가능합니다. 2~3명은 선박 전체 요금을 그룹 인원으로 나누는 방식이며, 현재 전세 예시는 반일 ¥72,000 또는 종일 ¥108,000입니다.",
+    a_th: "เรือเช่าเหมาลำเป็นของกลุ่มคุณเท่านั้น รองรับได้สูงสุด 12 คน สำหรับ 2–3 คน ค่าเช่าเหมาลำเป็นราคารวมทั้งลำแล้วแบ่งกันในกลุ่ม ตัวอย่างปัจจุบันคือครึ่งวัน ¥72,000 หรือเต็มวัน ¥108,000 ขึ้นอยู่กับแพ็กเกจที่เลือก"
   },
   {
     q_en: "How does the shared fishing boat work?",
@@ -3394,6 +3396,20 @@ const FAQS = [
     a_ja: "集合場所はプランにより異なります。西海岸は北谷アメリカンビレッジ港または北谷浜川港、東海岸はうるま泡瀬港、乗合体験は嘉手納漁港です。予約前に正確な港を確認します。",
     a_ko: "집합 장소는 플랜에 따라 다릅니다. 서해안은 차탄 아메리칸 빌리지 항구 또는 차탄 하마가와 항구, 동해안은 우루마 아와세 항구, 합승 보트 체험은 가데나 어항입니다. 예약 전 정확한 항구를 확인합니다.",
     a_th: "จุดนัดพบขึ้นอยู่กับแผน: ท่าเรือ Chatan American Village หรือ Chatan Hamagawa ทางฝั่งตะวันตก, ท่าเรือ Uruma Awase ทางฝั่งตะวันออก และท่าเรือประมง Kadena สำหรับประสบการณ์เรือร่วม เราจะยืนยันท่าเรือที่แน่นอนก่อนจอง"
+  },
+  {
+    q_en: "What's included in the price?",
+    q_zh: "价格包含哪些内容？",
+    'q_zh-TW': "價格包含哪些內容？",
+    q_ja: "料金には何が含まれますか？",
+    q_ko: "가격에는 무엇이 포함되나요?",
+    q_th: "ราคานี้รวมอะไรบ้าง?",
+    a_en: "Our price includes the boat charter, English coordination and booking support.",
+    a_zh: "我们的价格包括包船、英语协调和预约支持。",
+    'a_zh-TW': "我們的價格包括包船、英語協調和預約支援。",
+    a_ja: "料金にはチャーターボート、英語でのコーディネート、予約サポートが含まれます。",
+    a_ko: "가격에는 보트 차터, 영어 조율 및 예약 지원이 포함됩니다.",
+    a_th: "ราคานี้รวมเรือเช่าเหมาลำ การประสานงานภาษาอังกฤษ และการสนับสนุนการจอง"
   }
 ];
 
