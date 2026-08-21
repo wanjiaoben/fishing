@@ -1209,17 +1209,15 @@ async function customerPageForOrder(request, env, orderId) {
   const body = await response.text();
   const configMatch = body.match(/const cfg=(\{[\s\S]*?\}); const box=/);
   const configJson = configMatch ? configMatch[1] : "{}";
-  const fixed = body.replace(
-    /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
-    ""
-  ).replace(/<script>[\s\S]*?<\/script>/, `<textarea id="authorize-config" hidden>${escapeHtml(configJson)}</textarea><script src="/assets/authorize-page.js" defer></script>`);
+  const fixed = body.replace(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>/gi, "")
+    .replace(/<script>[\s\S]*?<\/script>/, `<textarea id="authorize-config" hidden>${escapeHtml(configJson)}</textarea><script src="/assets/authorize-page.js" defer></script>`);
   return html(fixed, { headers: {
-    "content-security-policy-report-only": "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com; font-src 'self' data: https://*.squarecdn.com; img-src 'self' data: https:; report-uri /__csp-report"
+    "content-security-policy-report-only": customerReportOnlyHeaders()
   } });
 }
 
 function customerReportOnlyHeaders() {
-  return "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com; font-src 'self' data: https://*.squarecdn.com; img-src 'self' data: https:; report-uri /__csp-report";
+  return "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com https://d1g145x70srn7h.cloudfront.net; font-src 'self' data: https://*.squarecdn.com https://d1g145x70srn7h.cloudfront.net; img-src 'self' data: https:; report-uri /__csp-report";
 }
 
 function asCustomerReportOnly(response) {

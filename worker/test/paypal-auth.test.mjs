@@ -379,6 +379,8 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
   assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
+  assert.match(page.headers.get("content-security-policy-report-only"), /d1g145x70srn7h\.cloudfront\.net/);
+  assert.doesNotMatch(text, /http-equiv=["']Content-Security-Policy["']/i);
   assert.match(page.headers.get("content-security-policy-report-only"), /script-src 'self' https:\/\/www\.paypal\.com/);
   assert.doesNotMatch(text, /Content-Security-Policy/);
   assert.doesNotMatch(text, /script-src[^;]*unsafe-inline/);
