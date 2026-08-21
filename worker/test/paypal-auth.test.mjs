@@ -408,6 +408,9 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(AUTHORIZE_PAGE_SCRIPT, /payments-init/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /card-init/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /card-attach/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /authorize-submit/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /HTTP ' \+ response\.status/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /Square authorization failed\.\\n/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /debug.*URLSearchParams/);
   assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
   assert.match(page.headers.get("content-security-policy-report-only"), /d1g145x70srn7h\.cloudfront\.net/);

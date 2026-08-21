@@ -60,6 +60,14 @@ pattern = "activity.nice.okinawa/api/paypal/*"
 zone_name = "nice.okinawa"
 
 [[routes]]
+pattern = "fishing.nice.okinawa/api/square/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/api/square/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
 pattern = "fishing.nice.okinawa/api/admin/*"
 zone_name = "nice.okinawa"
 

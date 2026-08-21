@@ -18,6 +18,7 @@
 |------|--------|------|
 | 2026-08-21 | Codex | FISH-0821-04 将 PayPal 客人页路由扩展至 activity.nice.okinawa，新增订单 brand（fishing/snorkel）与品牌化客人页，保留 fishing 旧链接；待 Wan 完成 ¥100 snorkel 真浏览器授权与 Release 验收 |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 生产 Square 卡表单真浏览器复验可渲染；补 Square 前端 stage 错误上报、`?debug=1` 明文诊断、短码诊断字段与 Square 字体 CSP 白名单；待 PR/Wan-Verified 发布 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：补两域 `/api/square/*` Worker 路由，Square 提交失败改显示 HTTP 状态码与服务端 message，并以 `authorize-submit` 上报 `/__client-error`；待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-02 补充 Chatan Amberjack trip report 的同日餐厅处理与 ATM 事实，价格改为 4 人总额 ¥166,000，并同步 llms.txt 摘要；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0821-01 新建 Chatan 全日 Amberjack trip report、列表页、两档无 EXIF WebP 图片；同步首页/套餐页入口、sitemap 与 llms.txt；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0820-10 在首页与英文套餐页价格表下新增 Included / Not included / Free on request 三段内容及 FAQPage 对应问答；Fishing licence 因待 Wan 确认未写入 |
@@ -140,3 +141,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加：移除客人页残留 enforcing CSP meta/头，保留单一 Report-Only 并加入 Square CloudFront 字体域；tag `fishing-paypal-auth-v2026.08.21-fish-0821-hotfix-03b`；Worker `b46094e1-ab1a-4384-849e-d1bd5f71535a` | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加④：集中公开路径表，补 activity/fishing 的 `/assets/*`、`/__csp-report`、`/__client-error`、`/__diag` Workers Routes；加入双域 × 路径断言与无 secret 诊断接口 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04：真实 Chromium 打开 `https://activity.nice.okinawa/p/E80E6F?debug=1` 已看到 Square 生产卡号框；补 `/__client-error` stage 上报与 debug 明文输出，未触发付款/未读 secret/未本地生产部署 | ✅ 测试通过，待 PR/Wan-Verified 发布 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：确认 Square 前端提交 URL 为 `/api/square/create-payment`，生产路由漏 `/api/square/*`；已补两域路由与提交失败专用错误文案/`authorize-submit` 上报 | ✅ 本地测试通过，待 PR/Wan-Verified 发布 |
