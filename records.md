@@ -16,7 +16,9 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
-| 2026-08-21 | Codex | FISH-0821-09 新建 `/en/how-booking-works/` 英文七步 HowTo + 六问 FAQPage 页面；强化 Chatan trip report 摘要、关键词标题、四问 FAQ/Article about；首页、套餐页、授权页脚与 trip report 增加入口；更新 sitemap/llms；移除公开页面 WeChat/微信/OkinawaOnline 联系方式；待 PR 验收 |
+| 2026-08-21 | Codex | FISH-0821-04 将 PayPal 客人页路由扩展至 activity.nice.okinawa，新增订单 brand（fishing/snorkel）与品牌化客人页，保留 fishing 旧链接；待 Wan 完成 ¥100 snorkel 真浏览器授权与 Release 验收 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-04 生产 Square 卡表单真浏览器复验可渲染；补 Square 前端 stage 错误上报、`?debug=1` 明文诊断、短码诊断字段与 Square 字体 CSP 白名单；待 PR/Wan-Verified 发布 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：补两域 `/api/square/*` Worker 路由，Square 提交失败改显示 HTTP 状态码与服务端 message，并以 `authorize-submit` 上报 `/__client-error`；待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-02 补充 Chatan Amberjack trip report 的同日餐厅处理与 ATM 事实，价格改为 4 人总额 ¥166,000，并同步 llms.txt 摘要；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0821-01 新建 Chatan 全日 Amberjack trip report、列表页、两档无 EXIF WebP 图片；同步首页/套餐页入口、sitemap 与 llms.txt；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0820-10 在首页与英文套餐页价格表下新增 Included / Not included / Free on request 三段内容及 FAQPage 对应问答；Fishing licence 因待 Wan 确认未写入 |
@@ -71,6 +73,7 @@
 - 旅行活动页面必须说明现场活动保险、自行购买海外旅行保险、翻译协调边界和联系担当。
 - M0805-06 生产发车回滚锚：合并前 `origin/main` 为 `b28d112754b3904d4c6929e4a3ab837795741a66`，#24 原始施工提交为 `5bba9bc288ec47fbb13db0b04f3e75c5a868bb85`。如需回滚，revert #24 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0805-15 生产发车回滚锚：合并前 `origin/main` 为 `d2d58362f25e90a6798c028eaf73dba7fe5a45d3`，#25 原始施工提交为 `9fb75a476c2f34e19a6ea6cc05d6a4ae6c55e966`。如需回滚，revert #25 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
+- FISH-0821-HOTFIX-02：Square 仅全额 Complete，使用独立 Sandbox/Production secret 命名；Sandbox 施工分支基线为 origin/main 1a9c45a。
 - M0808-17 生产发车回滚锚：合并前 `origin/main` 为 `fc8a79b97354eee99db5f733a23a9965e127d98a`，#26 发车校验提交为 `2afb1e4ba47be8e0faacb59170724093719897d1`。如需回滚，revert #26 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0808-26 生产发车回滚锚：合并前 `origin/main` 为 `4de81e333470d51f42e03e08744ffad5689bacc6`，#27 squash merge commit 为 `00f889a38713a9aa9e11ed0de9643f6c39fa1c7a`。如需回滚，revert #27 squash merge commit，并复验 `https://fishing.nice.okinawa/` 与 `https://fishing.nice.okinawa/fishing-seasons/`。
 
@@ -81,6 +84,7 @@
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
 | 2026-08-20 | Codex | FISH-0820-05：合并 #31；新建生产 D1 并应用五表 migration；补生产 wrangler 配置、任意订单 API/客户专属授权页、后台新建单 UI、生产 tag 发布 workflow；未注入 Live secrets、未部署 | ✅ 前置施工完成，待 FISH-0820-06 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加⑦：将 Square 初始化兜底改为 25 秒，加入加载进度提示并补成功状态清理/按钮启用测试 | ✅ 本地测试通过 |
 | 2026-08-20 | Codex | FISH-0820-02 新增 isolated PayPal Authorization Sandbox Worker/D1 施工稿：AUTHORIZE 订单、客户授权页、后台 void/capture、webhook 验签、audit log 与 Sandbox runbook；未上生产 | ⚠️ |
 | 2026-08-19 | Codex | FISH-0819-01 新增 `/en/guides/okinawa-fishing-packages/` 英文引流内容页：Chatan 私人船钓 4h 与 Kadena Kayak/SUP+Fishing 两套餐，CTA 导 WhatsApp/email 询盘，并收录 sitemap/llms | ✅ |
 | 2026-08-17 | Codex | FISH-0817-01 强化英文首页 AI 询盘路径：前置真实出发港、2/3 人包船示例与 WhatsApp CTA；新增 `/en/guides/where-to-stay-fishing/` 住宿区域指南并收录 sitemap/llms | ✅ |
@@ -120,3 +124,21 @@
 | 2026-06-09 | Codex | 运行日更记录检查；核对 2026-06-08 提交与工作区，`f004872` 仅涉及 `.DS_Store`，未发现需写入已完成/进行中的有效变更 | ✅ |
 | 2026-06-10 | Codex | 运行日更记录检查；核对 2026-06-09 提交与当前工作区，确认昨日规则初始化与命名调整已记录，未发现除 `records.md` 外的未完成工作 | ✅ |
 | 2026-06-11 | Codex | 运行 Daily repo records updater，核对 2026-06-10 提交与当前工作区，未发现相关变更 | ✅ |
+| 2026-08-21 | Codex | FISH-0821-05 后台客人字段、ORDER_CREATED 作废、状态分组、Resend 通知幂等施工；RESEND_API_KEY 仅待 Wan 通过 secret 注入，未发送邮件/未触发真实支付 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-01 PayPal 卡入口补充 guest card funding、翻译保护与 8 秒兜底提示；待生产发布 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-08 trip report 渔获清单更新为 25 fish，并同步 title/description/OG/Article headline；待发布 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加⑦：Square 客人页兜底延长至 25 秒，加入加载进度文案；初始化成功清除兜底状态并启用按钮 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加⑧：Square 超时与初始化异常按阶段写入 __client-error，debug=1 显示同一 JSON；客人页配置补 shortCode | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：新增 Square Web Payments delayed authorization、短链、provider/square_payment_id、后台全额 Complete/Cancel、Sandbox 配置与回归测试；未注入 secret、未部署、未发起真实支付 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 HOTFIX：补 Square/PayPal iframe CSP 主机白名单与客户页 provider 隔离；Sandbox Worker 版本 `addfcf26-716a-40f2-b851-a932e2d3d07e`，待 Wan 复测短链 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 Console 修复：内联初始化脚本改为每响应 nonce，CSP 不含 `unsafe-inline`；Sandbox Worker 版本 `4ef6c534-8da6-480d-bcdc-4d8c88518b14` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 第三次 Console 修复：客户页脚本外置为 `worker/src/authorize-page.js`，加入 HTML 脚本语法门禁与 CI `node --check`；Sandbox Worker 版本 `0e29936c-a381-476e-aa8b-2e4a31a79414` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 CSP 定案：客人页改 HTTP `Content-Security-Policy-Report-Only`，`/__csp-report` 写 Worker 日志；Playwright Chromium 安装因 npm registry DNS 失败未完成 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：补齐无订单 `/payment/authorize` 也返回 Report-Only CSP；Sandbox Worker 版本 `a437c315-5915-43fd-b662-bd877574cc71` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：Square delayed capture 改 P7D/CANCEL；后台日期超过今天+7天提示「请在出发前 7 天内发链接」；待 Sandbox 第二笔 Capture | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 生产：PR #51 squash merge `b8c03d0`；生产 D1 0004 前备份 `/private/tmp/fish-0821-hotfix02-prod-d1-before-0004.sql` SHA256 `b242f429c88ce6f497f881e289fb65e460f4ec97b545556ce62d1a8b5bf4aa68`；tag `fishing-paypal-auth-v2026.08.21-fish-0821-hotfix-02`；Actions deploy version `b1e66ba7-e75e-48cf-90d0-03486db5f5ed` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03：补生产 `fishing.nice.okinawa/p/*` 与 `activity.nice.okinawa/p/*` Workers Routes，并加入双域路由测试断言 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加：移除客人页残留 enforcing CSP meta/头，保留单一 Report-Only 并加入 Square CloudFront 字体域；tag `fishing-paypal-auth-v2026.08.21-fish-0821-hotfix-03b`；Worker `b46094e1-ab1a-4384-849e-d1bd5f71535a` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加④：集中公开路径表，补 activity/fishing 的 `/assets/*`、`/__csp-report`、`/__client-error`、`/__diag` Workers Routes；加入双域 × 路径断言与无 secret 诊断接口 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-04：真实 Chromium 打开 `https://activity.nice.okinawa/p/E80E6F?debug=1` 已看到 Square 生产卡号框；补 `/__client-error` stage 上报与 debug 明文输出，未触发付款/未读 secret/未本地生产部署 | ✅ 测试通过，待 PR/Wan-Verified 发布 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：确认 Square 前端提交 URL 为 `/api/square/create-payment`，生产路由漏 `/api/square/*`；已补两域路由与提交失败专用错误文案/`authorize-submit` 上报 | ✅ 本地测试通过，待 PR/Wan-Verified 发布 |

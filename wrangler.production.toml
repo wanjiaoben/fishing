@@ -8,7 +8,63 @@ pattern = "fishing.nice.okinawa/payment/*"
 zone_name = "nice.okinawa"
 
 [[routes]]
+pattern = "activity.nice.okinawa/payment/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/p/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/p/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/assets/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/assets/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/__csp-report"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/__csp-report"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/__client-error"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/__client-error"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/__diag"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/__diag"
+zone_name = "nice.okinawa"
+
+[[routes]]
 pattern = "fishing.nice.okinawa/api/paypal/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/api/paypal/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/api/square/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/api/square/*"
 zone_name = "nice.okinawa"
 
 [[routes]]
@@ -33,10 +89,16 @@ PAYPAL_AUTH_ACTIVITY_DATE = "2026-08-24"
 PAYPAL_AUTH_AMOUNT = "66000"
 PAYPAL_AUTH_CURRENCY = "JPY"
 PAYPAL_AUTH_VALIDITY_REMINDER_DAYS = "3"
-PAYPAL_AUTH_WORKER_ORIGIN = "https://fishing.nice.okinawa"
+PAYPAL_AUTH_WORKER_ORIGIN = "https://activity.nice.okinawa"
+SQUARE_ENV = "production"
+SQUARE_PRODUCTION_APPLICATION_ID = "sq0idp-ME14fEsdv65pY-8Oiei9nA"
+
+# Configure out of band: npx wrangler secret put RESEND_API_KEY --config wrangler.production.toml
 
 # Secrets are injected by Wan, never committed:
 # npx wrangler secret put PAYPAL_PRODUCTION_CLIENT_ID --config wrangler.production.toml
 # npx wrangler secret put PAYPAL_PRODUCTION_CLIENT_SECRET --config wrangler.production.toml
 # npx wrangler secret put ADMIN_TOKEN --config wrangler.production.toml
 # npx wrangler secret put PAYPAL_WEBHOOK_ID --config wrangler.production.toml
+# npx wrangler secret put SQUARE_PRODUCTION_ACCESS_TOKEN --config wrangler.production.toml
+# npx wrangler secret put SQUARE_PRODUCTION_LOCATION_ID --config wrangler.production.toml

@@ -18,12 +18,16 @@ PAYPAL_AUTH_AMOUNT = "66000"
 PAYPAL_AUTH_CURRENCY = "JPY"
 PAYPAL_AUTH_VALIDITY_REMINDER_DAYS = "3"
 PAYPAL_AUTH_WORKER_ORIGIN = "https://fishing-paypal-auth-sandbox.gerheidicn.workers.dev"
+SQUARE_ENV = "sandbox"
+SQUARE_SANDBOX_APPLICATION_ID = "sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA"
 
 # Secrets, never commit values:
 # wrangler secret put PAYPAL_SANDBOX_CLIENT_ID
 # wrangler secret put PAYPAL_SANDBOX_CLIENT_SECRET
 # wrangler secret put PAYPAL_WEBHOOK_ID
 # wrangler secret put ADMIN_TOKEN
+# wrangler secret put SQUARE_SANDBOX_ACCESS_TOKEN
+# wrangler secret put SQUARE_SANDBOX_LOCATION_ID
 #
 # Production credentials must be separate if/when Wan authorizes production:
 # wrangler secret put PAYPAL_PRODUCTION_CLIENT_ID
