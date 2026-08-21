@@ -134,3 +134,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 生产：PR #51 squash merge `b8c03d0`；生产 D1 0004 前备份 `/private/tmp/fish-0821-hotfix02-prod-d1-before-0004.sql` SHA256 `b242f429c88ce6f497f881e289fb65e460f4ec97b545556ce62d1a8b5bf4aa68`；tag `fishing-paypal-auth-v2026.08.21-fish-0821-hotfix-02`；Actions deploy version `b1e66ba7-e75e-48cf-90d0-03486db5f5ed` | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-03：补生产 `fishing.nice.okinawa/p/*` 与 `activity.nice.okinawa/p/*` Workers Routes，并加入双域路由测试断言 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加：移除客人页残留 enforcing CSP meta/头，保留单一 Report-Only 并加入 Square CloudFront 字体域；tag `fishing-paypal-auth-v2026.08.21-fish-0821-hotfix-03b`；Worker `b46094e1-ab1a-4384-849e-d1bd5f71535a` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加④：集中公开路径表，补 activity/fishing 的 `/assets/*`、`/__csp-report`、`/__client-error`、`/__diag` Workers Routes；加入双域 × 路径断言与无 secret 诊断接口 | ⏳ |

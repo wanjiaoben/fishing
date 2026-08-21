@@ -20,6 +20,38 @@ pattern = "activity.nice.okinawa/p/*"
 zone_name = "nice.okinawa"
 
 [[routes]]
+pattern = "fishing.nice.okinawa/assets/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/assets/*"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/__csp-report"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/__csp-report"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/__client-error"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/__client-error"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "fishing.nice.okinawa/__diag"
+zone_name = "nice.okinawa"
+
+[[routes]]
+pattern = "activity.nice.okinawa/__diag"
+zone_name = "nice.okinawa"
+
+[[routes]]
 pattern = "fishing.nice.okinawa/api/paypal/*"
 zone_name = "nice.okinawa"
 

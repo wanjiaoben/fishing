@@ -1,4 +1,5 @@
 import { AUTHORIZE_PAGE_SCRIPT } from "./authorize-page.js";
+import { WORKER_ADMIN_PATHS, WORKER_PUBLIC_PATHS, WORKER_ROUTE_DOMAINS } from "./routes.js";
 
 const PAYPAL_API = {
   sandbox: "https://api-m.sandbox.paypal.com",
@@ -1361,6 +1362,15 @@ async function handleRequest(request, env) {
       const report = await request.text();
       console.log("CSP_REPORT", report.slice(0, 8000));
       return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
+    }
+    if (url.pathname === "/__client-error" && request.method === "POST") {
+      const report = await request.text();
+      console.log("CLIENT_ERROR", report.slice(0, 8000));
+      return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
+    }
+    if (url.pathname === "/__diag" && request.method === "GET") {
+      const c = config(env);
+      return json({ ok: true, routes: { public: WORKER_PUBLIC_PATHS, admin: WORKER_ADMIN_PATHS, domains: WORKER_ROUTE_DOMAINS }, application_id: c.squareApplicationId || null });
     }
     if (url.pathname === "/admin/paypal-authorizations" && request.method === "GET") return adminPage();
     if (url.pathname === "/api/paypal/client-config" && request.method === "GET") {

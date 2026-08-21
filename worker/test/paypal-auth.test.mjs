@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { handleRequest, customerPage, adminPage } from "../src/index.js";
 import { AUTHORIZE_PAGE_SCRIPT } from "../src/authorize-page.js";
+import { WORKER_ADMIN_PATHS, WORKER_PUBLIC_PATHS, WORKER_ROUTE_DOMAINS } from "../src/routes.js";
 
 function fakeDb(rows = {}) {
   const calls = [];
@@ -58,8 +59,25 @@ function env(overrides = {}) {
 
 test("production keeps both customer short-link routes", () => {
   const toml = fs.readFileSync(new URL("../../wrangler.production.toml", import.meta.url), "utf8");
-  assert.match(toml, /pattern = "fishing\.nice\.okinawa\/p\/\*"/);
-  assert.match(toml, /pattern = "activity\.nice\.okinawa\/p\/\*"/);
+  for (const domain of WORKER_ROUTE_DOMAINS) {
+    for (const path of WORKER_PUBLIC_PATHS) {
+      assert.match(toml, new RegExp(`pattern = "${domain.replaceAll('.', '\\.')}${path.replaceAll('*', '\\*').replaceAll('/', '\\/')}"`), `${domain}${path} missing`);
+    }
+  }
+  for (const path of WORKER_ADMIN_PATHS) {
+    assert.match(toml, new RegExp(`pattern = "fishing\\.nice\\.okinawa${path.replaceAll('*', '\\*').replaceAll('/', '\\/')}"`), `fishing${path} missing`);
+  }
+});
+
+test("diagnostic route exposes route table without secrets", async () => {
+  const response = await handleRequest(new Request("https://activity.nice.okinawa/__diag"), env({ env: { SQUARE_SANDBOX_APPLICATION_ID: "sandbox-app" } }));
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.deepEqual(data.routes.public, WORKER_PUBLIC_PATHS);
+  assert.deepEqual(data.routes.admin, WORKER_ADMIN_PATHS);
+  assert.deepEqual(data.routes.domains, WORKER_ROUTE_DOMAINS);
+  assert.equal(data.application_id, "sandbox-app");
+  assert.doesNotMatch(JSON.stringify(data), /ACCESS_TOKEN|SECRET|ADMIN_TOKEN/);
 });
 
 test("customer page states authorization is not an immediate charge", async () => {
