@@ -468,5 +468,9 @@ test("terminal customer short-link pages stay HTTP 200", async () => {
       byShortCode: { paypal_order_id: "ORDER-TERMINAL", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", authorization_status }
     } }));
     assert.equal(page.status, 200, authorization_status);
+    const text = await page.text();
+    if (authorization_status === "VOIDED / RELEASED") assert.match(text, /This hold has been released — nothing was charged/);
+    if (authorization_status === "CAPTURED") assert.match(text, /This authorization was captured according to the cancellation policy/);
+    if (authorization_status === "CANCELLED") assert.match(text, /This booking authorization was cancelled — nothing was charged/);
   }
 });
