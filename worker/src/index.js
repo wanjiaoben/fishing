@@ -17,6 +17,34 @@ const WEBHOOK_EVENTS = new Set([
   "PAYMENT.CAPTURE.REFUNDED"
 ]);
 
+const BRAND_CONFIG = Object.freeze({
+  fishing: {
+    key: "fishing",
+    name: "Fishing Nice Okinawa",
+    title: "Fishing Authorization",
+    accent: "#00b4c8",
+    background: "#06101d",
+    returnUrl: "https://fishing.nice.okinawa/"
+  },
+  snorkel: {
+    key: "snorkel",
+    name: "Snorkel Nice Okinawa",
+    title: "Snorkel Authorization",
+    accent: "#25c2a0",
+    background: "#06201f",
+    returnUrl: "https://snorkel.nice.okinawa/"
+  }
+});
+
+function normalizeBrand(value) {
+  const brand = String(value || "fishing").trim().toLowerCase();
+  return BRAND_CONFIG[brand] ? brand : "fishing";
+}
+
+function brandConfig(value) {
+  return BRAND_CONFIG[normalizeBrand(value)];
+}
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -247,12 +275,13 @@ async function createOrder(request, env) {
 
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
-     (id, paypal_order_id, activity, activity_date, amount, currency, authorization_status, paypal_status,
+     (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
       paypal_create_response, policy_version, agreed_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     authId,
     paypalOrder.id,
+    "fishing",
     c.product,
     c.activityDate,
     c.amount,
@@ -308,6 +337,7 @@ async function createAdminOrder(request, env) {
   const activityDate = String(body.activity_date || "").trim();
   const amount = Number(body.amount);
   const currency = String(body.currency || "JPY").trim().toUpperCase();
+  const brand = normalizeBrand(body.brand);
   if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY") {
     return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY"] }, { status: 400 });
   }
@@ -325,14 +355,14 @@ async function createAdminOrder(request, env) {
   });
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
-     (id, paypal_order_id, activity, activity_date, amount, currency, authorization_status, paypal_status,
+     (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
       paypal_create_response, policy_version, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(localId, paypalOrder.id, activity, activityDate, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(localId, paypalOrder.id, brand, activity, activityDate, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
     JSON.stringify(paypalOrder), c.policyVersion, createdAt, createdAt).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
   return json({ ok: true, local_authorization_id: localId, paypal_order_id: paypalOrder.id,
-    authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}` });
+    authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`, brand });
 }
 
 async function createOrderWithSandboxTestCard(request, env) {
@@ -371,12 +401,13 @@ async function createOrderWithSandboxTestCard(request, env) {
 
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
-     (id, paypal_order_id, activity, activity_date, amount, currency, authorization_status, paypal_status,
+     (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
       paypal_create_response, policy_version, agreed_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     authId,
     paypalOrder.id,
+    "fishing",
     c.product,
     c.activityDate,
     c.amount,
@@ -597,7 +628,7 @@ async function listAuthorizations(request, env) {
     return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
   }
   const rows = await env.DB.prepare(
-    `SELECT id, paypal_order_id, paypal_authorization_id, activity, activity_date, amount, currency,
+    `SELECT id, paypal_order_id, paypal_authorization_id, brand, activity, activity_date, amount, currency,
             authorization_status, paypal_status, authorization_create_time, authorization_expiration_time,
             honor_period_ends_at, created_at, updated_at
      FROM paypal_authorizations
@@ -947,9 +978,12 @@ async function customerPageForOrder(request, env, orderId) {
   const row = await getAuthorizationByOrder(env, orderId);
   if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
   const c = config(env);
+  const brand = brandConfig(row.brand);
   const cfg = { clientId: c.clientId || "", currency: row.currency, policyVersion: row.policy_version,
-    amount: row.amount, activity: row.activity, activityDate: row.activity_date, orderId, paypalJsBase: c.jsBase };
-  return html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PayPal Authorization | ${escapeHtml(row.activity)}</title><style>body{font-family:system-ui;background:#06101d;color:#fff;margin:0;line-height:1.6}main{max-width:760px;margin:auto;padding:32px 18px}.card{background:#10243b;border:1px solid #34506b;border-radius:16px;padding:24px}.fact{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:10px 0;border-top:1px solid #29415a}.fact strong{color:#00b4c8}.notice{background:#3c321d;border:1px solid #806b32;border-radius:12px;padding:16px;margin:18px 0}button{background:#c8a44a;color:#06101d;border:0;border-radius:8px;padding:12px 16px;font-weight:800;min-height:46px}button:disabled{opacity:.45}.status{white-space:pre-wrap;background:#081522;border-radius:8px;padding:12px;margin-top:18px}@media(max-width:520px){.fact{grid-template-columns:1fr}}</style></head><body><main><div class="card"><h1>Card Authorization</h1><p>Your card will be authorized, not charged immediately.</p><div class="fact"><strong>Activity</strong><span>${escapeHtml(row.activity)}</span></div><div class="fact"><strong>Date</strong><span>${escapeHtml(row.activity_date)}</span></div><div class="fact"><strong>Authorized amount</strong><span>${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}</span></div><div class="notice"><p>Your card will be authorized for ${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}, but you will not be charged at this time.</p><p>The hold amount covers the charter fee plus any gear rental stated in your confirmation email. Nothing is charged unless you do not show up.</p><p>If you participate as scheduled, the authorization will be released.</p><p>If you cancel or do not attend, the applicable cancellation fee may be charged according to the cancellation policy you agreed to.</p><p>If the operator cancels due to weather or unsafe sea conditions, the authorization will be released without charge.</p></div><label><input id="agree" type="checkbox"> I understand and agree to the authorization and cancellation policy.</label><button id="load-paypal" disabled>Continue to PayPal Authorization</button><div id="paypal-buttons"></div><div id="status" class="status" hidden></div></div></main><script>
+    amount: row.amount, activity: row.activity, activityDate: row.activity_date, orderId, paypalJsBase: c.jsBase,
+    brand: brand.key, brandName: brand.name, brandTitle: brand.title, brandAccent: brand.accent,
+    brandBackground: brand.background, returnUrl: brand.returnUrl };
+  return html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(brand.title)} | ${escapeHtml(row.activity)}</title><style>:root{--accent:${brand.accent};--background:${brand.background}}body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--background);color:#fff;margin:0;line-height:1.6}main{max-width:760px;margin:auto;padding:32px 18px}.brand{color:var(--accent);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:24px}.fact{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}.fact strong{color:var(--accent)}.notice{background:rgba(200,164,74,.12);border:1px solid rgba(200,164,74,.35);border-radius:12px;padding:16px;margin:18px 0}button{background:#c8a44a;color:#06101d;border:0;border-radius:8px;padding:12px 16px;font-weight:800;min-height:46px}button:disabled{opacity:.45}.status{white-space:pre-wrap;background:rgba(0,0,0,.25);border-radius:8px;padding:12px;margin-top:18px}footer{max-width:760px;margin:auto;padding:0 18px 28px;color:rgba(255,255,255,.65)}footer a{color:var(--accent)}@media(max-width:520px){.fact{grid-template-columns:1fr}}</style></head><body><main><div class="card"><div class="brand">${escapeHtml(brand.name)}</div><h1>${escapeHtml(brand.title)}</h1><p>Your card will be authorized, not charged immediately.</p><div class="fact"><strong>Activity</strong><span>${escapeHtml(row.activity)}</span></div><div class="fact"><strong>Date</strong><span>${escapeHtml(row.activity_date)}</span></div><div class="fact"><strong>Authorized amount</strong><span>${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}</span></div><div class="notice"><p>Your card will be authorized for ${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}, but you will not be charged at this time.</p><p>The hold amount covers the charter fee plus any gear rental stated in your confirmation email. Nothing is charged unless you do not show up.</p><p>If you participate as scheduled, the authorization will be released.</p><p>If you cancel or do not attend, the applicable cancellation fee may be charged according to the cancellation policy you agreed to.</p><p>If the operator cancels due to weather or unsafe sea conditions, the authorization will be released without charge.</p></div><label><input id="agree" type="checkbox"> I understand and agree to the authorization and cancellation policy.</label><button id="load-paypal" disabled>Continue to PayPal Authorization</button><div id="paypal-buttons"></div><div id="status" class="status" hidden></div></div></main><footer><a href="${escapeHtml(brand.returnUrl)}">Return to ${escapeHtml(brand.name)}</a></footer><script>
 const cfg=${JSON.stringify(cfg)}; const box=document.getElementById('status'); const show=m=>{box.hidden=false;box.textContent=m};
 document.getElementById('agree').onchange=e=>document.getElementById('load-paypal').disabled=!e.target.checked;
 document.getElementById('load-paypal').onclick=()=>{const s=document.createElement('script');s.src=cfg.paypalJsBase+'?client-id='+encodeURIComponent(cfg.clientId)+'&currency='+encodeURIComponent(cfg.currency)+'&intent=authorize';s.onload=render;s.onerror=()=>show('Failed to load PayPal. Please contact us.');document.head.appendChild(s)};
@@ -982,7 +1016,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p><input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -993,7 +1027,7 @@ document.getElementById('load').onclick = load;
 document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
-  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
+  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
   const data=await res.json(); document.getElementById('new-result').textContent=data.ok ? data.authorize_url : (data.error||'Failed');
 }
 async function load(){
@@ -1003,7 +1037,7 @@ async function load(){
   list.innerHTML = data.authorizations.map(render).join('');
 }
 function render(row){
-  return '<div class="row"><h2>'+row.activity+'</h2>'+
+  return '<div class="row"><h2>'+row.activity+' <small>('+row.brand+')</small></h2>'+
     '<div class="meta">'+
     '<div>Status: <span class="status">'+row.status_label+'</span></div>'+
     '<div>Amount: '+row.currency+' '+Number(row.amount).toLocaleString('en-US')+'</div>'+
