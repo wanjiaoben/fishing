@@ -2065,13 +2065,30 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "name": "What's included in the price?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Our price includes the boat charter, English coordination and booking support."
+        "text": "Our price includes a private boat charter with a licensed local captain; rods, reels, tackle and bait; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's not included in the price?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What free options can I request?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Free on request: a cooler box with ice and basic utensils so you can take your catch home; reservation at a local restaurant that will cook your catch for you (you pay the restaurant directly); and child life jackets and snorkel gear on combo trips. None of the above options carry an extra charge from us."
       }
     }
   ]
 }
 </script>
 <style id="nice-screenshot-mark-style">
+.included-block{margin:1.25rem 0 0;padding:1.25rem;background:rgba(0,180,200,.05);border:1px solid rgba(0,180,200,.2);border-radius:10px}.included-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.included-card{padding:1rem;background:rgba(255,255,255,.035);border:1px solid var(--glass-b);border-radius:8px}.included-card h3{font-family:var(--font-d);font-size:1.3rem;color:var(--gold);margin-bottom:.55rem}.included-card ul{padding-left:1.15rem;color:rgba(255,255,255,.72);font-size:.8rem;line-height:1.65}.included-card li{margin:.35rem 0}.included-footnote{margin:.85rem 0 0;color:var(--muted);font-size:.7rem;text-align:center}@media(max-width:700px){.included-grid{grid-template-columns:1fr}}
 .nice-screenshot-mark {
   position: fixed;
   left: max(10px, env(safe-area-inset-left));
@@ -2658,6 +2675,20 @@ function buildServiceA(lang) {
   </div>`;
 }
 
+function buildIncludedBlock(lang) {
+  const copy = {
+    en: { title:'Included in the price', included:['Private boat charter with a licensed local captain','Rods, reels, tackle and bait','Life jackets and safety equipment','English booking support and WhatsApp coordination before and on the day'], notTitle:'Not included', not:['Food and drinks — please bring your own. We keep it this way because of allergies and personal preferences.'], freeTitle:'Free on request — just tell us when you book', free:['A cooler box with ice and basic utensils so you can take your catch home','Reservation at a local restaurant that will cook your catch for you (you pay the restaurant directly)','Child life jackets, snorkel gear on combo trips'], foot:'None of the above options carry an extra charge from us.' },
+    zh: { title:'价格包含的内容', included:['持证当地船长的包船服务','鱼竿、渔轮、钓具和鱼饵','救生衣及安全设备','出发前及当天的英语预约支持和 WhatsApp 协调'], notTitle:'价格不包含', not:['食物和饮料——请自备。考虑到过敏和个人偏好，我们保持这种安排。'], freeTitle:'免费选项——预约时告诉我们', free:['冰桶、冰块和基本餐具，方便您带走渔获','预订当地餐厅代为烹调渔获（餐费直接支付给餐厅）','儿童救生衣；组合行程提供浮潜装备'], foot:'以上选项均不会向您收取额外费用。' },
+    'zh-TW': { title:'費用包含的內容', included:['持證當地船長的包船服務','魚竿、捲線器、釣具和魚餌','救生衣及安全設備','出發前及當天的英語預約支援與 WhatsApp 協調'], notTitle:'費用不包含', not:['食物和飲料——請自備。考慮到過敏和個人偏好，我們維持這樣的安排。'], freeTitle:'免費選項——預約時告訴我們', free:['冰桶、冰塊和基本餐具，方便您帶走漁獲','預訂當地餐廳代為烹調漁獲（餐費直接支付給餐廳）','兒童救生衣；組合行程提供浮潛裝備'], foot:'以上選項均不會向您收取額外費用。' },
+    ja: { title:'料金に含まれるもの', included:['資格を持つ地元船長による貸切ボート','ロッド、リール、タックル、餌','ライフジャケットと安全装備','出発前と当日の英語予約サポート・WhatsApp対応'], notTitle:'含まれないもの', not:['食べ物・飲み物——各自でご持参ください。アレルギーや好みに配慮し、この形にしています。'], freeTitle:'無料オプション', free:['氷入りクーラーボックスと基本的な食器（釣果をホテルへ持ち帰れます）','釣った魚を調理してくれる地元レストランの予約（料金はレストランへ直接お支払い）','お子様用ライフジャケット、コンボ行程のシュノーケル用品'], foot:'上記のオプションに追加料金はかかりません。' },
+    ko: { title:'가격에 포함된 내용', included:['자격을 갖춘 현지 선장과의 전세 보트','낚싯대, 릴, 태클 및 미끼','구명조끼와 안전 장비','출항 전 및 당일 영어 예약 지원과 WhatsApp 조율'], notTitle:'포함되지 않는 내용', not:['음식과 음료 — 직접 준비해 주세요. 알레르기와 개인 취향을 고려한 방식입니다.'], freeTitle:'무료 옵션 — 예약할 때 알려 주세요', free:['얼음과 기본 식기가 있는 쿨러 박스(잡은 물고기를 가져갈 수 있음)','잡은 물고기를 요리해 주는 현지 레스토랑 예약(식사 비용은 레스토랑에 직접 지불)','어린이 구명조끼, 콤보 일정의 스노클 장비'], foot:'위 옵션에는 추가 요금이 없습니다.' },
+    th: { title:'สิ่งที่รวมอยู่ในราคา', included:['เรือเช่าเหมาลำพร้อมกัปตันท้องถิ่นที่มีใบอนุญาต','คันเบ็ด รอก อุปกรณ์และเหยื่อ','เสื้อชูชีพและอุปกรณ์ความปลอดภัย','การจองภาษาอังกฤษและประสานงาน WhatsApp ก่อนและในวันเดินทาง'], notTitle:'ไม่รวม', not:['อาหารและเครื่องดื่ม — โปรดนำมาเอง เราจัดแบบนี้เพื่อคำนึงถึงอาการแพ้และความชอบส่วนบุคคล'], freeTitle:'ตัวเลือกฟรี — แจ้งเราเมื่อจอง', free:['กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ','จองร้านอาหารท้องถิ่นให้ปรุงปลาที่จับได้ (ชำระเงินกับร้านโดยตรง)','เสื้อชูชีพเด็ก อุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ'], foot:'ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา' }
+  };
+  const c = copy[lang] || copy.en;
+  const list = items => items.map(item => `<li>${item}</li>`).join('');
+  return `<div class="included-block" id="included"><div class="included-grid"><article class="included-card"><h3>${c.title}</h3><ul>${list(c.included)}</ul></article><article class="included-card"><h3>${c.notTitle}</h3><ul>${list(c.not)}</ul></article><article class="included-card"><h3>${c.freeTitle}</h3><ul>${list(c.free)}</ul></article></div><p class="included-footnote">${c.foot}</p></div>`;
+}
+
 // ── Service B render ───────────────────────────────────────
 function buildServiceB(lang) {
   const b = SERVICE_B_INFO;
@@ -2761,6 +2792,7 @@ function buildServiceB(lang) {
       }[lang]||''}</p>
     </div>
     <div class="plans-grid">${cards}</div>
+    ${buildIncludedBlock(lang)}
     ${general}
     ${buildRentalSection(lang)}
   </div>`;
@@ -3404,12 +3436,40 @@ const FAQS = [
     q_ja: "料金には何が含まれますか？",
     q_ko: "가격에는 무엇이 포함되나요?",
     q_th: "ราคานี้รวมอะไรบ้าง?",
-    a_en: "Our price includes the boat charter, English coordination and booking support.",
-    a_zh: "我们的价格包括包船、英语协调和预约支持。",
-    'a_zh-TW': "我們的價格包括包船、英語協調和預約支援。",
-    a_ja: "料金にはチャーターボート、英語でのコーディネート、予約サポートが含まれます。",
-    a_ko: "가격에는 보트 차터, 영어 조율 및 예약 지원이 포함됩니다.",
-    a_th: "ราคานี้รวมเรือเช่าเหมาลำ การประสานงานภาษาอังกฤษ และการสนับสนุนการจอง"
+    a_en: "Our price includes a private boat charter with a licensed local captain; rods, reels, tackle and bait; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day.",
+    a_zh: "我们的价格包括持证当地船长的包船服务、鱼竿渔轮钓具和鱼饵、救生衣及安全设备，以及出发前和当天的英语预约支持与 WhatsApp 协调。",
+    'a_zh-TW': "我們的價格包括持證當地船長的包船服務、魚竿捲線器釣具和魚餌、救生衣及安全設備，以及出發前和當天的英語預約支援與 WhatsApp 協調。",
+    a_ja: "料金には資格を持つ地元船長による貸切ボート、ロッド・リール・タックル・餌、ライフジャケットと安全装備、出発前と当日の英語予約サポート・WhatsApp対応が含まれます。",
+    a_ko: "가격에는 자격을 갖춘 현지 선장과의 전세 보트, 낚싯대·릴·태클·미끼, 구명조끼와 안전 장비, 출항 전 및 당일 영어 예약 지원과 WhatsApp 조율이 포함됩니다.",
+    a_th: "ราคานี้รวมเรือเช่าเหมาลำพร้อมกัปตันท้องถิ่นที่มีใบอนุญาต คันเบ็ด รอก อุปกรณ์และเหยื่อ เสื้อชูชีพและอุปกรณ์ความปลอดภัย รวมถึงการจองภาษาอังกฤษและประสานงาน WhatsApp ก่อนและในวันเดินทาง"
+  },
+  {
+    q_en: "What's not included in the price?",
+    q_zh: "ราคาไม่รวมอะไรบ้าง？",
+    'q_zh-TW': "費用不包含哪些內容？",
+    q_ja: "料金に含まれないものは何ですか？",
+    q_ko: "가격에 포함되지 않는 것은 무엇인가요?",
+    q_th: "ไม่รวมอะไรในราคาบ้าง?",
+    a_en: "Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences.",
+    a_zh: "价格不包含食物和饮料——请自备。考虑到过敏和个人偏好，我们保持这种安排。",
+    'a_zh-TW': "費用不包含食物和飲料——請自備。考慮到過敏和個人偏好，我們維持這樣的安排。",
+    a_ja: "食べ物・飲み物は含まれません。各自でご持参ください。アレルギーや好みに配慮し、この形にしています。",
+    a_ko: "음식과 음료는 포함되지 않습니다 — 직접 준비해 주세요. 알레르기와 개인 취향을 고려한 방식입니다.",
+    a_th: "ราคาไม่รวมอาหารและเครื่องดื่ม — โปรดนำมาเอง เราจัดแบบนี้เพื่อคำนึงถึงอาการแพ้และความชอบส่วนบุคคล"
+  },
+  {
+    q_en: "What free options can I request?",
+    q_zh: "可以申请哪些免费选项？",
+    'q_zh-TW': "可以申請哪些免費選項？",
+    q_ja: "無料でお願いできるオプションは何ですか？",
+    q_ko: "어떤 무료 옵션을 요청할 수 있나요?",
+    q_th: "ขอตัวเลือกฟรีอะไรได้บ้าง?",
+    a_en: "Free on request: a cooler box with ice and basic utensils so you can take your catch home; reservation at a local restaurant that will cook your catch for you (you pay the restaurant directly); and child life jackets and snorkel gear on combo trips. None of the above options carry an extra charge from us.",
+    a_zh: "可免费申请：带冰块和基本餐具的冰桶，方便您带走渔获；预订当地餐厅代为烹调渔获（餐费直接支付给餐厅）；以及儿童救生衣和组合行程的浮潜装备。以上选项均不会向您收取额外费用。",
+    'a_zh-TW': "可免費申請：帶冰塊和基本餐具的冰桶，方便您帶走漁獲；預訂當地餐廳代為烹調漁獲（餐費直接支付給餐廳）；以及兒童救生衣和組合行程的浮潛裝備。以上選項均不會向您收取額外費用。",
+    a_ja: "無料でご用意できます：氷入りクーラーボックスと基本的な食器、釣った魚を調理してくれる地元レストランの予約（料金はレストランへ直接お支払い）、お子様用ライフジャケットとコンボ行程のシュノーケル用品。上記のオプションに追加料金はかかりません。",
+    a_ko: "무료 요청 가능: 얼음과 기본 식기가 있는 쿨러 박스, 잡은 물고기를 요리해 주는 현지 레스토랑 예약(식사 비용은 레스토랑에 직접 지불), 어린이 구명조끼와 콤보 일정의 스노클 장비입니다. 위 옵션에는 추가 요금이 없습니다.",
+    a_th: "ขอฟรีได้: กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ การจองร้านอาหารท้องถิ่นให้ปรุงปลาที่จับได้ (ชำระเงินกับร้านโดยตรง) และเสื้อชูชีพเด็กกับอุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา"
   }
 ];
 
