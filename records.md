@@ -71,6 +71,7 @@
 - 旅行活动页面必须说明现场活动保险、自行购买海外旅行保险、翻译协调边界和联系担当。
 - M0805-06 生产发车回滚锚：合并前 `origin/main` 为 `b28d112754b3904d4c6929e4a3ab837795741a66`，#24 原始施工提交为 `5bba9bc288ec47fbb13db0b04f3e75c5a868bb85`。如需回滚，revert #24 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0805-15 生产发车回滚锚：合并前 `origin/main` 为 `d2d58362f25e90a6798c028eaf73dba7fe5a45d3`，#25 原始施工提交为 `9fb75a476c2f34e19a6ea6cc05d6a4ae6c55e966`。如需回滚，revert #25 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
+- FISH-0821-HOTFIX-02：Square 仅全额 Complete，使用独立 Sandbox/Production secret 命名；Sandbox 施工分支基线为 origin/main 1a9c45a。
 - M0808-17 生产发车回滚锚：合并前 `origin/main` 为 `fc8a79b97354eee99db5f733a23a9965e127d98a`，#26 发车校验提交为 `2afb1e4ba47be8e0faacb59170724093719897d1`。如需回滚，revert #26 squash merge commit，并复验 `https://fishing.nice.okinawa/`。
 - M0808-26 生产发车回滚锚：合并前 `origin/main` 为 `4de81e333470d51f42e03e08744ffad5689bacc6`，#27 squash merge commit 为 `00f889a38713a9aa9e11ed0de9643f6c39fa1c7a`。如需回滚，revert #27 squash merge commit，并复验 `https://fishing.nice.okinawa/` 与 `https://fishing.nice.okinawa/fishing-seasons/`。
 
@@ -123,3 +124,10 @@
 | 2026-08-21 | Codex | FISH-0821-05 后台客人字段、ORDER_CREATED 作废、状态分组、Resend 通知幂等施工；RESEND_API_KEY 仅待 Wan 通过 secret 注入，未发送邮件/未触发真实支付 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-01 PayPal 卡入口补充 guest card funding、翻译保护与 8 秒兜底提示；待生产发布 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-08 trip report 渔获清单更新为 25 fish，并同步 title/description/OG/Article headline；待发布 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：新增 Square Web Payments delayed authorization、短链、provider/square_payment_id、后台全额 Complete/Cancel、Sandbox 配置与回归测试；未注入 secret、未部署、未发起真实支付 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 HOTFIX：补 Square/PayPal iframe CSP 主机白名单与客户页 provider 隔离；Sandbox Worker 版本 `addfcf26-716a-40f2-b851-a932e2d3d07e`，待 Wan 复测短链 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 Console 修复：内联初始化脚本改为每响应 nonce，CSP 不含 `unsafe-inline`；Sandbox Worker 版本 `4ef6c534-8da6-480d-bcdc-4d8c88518b14` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 第三次 Console 修复：客户页脚本外置为 `worker/src/authorize-page.js`，加入 HTML 脚本语法门禁与 CI `node --check`；Sandbox Worker 版本 `0e29936c-a381-476e-aa8b-2e4a31a79414` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 CSP 定案：客人页改 HTTP `Content-Security-Policy-Report-Only`，`/__csp-report` 写 Worker 日志；Playwright Chromium 安装因 npm registry DNS 失败未完成 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：补齐无订单 `/payment/authorize` 也返回 Report-Only CSP；Sandbox Worker 版本 `a437c315-5915-43fd-b662-bd877574cc71` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：Square delayed capture 改 P7D/CANCEL；后台日期超过今天+7天提示「请在出发前 7 天内发链接」；待 Sandbox 第二笔 Capture | ⏳ |

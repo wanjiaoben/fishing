@@ -1,3 +1,5 @@
+import { AUTHORIZE_PAGE_SCRIPT } from "./authorize-page.js";
+
 const PAYPAL_API = {
   sandbox: "https://api-m.sandbox.paypal.com",
   production: "https://api-m.paypal.com"
@@ -7,6 +9,17 @@ const PAYPAL_JS = {
   sandbox: "https://www.paypal.com/sdk/js",
   production: "https://www.paypal.com/sdk/js"
 };
+
+const SQUARE_API = {
+  sandbox: "https://connect.squareupsandbox.com",
+  production: "https://connect.squareup.com"
+};
+
+const SQUARE_JS = {
+  sandbox: "https://sandbox.web.squarecdn.com/v1/square.js",
+  production: "https://web.squarecdn.com/v1/square.js"
+};
+
 
 const WEBHOOK_EVENTS = new Set([
   "CHECKOUT.ORDER.APPROVED",
@@ -102,7 +115,61 @@ function config(env) {
     currency: env.PAYPAL_AUTH_CURRENCY || "JPY",
     reminderDays: Number(env.PAYPAL_AUTH_VALIDITY_REMINDER_DAYS || 3),
     workerOrigin: env.PAYPAL_AUTH_WORKER_ORIGIN || ""
+    ,squareEnv: env.SQUARE_ENV === "production" ? "production" : "sandbox"
+    ,squareApplicationId: env.SQUARE_ENV === "production" ? env.SQUARE_PRODUCTION_APPLICATION_ID : env.SQUARE_SANDBOX_APPLICATION_ID
+    ,squareAccessToken: env.SQUARE_ENV === "production" ? env.SQUARE_PRODUCTION_ACCESS_TOKEN : env.SQUARE_SANDBOX_ACCESS_TOKEN
+    ,squareLocationId: env.SQUARE_ENV === "production" ? env.SQUARE_PRODUCTION_LOCATION_ID : env.SQUARE_SANDBOX_LOCATION_ID
+    ,squareApiBase: SQUARE_API[env.SQUARE_ENV === "production" ? "production" : "sandbox"]
+    ,squareJsBase: SQUARE_JS[env.SQUARE_ENV === "production" ? "production" : "sandbox"]
   };
+}
+
+function requireSquareConfig(env) {
+  const c = config(env);
+  if (!c.squareApplicationId || !c.squareAccessToken || !c.squareLocationId) {
+    throw new Error(`Missing Square ${c.squareEnv} credentials`);
+  }
+  return c;
+}
+
+async function squareFetch(env, path, options = {}) {
+  const c = requireSquareConfig(env);
+  const res = await fetch(`${c.squareApiBase}${path}`, {
+    ...options,
+    headers: {
+      authorization: `Bearer ${c.squareAccessToken}`,
+      "square-version": "2026-07-15",
+      "content-type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+  const text = await res.text();
+  let data = {};
+  if (text) { try { data = JSON.parse(text); } catch { data = { raw: text }; } }
+  if (!res.ok) {
+    const err = new Error(`Square API failed ${res.status} ${path}`);
+    err.status = res.status; err.data = data; throw err;
+  }
+  return data;
+}
+
+function makeShortCode() {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
+}
+
+async function ensureShortCode(env, row) {
+  if (row.short_code) return row.short_code;
+  for (let i = 0; i < 5; i += 1) {
+    const code = makeShortCode();
+    try {
+      await env.DB.prepare(`UPDATE paypal_authorizations SET short_code = ?, updated_at = ? WHERE id = ? AND short_code IS NULL`).bind(code, nowIso(), row.id).run();
+      const found = await env.DB.prepare(`SELECT short_code FROM paypal_authorizations WHERE id = ?`).bind(row.id).first();
+      if (found?.short_code) return found.short_code;
+    } catch (error) {
+      if (i === 4) throw error;
+    }
+  }
+  throw new Error("SHORT_CODE_GENERATION_FAILED");
 }
 
 function requireServerConfig(env) {
@@ -217,6 +284,10 @@ async function getAuthorizationByOrder(env, orderId) {
   return await env.DB.prepare(
     `SELECT * FROM paypal_authorizations WHERE paypal_order_id = ?`
   ).bind(orderId).first();
+}
+
+async function getAuthorizationByShortCode(env, shortCode) {
+  return await env.DB.prepare(`SELECT * FROM paypal_authorizations WHERE short_code = ?`).bind(shortCode).first();
 }
 
 async function getAuthorizationById(env, authId) {
@@ -362,9 +433,16 @@ async function createAdminOrder(request, env) {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(localId, paypalOrder.id, brand, activity, activityDate, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
     JSON.stringify(paypalOrder), c.policyVersion, guestName || null, guestEmail || null, createdAt, createdAt).run();
+  const shortCode = makeShortCode();
+  await env.DB.prepare(`UPDATE paypal_authorizations SET short_code = ? WHERE id = ?`).bind(shortCode, localId).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
+  const squareLimit = new Date();
+  squareLimit.setHours(0, 0, 0, 0);
+  squareLimit.setDate(squareLimit.getDate() + 7);
+  const squareLinkWarning = new Date(`${activityDate}T00:00:00Z`) > squareLimit;
   return json({ ok: true, local_authorization_id: localId, paypal_order_id: paypalOrder.id,
-    authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`, brand });
+    authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`,
+    short_code: shortCode, short_url: `${c.workerOrigin || new URL(request.url).origin}/p/${shortCode}`, brand, square_link_warning: squareLinkWarning });
 }
 
 async function createOrderWithSandboxTestCard(request, env) {
@@ -494,6 +572,66 @@ async function authorizeOrder(request, env) {
   });
 
   return await storeAuthorizedOrder(env, row, orderId, paypalAuth);
+}
+
+async function createSquarePayment(request, env) {
+  const body = await readJson(request);
+  const orderId = String(body.order_id || "").trim();
+  const sourceId = String(body.source_id || "").trim();
+  if (!orderId || !sourceId) return json({ ok: false, error: "ORDER_ID_AND_SOURCE_ID_REQUIRED" }, { status: 400 });
+  const row = await getAuthorizationByOrder(env, orderId);
+  if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+  if (body.accepted_policy !== true || body.policy_version !== row.policy_version) {
+    return json({ ok: false, error: "POLICY_AGREEMENT_REQUIRED" }, { status: 400 });
+  }
+  if (row.provider === "square" && row.square_payment_id && row.authorization_status === "AUTHORIZED") {
+    return json({ ok: true, idempotent: true, status: "AUTHORIZED", charged: false, square_payment_id: row.square_payment_id });
+  }
+  if (row.authorization_status !== "ORDER_CREATED") {
+    return json({ ok: false, error: "ORDER_NOT_AVAILABLE", current_status: row.authorization_status }, { status: 409 });
+  }
+  const shortCode = await ensureShortCode(env, row);
+  const createdAt = nowIso();
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO payment_policy_agreements
+     (id, authorization_id, paypal_order_id, activity, activity_date, amount, currency, policy_version, agreed_at, client_ip_hash, user_agent)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id("agree"), row.id, row.paypal_order_id, row.activity, row.activity_date, row.amount, row.currency,
+    row.policy_version, createdAt, await sha256Hex(clientIp(request)), request.headers.get("user-agent") || "").run();
+  const c = requireSquareConfig(env);
+  const response = await squareFetch(env, "/v2/payments", {
+    method: "POST",
+    headers: { "idempotency-key": shortCode },
+    body: JSON.stringify({
+      source_id: sourceId,
+      idempotency_key: shortCode,
+      amount_money: { amount: Number(row.amount), currency: row.currency },
+      autocomplete: false,
+      delay_duration: "P7D",
+      delay_action: "CANCEL",
+      location_id: c.squareLocationId,
+      note: `${row.activity} ${row.activity_date}`
+    })
+  });
+  const payment = response.payment || {};
+  if (payment.status !== "APPROVED" || !payment.id) {
+    return json({ ok: false, error: "SQUARE_AUTHORIZATION_NOT_APPROVED", square_status: payment.status || null }, { status: 502 });
+  }
+  const authCreateTime = payment.created_at || createdAt;
+  const expiration = payment.delayed_until || addDaysIso(authCreateTime, 7);
+  const honorPeriod = addDaysIso(authCreateTime, 3);
+  await env.DB.prepare(
+    `UPDATE paypal_authorizations SET provider = 'square', square_payment_id = ?, authorization_status = ?, paypal_status = ?,
+      authorization_create_time = ?, authorization_expiration_time = ?, honor_period_ends_at = ?, updated_at = ? WHERE id = ?`
+  ).bind(payment.id, "AUTHORIZED", payment.status, authCreateTime, expiration, honorPeriod, nowIso(), row.id).run();
+  await audit(env, {
+    authorization_id: row.id, action: "SQUARE_AUTHORIZE_PAYMENT", actor: "customer", amount: row.amount, currency: row.currency,
+    idempotency_key: shortCode, request_payload: { amount_money: { amount: Number(row.amount), currency: row.currency }, autocomplete: false },
+    response_payload: response, result_status: "SUCCESS"
+  });
+  await insertEvent(env, { authorization_id: row.id, paypal_order_id: row.paypal_order_id, event_type: "SQUARE_PAYMENT_AUTHORIZED", event_status: payment.status, payload: response });
+  await notifyInfoOnce(env, { ...row, provider: "square", square_payment_id: payment.id, authorization_status: "AUTHORIZED" }, "AUTHORIZED");
+  return json({ ok: true, status: "AUTHORIZED", charged: false, message: "AUTHORIZED – NOT CHARGED", square_payment_id: payment.id, amount: row.amount, currency: row.currency, authorization_expiration_time: expiration, honor_period_ends_at: honorPeriod });
 }
 
 function sandboxTestCardPaymentSource() {
@@ -631,7 +769,7 @@ async function listAuthorizations(request, env) {
     return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
   }
   const rows = await env.DB.prepare(
-    `SELECT id, paypal_order_id, paypal_authorization_id, brand, activity, activity_date, amount, currency,
+    `SELECT id, paypal_order_id, paypal_authorization_id, provider, square_payment_id, short_code, brand, activity, activity_date, amount, currency,
             guest_name, guest_email,
             authorization_status, paypal_status, authorization_create_time, authorization_expiration_time,
             honor_period_ends_at, created_at, updated_at
@@ -646,6 +784,7 @@ async function listAuthorizations(request, env) {
     return {
       ...r,
       authorize_url: `${config(env).workerOrigin || "https://activity.nice.okinawa"}/payment/authorize?order=${encodeURIComponent(r.paypal_order_id)}`,
+      short_url: r.short_code ? `${config(env).workerOrigin || "https://activity.nice.okinawa"}/p/${encodeURIComponent(r.short_code)}` : null,
       status_label: r.authorization_status === "AUTHORIZED" ? "AUTHORIZED – NOT CHARGED" : r.authorization_status,
       days_until_expiration: expiresAt ? Math.ceil((expiresAt - now) / 86400000) : null,
       in_honor_period: honorEnds ? now <= honorEnds : false,
@@ -731,24 +870,22 @@ async function voidAuthorization(request, env, authId) {
     return json({ ok: true, idempotent: true, status: "VOIDED / RELEASED" });
   }
   const row = await getAuthorizationById(env, authId);
-  if (!row || !row.paypal_authorization_id) {
+  if (!row || (!row.paypal_authorization_id && !row.square_payment_id)) {
     return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
   }
   if (row.authorization_status !== "AUTHORIZED") {
     return json({ ok: false, error: "AUTHORIZATION_NOT_VOIDABLE", current_status: row.authorization_status }, { status: 409 });
   }
-  const response = await paypalFetch(env, `/v2/payments/authorizations/${encodeURIComponent(row.paypal_authorization_id)}/void`, {
-    method: "POST",
-    headers: { "PayPal-Request-Id": idempotencyKey },
-    body: "{}"
-  });
+  const response = row.provider === "square"
+    ? await squareFetch(env, `/v2/payments/${encodeURIComponent(row.square_payment_id)}/cancel`, { method: "POST", body: "{}" })
+    : await paypalFetch(env, `/v2/payments/authorizations/${encodeURIComponent(row.paypal_authorization_id)}/void`, { method: "POST", headers: { "PayPal-Request-Id": idempotencyKey }, body: "{}" });
   await env.DB.prepare(
     `UPDATE paypal_authorizations SET authorization_status = ?, paypal_status = ?, updated_at = ? WHERE id = ?`
   ).bind("VOIDED / RELEASED", response.status || "VOIDED", nowIso(), row.id).run();
   await audit(env, {
     authorization_id: row.id,
     paypal_authorization_id: row.paypal_authorization_id,
-    action: "VOID_AUTHORIZATION",
+    action: row.provider === "square" ? "SQUARE_CANCEL_PAYMENT" : "VOID_AUTHORIZATION",
     actor: adminActor(request),
     idempotency_key: idempotencyKey,
     request_payload: { confirm: true },
@@ -764,7 +901,7 @@ async function voidAuthorization(request, env, authId) {
     payload: response
   });
   await notifyInfoOnce(env, { ...row, authorization_status: "VOIDED / RELEASED" }, "RELEASED");
-  return json({ ok: true, status: "VOIDED / RELEASED", paypal_response: response });
+  return json({ ok: true, status: "VOIDED / RELEASED", provider: row.provider || "paypal", response });
 }
 
 async function captureAuthorization(request, env, authId) {
@@ -789,11 +926,14 @@ async function captureAuthorization(request, env, authId) {
     return json({ ok: true, idempotent: true, status: "CAPTURED" });
   }
   const row = await getAuthorizationById(env, authId);
-  if (!row || !row.paypal_authorization_id) {
+  if (!row || (!row.paypal_authorization_id && !row.square_payment_id)) {
     return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
   }
   if (row.authorization_status !== "AUTHORIZED") {
     return json({ ok: false, error: "AUTHORIZATION_NOT_CAPTURABLE", current_status: row.authorization_status }, { status: 409 });
+  }
+  if (row.provider === "square" && amount !== Number(row.amount)) {
+    return json({ ok: false, error: "SQUARE_FULL_CAPTURE_ONLY", required_amount: Number(row.amount) }, { status: 400 });
   }
   const payload = {
     amount: {
@@ -802,11 +942,9 @@ async function captureAuthorization(request, env, authId) {
     },
     final_capture: amount >= row.amount
   };
-  const response = await paypalFetch(env, `/v2/payments/authorizations/${encodeURIComponent(row.paypal_authorization_id)}/capture`, {
-    method: "POST",
-    headers: { "PayPal-Request-Id": idempotencyKey },
-    body: JSON.stringify(payload)
-  });
+  const response = row.provider === "square"
+    ? await squareFetch(env, `/v2/payments/${encodeURIComponent(row.square_payment_id)}/complete`, { method: "POST", body: JSON.stringify({}) })
+    : await paypalFetch(env, `/v2/payments/authorizations/${encodeURIComponent(row.paypal_authorization_id)}/capture`, { method: "POST", headers: { "PayPal-Request-Id": idempotencyKey }, body: JSON.stringify(payload) });
   const nextStatus = payload.final_capture ? "CAPTURED" : "PARTIALLY_CAPTURED";
   await env.DB.prepare(
     `UPDATE paypal_authorizations SET authorization_status = ?, paypal_status = ?, updated_at = ? WHERE id = ?`
@@ -814,7 +952,7 @@ async function captureAuthorization(request, env, authId) {
   await audit(env, {
     authorization_id: row.id,
     paypal_authorization_id: row.paypal_authorization_id,
-    action: "CAPTURE_AUTHORIZATION",
+    action: row.provider === "square" ? "SQUARE_COMPLETE_PAYMENT" : "CAPTURE_AUTHORIZATION",
     actor: adminActor(request),
     amount,
     currency: row.currency,
@@ -832,7 +970,7 @@ async function captureAuthorization(request, env, authId) {
     payload: response
   });
   await notifyInfoOnce(env, { ...row, authorization_status: nextStatus }, "CAPTURED");
-  return json({ ok: true, status: nextStatus, paypal_response: response });
+  return json({ ok: true, status: nextStatus, provider: row.provider || "paypal", response });
 }
 
 async function verifyWebhook(env, request, body) {
@@ -1044,22 +1182,51 @@ function renderButtons() {
 </html>`);
 }
 
-async function customerPageForOrder(request, env, orderId) {
+async function customerPageForOrderLegacy(request, env, orderId) {
   const row = await getAuthorizationByOrder(env, orderId);
   if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
   const c = config(env);
   const brand = brandConfig(row.brand);
   const cfg = { clientId: c.clientId || "", currency: row.currency, policyVersion: row.policy_version,
     amount: row.amount, activity: row.activity, activityDate: row.activity_date, orderId, paypalJsBase: c.jsBase,
+    squareApplicationId: c.squareApplicationId || "", squareLocationId: c.squareLocationId || "", squareJsBase: c.squareJsBase,
     brand: brand.key, brandName: brand.name, brandTitle: brand.title, brandAccent: brand.accent,
     brandBackground: brand.background, returnUrl: brand.returnUrl };
-  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(brand.title)} | ${escapeHtml(row.activity)}</title><style>:root{--accent:${brand.accent};--background:${brand.background}}body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--background);color:#fff;margin:0;line-height:1.6}main{max-width:760px;margin:auto;padding:32px 18px}.brand{color:var(--accent);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:24px}.fact{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}.fact strong{color:var(--accent)}.notice{background:rgba(200,164,74,.12);border:1px solid rgba(200,164,74,.35);border-radius:12px;padding:16px;margin:18px 0}button{background:#c8a44a;color:#06101d;border:0;border-radius:8px;padding:12px 16px;font-weight:800;min-height:46px}button:disabled{opacity:.45}.status{white-space:pre-wrap;background:rgba(0,0,0,.25);border-radius:8px;padding:12px;margin-top:18px}footer{max-width:760px;margin:auto;padding:0 18px 28px;color:rgba(255,255,255,.65)}footer a{color:var(--accent)}@media(max-width:520px){.fact{grid-template-columns:1fr}}</style></head><body><main><div class="card"><div class="brand">${escapeHtml(brand.name)}</div><h1>${escapeHtml(brand.title)}</h1><p>Your card will be authorized, not charged immediately.</p><div class="fact"><strong>Activity</strong><span>${escapeHtml(row.activity)}</span></div><div class="fact"><strong>Date</strong><span>${escapeHtml(row.activity_date)}</span></div><div class="fact"><strong>Authorized amount</strong><span>${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}</span></div><div class="notice"><p>Your card will be authorized for ${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}, but you will not be charged at this time.</p><p>The hold amount covers the charter fee plus any gear rental stated in your confirmation email. Nothing is charged unless you do not show up.</p><p>If you participate as scheduled, the authorization will be released.</p><p>If you cancel or do not attend, the applicable cancellation fee may be charged according to the cancellation policy you agreed to.</p><p>If the operator cancels due to weather or unsafe sea conditions, the authorization will be released without charge.</p></div><label><input id="agree" type="checkbox"> I understand and agree to the authorization and cancellation policy.</label><button id="load-paypal" disabled>Continue to PayPal Authorization</button><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><div id="status" class="status" hidden></div></div></main><footer><a href="${escapeHtml(brand.returnUrl)}">Return to ${escapeHtml(brand.name)}</a></footer><script>
+  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.paypal.com https://sandbox.web.squarecdn.com https://web.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:"><title>${escapeHtml(brand.title)} | ${escapeHtml(row.activity)}</title><style>:root{--accent:${brand.accent};--background:${brand.background}}body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--background);color:#fff;margin:0;line-height:1.6}main{max-width:760px;margin:auto;padding:32px 18px}.brand{color:var(--accent);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:24px}.fact{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}.fact strong{color:var(--accent)}.notice{background:rgba(200,164,74,.12);border:1px solid rgba(200,164,74,.35);border-radius:12px;padding:16px;margin:18px 0}button{background:#c8a44a;color:#06101d;border:0;border-radius:8px;padding:12px 16px;font-weight:800;min-height:46px}button:disabled{opacity:.45}.square{margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1)}.status{white-space:pre-wrap;background:rgba(0,0,0,.25);border-radius:8px;padding:12px;margin-top:18px}footer{max-width:760px;margin:auto;padding:0 18px 28px;color:rgba(255,255,255,.65)}footer a{color:var(--accent)}@media(max-width:520px){.fact{grid-template-columns:1fr}}</style></head><body><main><div class="card"><div class="brand">${escapeHtml(brand.name)}</div><h1>${escapeHtml(brand.title)}</h1><p>Your card will be authorized, not charged immediately.</p><div class="fact"><strong>Activity</strong><span>${escapeHtml(row.activity)}</span></div><div class="fact"><strong>Date</strong><span>${escapeHtml(row.activity_date)}</span></div><div class="fact"><strong>Authorized amount</strong><span>${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}</span></div><div class="notice"><p>Your card will be authorized for ${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}, but you will not be charged at this time.</p><p>The hold amount covers the charter fee plus any gear rental stated in your confirmation email. Nothing is charged unless you do not show up.</p><p>If you participate as scheduled, the authorization will be released.</p><p>If you cancel or do not attend, the applicable cancellation fee may be charged according to the cancellation policy you agreed to.</p><p>If the operator cancels due to weather or unsafe sea conditions, the authorization will be released without charge.</p></div><label><input id="agree" type="checkbox"> I understand and agree to the authorization and cancellation policy.</label><button id="load-paypal" disabled>Continue to PayPal Authorization</button><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><div class="square notranslate"><h2>Pay by card (Square)</h2><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Authorize card securely</button></div><div id="status" class="status" hidden></div></div></main><footer><a href="${escapeHtml(brand.returnUrl)}">Return to ${escapeHtml(brand.name)}</a></footer><script>
 const cfg=${JSON.stringify(cfg)}; const box=document.getElementById('status'); const show=m=>{box.hidden=false;box.textContent=m};
 document.getElementById('agree').onchange=e=>document.getElementById('load-paypal').disabled=!e.target.checked;
   let cardTimer;
   document.getElementById('load-paypal').onclick=()=>{const s=document.createElement('script');s.src=cfg.paypalJsBase+'?client-id='+encodeURIComponent(cfg.clientId)+'&currency='+encodeURIComponent(cfg.currency)+'&intent=authorize&components=buttons&enable-funding=card';s.onload=render;s.onerror=()=>show('Failed to load PayPal. Please contact us.');setTimeout(()=>show("Card form didn't load — use the PayPal button or open in Safari"),8000);document.head.appendChild(s)};
-  function render(){const shared={createOrder:()=>Promise.resolve(cfg.orderId),onApprove:async data=>{clearTimeout(cardTimer);const r=await fetch('/api/paypal/authorize-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:data.orderID,accepted_policy:true,policy_version:cfg.policyVersion,idempotency_key:'authorize-'+data.orderID})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Authorization failed');show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: '+d.paypal_authorization_id+'\\nExpiration: '+(d.authorization_expiration_time||''))},onError:e=>show('Authorization failed. Please contact us.\\n'+(e&&e.message||e))};paypal.Buttons({...shared,fundingSource:paypal.FUNDING.PAYPAL,style:{color:'gold'}}).render('#paypal-buttons');paypal.Buttons({...shared,fundingSource:paypal.FUNDING.CARD,style:{color:'black'},onClick:()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>show("Card form didn't load — use the PayPal button or open in Safari"),8000)}}).render('#paypal-card-buttons')}
+  function render(){const shared={createOrder:()=>Promise.resolve(cfg.orderId),onApprove:async data=>{clearTimeout(cardTimer);const r=await fetch('/api/paypal/authorize-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:data.orderID,accepted_policy:true,policy_version:cfg.policyVersion,idempotency_key:'authorize-'+data.orderID})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Authorization failed');show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: '+(d.paypal_authorization_id||d.square_payment_id)+'\\nExpiration: '+(d.authorization_expiration_time||''))},onError:e=>show('Authorization failed. Please contact us.\\n'+(e&&e.message||e))};paypal.Buttons({...shared,fundingSource:paypal.FUNDING.PAYPAL,style:{color:'gold'}}).render('#paypal-buttons');paypal.Buttons({...shared,fundingSource:paypal.FUNDING.CARD,style:{color:'black'},onClick:()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>show("Card form didn't load — use the PayPal button or open in Safari"),8000)}}).render('#paypal-card-buttons')}
+  (async()=>{const status=document.getElementById('square-status');const button=document.getElementById('square-pay');const timeout=setTimeout(()=>{status.textContent="Card form didn't load — use the PayPal button or open in Safari"},8000);try{if(!cfg.squareApplicationId||!cfg.squareLocationId){throw new Error('Square is not configured');}const s=document.createElement('script');s.src=cfg.squareJsBase;s.onload=async()=>{try{const payments=window.Square.payments(cfg.squareApplicationId,cfg.squareLocationId);const card=await payments.card();await card.attach('#square-card-container');clearTimeout(timeout);status.textContent='Card details are handled securely by Square.';button.disabled=false;button.onclick=async()=>{button.disabled=true;const token=await card.tokenize();if(token.status!=='OK')throw new Error('Card verification failed');const r=await fetch('/api/square/create-payment',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:cfg.orderId,source_id:token.token,accepted_policy:true,policy_version:cfg.policyVersion})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Square authorization failed');show('AUTHORIZED – NOT CHARGED\\nSquare payment ID: '+d.square_payment_id);};}catch(e){status.textContent="Card form didn't load — use the PayPal button or open in Safari";}};s.onerror=()=>{clearTimeout(timeout);status.textContent="Card form didn't load — use the PayPal button or open in Safari"};document.head.appendChild(s)})()
 </script></body></html>`);
+}
+
+// Keep the PayPal and Square embeds isolated while allowing each provider's iframe hosts.
+async function customerPageForOrder(request, env, orderId) {
+  const response = await customerPageForOrderLegacy(request, env, orderId);
+  if (!response.headers.get("content-type")?.startsWith("text/html")) return response;
+  const body = await response.text();
+  const configMatch = body.match(/const cfg=(\{[\s\S]*?\}); const box=/);
+  const configJson = configMatch ? configMatch[1] : "{}";
+  const fixed = body.replace(
+    /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
+    ""
+  ).replace(/<script>[\s\S]*?<\/script>/, `<textarea id="authorize-config" hidden>${escapeHtml(configJson)}</textarea><script src="/assets/authorize-page.js" defer></script>`);
+  return html(fixed, { headers: {
+    "content-security-policy-report-only": "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com; font-src 'self' data: https://*.squarecdn.com; img-src 'self' data: https:; report-uri /__csp-report"
+  } });
+}
+
+function customerReportOnlyHeaders() {
+  return "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com; font-src 'self' data: https://*.squarecdn.com; img-src 'self' data: https:; report-uri /__csp-report";
+}
+
+function asCustomerReportOnly(response) {
+  const headers = new Headers(response.headers);
+  headers.set("content-security-policy-report-only", customerReportOnlyHeaders());
+  headers.delete("content-security-policy");
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
 function adminPage() {
@@ -1103,8 +1270,9 @@ document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
   const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
-  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<a href="'+data.authorize_url+'">'+data.authorize_url+'</a>' : (data.error||'Failed');
+  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<div><a href="'+data.short_url+'">'+data.short_url+'</a> <button onclick="copyLink(\\''+data.short_url+'\\')">Copy link</button></div><div><small>Legacy link: '+data.authorize_url+'</small></div>'+(data.square_link_warning?'<p class="warn">请在出发前 7 天内发链接</p>':'') : (data.error||'Failed');
 }
+document.getElementById('new-date').addEventListener('change',()=>{const value=document.getElementById('new-date').value;const limit=new Date();limit.setHours(0,0,0,0);limit.setDate(limit.getDate()+7);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}hint.textContent=value&&new Date(value+'T00:00:00')>limit?'请在出发前 7 天内发链接':''});
 async function load(){
   const res = await fetch('/api/admin/authorizations', {headers: headers()});
   const data = await res.json();
@@ -1119,19 +1287,19 @@ function group(title,rows,collapsed){ return rows.length ? '<h2 class="group-tit
 function esc(value){ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function render(row){
   const terminal=!['AUTHORIZED','ORDER_CREATED'].includes(row.authorization_status);
-  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? '<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\')">Capture Authorization</button>');
+  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? '<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
   return '<div class="row '+(terminal?'terminal':'')+'"><h2>'+esc(row.activity)+' <small>· '+esc(row.brand)+' · '+esc(row.guest_name||'Guest name not provided')+'</small></h2>'+
     '<div class="meta">'+
     '<div>Status: <span class="status">'+esc(row.status_label)+'</span></div>'+
     '<div>Amount: '+esc(row.currency)+' '+Number(row.amount).toLocaleString('en-US')+'</div>'+
     '<div>Date: '+esc(row.activity_date)+'</div>'+
     '<div>Created: '+esc(row.created_at||'-')+'</div>'+
-    '<div>Authorization: '+esc(row.paypal_authorization_id||'-')+'</div>'+
+    '<div>Provider: '+esc(row.provider||'paypal')+'</div>'+ '<div>Authorization: '+esc(row.paypal_authorization_id||row.square_payment_id||'-')+'</div>'+
     '<div>Expires: '+esc(row.authorization_expiration_time||'-')+'</div>'+
     '<div>Days left: '+(row.days_until_expiration ?? '-')+' '+(row.reminder ? '<span class="warn">'+row.reminder+'</span>' : '')+'</div>'+
     '<div>Honor period: '+(row.in_honor_period ? 'within first 3 days' : 'outside 3-day honor period')+'</div>'+
     '</div>'+
-    '<div class="order-link"><a href="'+esc(row.authorize_url)+'">'+esc(row.authorize_url)+'</a><button onclick="copyLink(\\''+esc(row.authorize_url)+'\\')">Copy link</button></div>'+
+    '<div class="order-link"><a href="'+esc(row.short_url||row.authorize_url)+'">'+esc(row.short_url||row.authorize_url)+'</a><button onclick="copyLink(\\''+esc(row.short_url||row.authorize_url)+'\\')">Copy link</button></div>'+
     '<div class="actions">'+actions+'</div></div>';
 }
 async function copyLink(link){ try{await navigator.clipboard.writeText(link); alert('Link copied');}catch(e){alert(link);} }
@@ -1144,9 +1312,9 @@ async function releaseAuth(id){
   const res = await fetch('/api/admin/authorizations/'+id+'/void', {method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})});
   alert(JSON.stringify(await res.json(), null, 2)); operationLocks.delete('void-'+id); load();
 }
-async function captureAuth(id){
+async function captureAuth(id,provider,fullAmount){
   if(operationLocks.has('capture-'+id)) return;
-  const amount = Number(document.getElementById('cap-'+id).value);
+  const amount = provider==='square' ? Number(fullAmount) : Number(document.getElementById('cap-'+id).value);
   const text = 'You are about to charge JPY '+amount.toLocaleString('en-US')+' from this authorization.';
   if(!amount || !confirm(text)) return;
   operationLocks.add('capture-'+id);
@@ -1181,9 +1349,21 @@ async function handleRequest(request, env) {
   try {
     if (url.pathname === "/payment/authorize" && request.method === "GET") {
       const orderId = url.searchParams.get("order");
-      return orderId ? await customerPageForOrder(request, env, orderId) : customerPage(env);
+      return orderId ? await customerPageForOrder(request, env, orderId) : asCustomerReportOnly(customerPage(env));
+    }
+    if (url.pathname.match(/^\/p\/[A-Za-z0-9]{6}$/) && request.method === "GET") {
+      const row = await getAuthorizationByShortCode(env, url.pathname.split("/").pop().toUpperCase());
+      return row ? await customerPageForOrder(request, env, row.paypal_order_id) : json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
     }
     if (url.pathname === "/payment/authorize-static" && request.method === "GET") return staticAuthorizePage();
+    if (url.pathname === "/assets/authorize-page.js" && request.method === "GET") {
+      return new Response(AUTHORIZE_PAGE_SCRIPT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "public, max-age=300" } });
+    }
+    if (url.pathname === "/__csp-report" && request.method === "POST") {
+      const report = await request.text();
+      console.log("CSP_REPORT", report.slice(0, 8000));
+      return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
+    }
     if (url.pathname === "/admin/paypal-authorizations" && request.method === "GET") return adminPage();
     if (url.pathname === "/api/paypal/client-config" && request.method === "GET") {
       const c = config(env);
@@ -1196,13 +1376,17 @@ async function handleRequest(request, env) {
         activity_date: c.activityDate,
         amount: c.amount,
         currency: c.currency,
-        policy_version: c.policyVersion
+        policy_version: c.policyVersion,
+        square_env: c.squareEnv,
+        square_application_id_available: Boolean(c.squareApplicationId),
+        square_location_id_available: Boolean(c.squareLocationId)
       });
     }
     if (url.pathname === "/api/paypal/create-order" && request.method === "POST") return await createOrder(request, env);
     if (url.pathname === "/api/admin/orders" && request.method === "POST") return await createAdminOrder(request, env);
     if (url.pathname === "/api/paypal/sandbox/create-authorize-test-card" && request.method === "POST") return await createOrderWithSandboxTestCard(request, env);
     if (url.pathname === "/api/paypal/authorize-order" && request.method === "POST") return await authorizeOrder(request, env);
+    if (url.pathname === "/api/square/create-payment" && request.method === "POST") return await createSquarePayment(request, env);
     if (url.pathname === "/api/paypal/sandbox/authorize-test-card" && request.method === "POST") return await authorizeOrderWithSandboxTestCard(request, env);
     if (url.pathname === "/api/paypal/webhook" && request.method === "POST") return await handleWebhook(request, env);
     if (url.pathname === "/api/admin/authorizations" && request.method === "GET") return await listAuthorizations(request, env);

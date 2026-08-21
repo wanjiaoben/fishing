@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { handleRequest, customerPage, adminPage } from "../src/index.js";
+import { AUTHORIZE_PAGE_SCRIPT } from "../src/authorize-page.js";
 
 function fakeDb(rows = {}) {
   const calls = [];
@@ -46,6 +47,10 @@ function env(overrides = {}) {
     PAYPAL_AUTH_ACTIVITY_DATE: "2026-08-24",
     PAYPAL_AUTH_AMOUNT: "66000",
     PAYPAL_AUTH_CURRENCY: "JPY",
+    SQUARE_ENV: "sandbox",
+    SQUARE_SANDBOX_APPLICATION_ID: "sandbox-sq0idb-test",
+    SQUARE_SANDBOX_ACCESS_TOKEN: "sandbox-square-token",
+    SQUARE_SANDBOX_LOCATION_ID: "L10P89476GMB8",
     ...(overrides.env || {})
   };
 }
@@ -328,4 +333,71 @@ test("authorization notification is audited and does not block payment when Rese
   assert.equal(response.status, 200);
   assert.equal((await response.json()).status, "AUTHORIZED");
   assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log") && call.values.includes("NOTIFY_AUTHORIZED")));
+});
+
+test("Square create-payment uses delayed full authorization and short-code idempotency", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    if (String(url).includes("connect.squareupsandbox.com/v2/payments")) {
+      return Response.json({ payment: { id: "SQ-PAY-1", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-24T00:00:00Z" } });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byOrder: { id: "auth-square", paypal_order_id: "ORDER-SQ", short_code: "ABC123", activity: "Private Fishing Charter", activity_date: "2026-08-24", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: "fishing-paypal-auth-v2026-08-20", brand: "fishing" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-SQ", source_id: "cnon:test", accepted_policy: true, policy_version: "fishing-paypal-auth-v2026-08-20" })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(data.status, "AUTHORIZED");
+  assert.equal(data.charged, false);
+  const call = captured[0];
+  const payload = JSON.parse(call.init.body);
+  assert.equal(payload.autocomplete, false);
+  assert.equal(payload.delay_duration, "P7D");
+  assert.equal(payload.amount_money.amount, 66000);
+  assert.equal(payload.idempotency_key, "ABC123");
+  assert.equal(call.init.headers["idempotency-key"], "ABC123");
+});
+
+test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SQ"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-SQ", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } }, env: { SQUARE_SANDBOX_APPLICATION_ID: "sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA", SQUARE_SANDBOX_LOCATION_ID: "L10P89476GMB8" } }));
+  const text = await page.text();
+  assert.match(text, /Pay by card \(Square\)/);
+  assert.match(text, /sandbox\.web\.squarecdn\.com/);
+  assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
+  assert.match(text, /L10P89476GMB8/);
+  assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
+  assert.match(page.headers.get("content-security-policy-report-only"), /script-src 'self' https:\/\/www\.paypal\.com/);
+  assert.doesNotMatch(text, /Content-Security-Policy/);
+  assert.doesNotMatch(text, /script-src[^;]*unsafe-inline/);
+  assert.match(await (await adminPage()).text(), /Square: full capture only/);
+});
+
+test("customer page uses report-only CSP and report endpoint is non-blocking", async () => {
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-CSP"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-CSP", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  assert.match(page.headers.get("content-security-policy-report-only"), /report-uri \/__csp-report/);
+  assert.equal(page.headers.get("content-security-policy"), null);
+  const report = await handleRequest(new Request("https://activity.nice.okinawa/__csp-report", { method: "POST", body: JSON.stringify({ "csp-report": { "blocked-uri": "https://example.test" } }) }), env());
+  assert.equal(report.status, 204);
+  const generic = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize"), env());
+  assert.match(generic.headers.get("content-security-policy-report-only"), /report-uri \/__csp-report/);
+  assert.equal(generic.headers.get("content-security-policy"), null);
+});
+
+test("rendered customer HTML and external authorization script are syntactically valid", async () => {
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SYNTAX"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-SYNTAX", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  const text = await page.text();
+  const scripts = [...text.matchAll(/<script(?![^>]*\bsrc=)(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
+  assert.equal(scripts.length, 0, "customer page must use the external authorization script");
+  assert.match(text, /<script src="\/assets\/authorize-page\.js" defer><\/script>/);
+  assert.doesNotThrow(() => new Function(AUTHORIZE_PAGE_SCRIPT));
 });
