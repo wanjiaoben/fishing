@@ -862,7 +862,7 @@ async function sendCustomerAuthorizationEmail(env, row) {
       try {
         await sendResendEmail(env, {
           from: "noreply@nice.okinawa",
-          to: ["info@nice.okinawa"],
+          to: ["aboutokinawa@gmail.com"],
           subject: "Customer authorization email failed · " + row.activity + " · " + row.activity_date,
           text: "The authorization email to " + recipient + " failed.\n\nActivity: " + row.activity + "\nTrip date: " + row.activity_date + "\nAmount: " + amount + "\nAuthorization ID: " + row.id + "\nError: " + responsePayload.error
         });

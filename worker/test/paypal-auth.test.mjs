@@ -429,7 +429,7 @@ test("customer authorization email failures (500, timeout, invalid key) do not f
     assert.equal((await response.json()).status, "AUTHORIZED");
     await Promise.all(waits);
     const customerMail = captured.find(mail => mail.to[0] === "delivered@resend.dev");
-    const failureNotice = captured.find(mail => mail.to[0] === "info@nice.okinawa" && /failed/i.test(`${mail.subject || ""} ${mail.text || ""}`));
+    const failureNotice = captured.find(mail => mail.to[0] === "aboutokinawa@gmail.com" && /failed/i.test(`${mail.subject || ""} ${mail.text || ""}`));
     assert.ok(customerMail, `${label}: customer mail attempted`);
     assert.ok(failureNotice, `${label}: info failure notice attempted`);
     const auditValues = e.DB.calls.filter(call => call.sql.includes("payment_audit_log")).flatMap(call => call.values);
