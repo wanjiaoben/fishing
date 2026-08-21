@@ -98,4 +98,8 @@ Send the preferred date, group size, preferred fishing style, contact method and
 
 ## Trip reports
 
-- [Chatan full-day amberjack trip report, August 2026](https://fishing.nice.okinawa/en/trip-reports/chatan-full-day-amberjack-aug-2026/): A real four-guest private full-day charter from Chatan, covering the English booking flow, card hold, local weights, electric reels, a large amberjack, same-day restaurant preparation, an ATM stop and ¥166,000 paid in total for four people including the charter, gear rental and the day's other costs.
+- [Chatan full-day amberjack trip report, August 2026](https://fishing.nice.okinawa/en/trip-reports/chatan-full-day-amberjack-aug-2026/): A real four-guest private full-day charter from Chatan, covering the English booking flow, card hold, local weights, electric reels, 25 fish (20 tuna, 4 rainbow runner and 1 amberjack), same-day sashimi on board when the catch allowed, an ATM stop and ¥166,000 paid in total for four people including the charter, gear rental and the day's other costs.
+
+## How booking works
+
+- [What happens after you book](https://fishing.nice.okinawa/en/how-booking-works/): an English seven-step guide covering the enquiry, captain confirmation, one confirmation email, temporary PayPal card hold (not a payment), the evening-before check-in, meeting at the port, and what happens if weather or plans change.
