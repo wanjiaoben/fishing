@@ -1,8 +1,8 @@
-<!--WAN-CONSTITUTION-START version=v1.16-->
-# WAN Constitution v1.16
+<!--WAN-CONSTITUTION-START version=v1.17-->
+# WAN Constitution v1.17
 
 更新日期:2026-08-22
-Changelog:v1.16 补“自动邮件与测试发信附则”,划清 CC 代理发信禁令与系统自动邮件验收边界。
+Changelog:v1.17 新增“常设授权”小节,明确宪法同步、指令内验收动作与外网可审查交付的授权边界。
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 设计背景参考:docs/REVIEW_2026-0707_SYSTEM_DESIGN.md;CC 开工前必读 rules/ANTI_PATTERNS.md。该引用为 v1.8 设计背景与执法清单,非新增宪法条文。
@@ -13,6 +13,13 @@ Changelog:v1.16 补“自动邮件与测试发信附则”,划清 CC 代理发�
 指令闭环:每条指令以回报要求结尾;每日收工执行一次收尾确认,清空悬空任务。
 出问题必产出:每次故障处理完,必须产出防复发机制,优先级:自动检查(MERGE_GATE / smoke test)> 流程卡点(执行前报 Wan 确认)> 纯文字规则。纯文字规则每季度盘点,一季度未触发即删除或降级。
 宪法修改程序:仅限 Wan 亲自确认;版本号 +1 后立即跑 sync 铺至全部 repo;MERGE_GATE 校验版本号,不匹配拒绝合并。
+
+### 常设授权
+
+1. 各仓 `CLAUDE.md` 落后于宪法当前版本时,CC 在当前车内直接同步升版并随 PR 合并,无需另行授权;以“需授权同步 CLAUDE.md”为由推回验收,视同未交车。
+2. 凡指令中明确写出的验收动作(Sandbox/preview 下单、测试邮件、错误路径注入、登录态回归),即视为已授权;CC 缺的是凭据而非授权时,回报中只写“缺 <key 名>”一句,不写授权请求。
+3. 需 Wan 目检的页面必须外网可打开(Pages preview 公开,或挂审核台 `/tasks/<仓>/`);本地文件路径不算交付。
+
 任务三分类:任务指令首行必须标注 A功能 / B内容 / C包装。A功能按全流程严管;B内容按产题、产词、加词工場规则推进,不得被无关技术流程阻塞;C包装仅允许在限定文件范围内试错。
 Platform First:新增任何能力(Prompt/Schema/Workflow/工具/规则)前必答:产品能力还是平台能力?可做成平台能力的,禁止做成产品专属。平台能力入 shared 层,随 sync.sh 分发;产品层仅允许配置与扩展字段,禁止 fork 平台逻辑。
 Evidence before Abstraction:任何抽象(共享模块/schema/generator/框架)必须来自 ≥2 个真实案例。禁止为预测中的需求做抽象;重复出现之后再抽象。流程升级为自动化/Agent/Generator:手动跑满20次且 SOP 稳定两周无修订。product-template 产品级变量以 {{PRODUCT_XXX}} 占位符登记于 product.config.md;generator 待第3个产品复制完成后立项。
