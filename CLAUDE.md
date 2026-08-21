@@ -1,5 +1,5 @@
-<!--WAN-CONSTITUTION-START version=v1.13-->
-# WAN Constitution v1.13
+<!--WAN-CONSTITUTION-START version=v1.14-->
+# WAN Constitution v1.14
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 设计背景参考:docs/REVIEW_2026-0707_SYSTEM_DESIGN.md;CC 开工前必读 rules/ANTI_PATTERNS.md。该引用为 v1.8 设计背景与执法清单,非新增宪法条文。
@@ -22,7 +22,8 @@ Needs pool 门禁:新条目必填 reuse/auto/compound 三布尔 + platform|produ
 域名/API入口切换三同步:任何域名、API 入口、Worker 路由或前端入口切换,必须同时完成 DNS 解析验证通过、前端引用全量替换并经 site-config 收口、wrangler.toml 路由固化;三者未齐禁止合并 main。
 冻结区改动红线:触碰 FREEZE.md 定义的冻结区即为高风险任务,必须单独任务、单独分支;指令必须列明允许修改的文件清单,清单外禁止改动。
 密钥零明文:密钥只进 wrangler secret / 环境变量,禁止出现在代码、配置文件、仓库、聊天记录明文中。
-生产数据只读:生产 KV / D1 / R2 只读;写入仅限 cctest 范围(fixture:cctest@nice.okinawa,OTP 135790,entitlement source "cctest",排除于营收统计)。
+生产数据默认只读:生产 KV / D1 / R2 默认只读;写入仅限 cctest 范围(fixture:cctest@nice.okinawa,OTP 135790,entitlement source "cctest",排除于营收统计)。
+声明式生产 KV 导入通道:经 Wan 逐次明确授权的内容导入,必须将数据包、导入脚本、源 sha256、旧包备份路径一并入仓 PR;导入动作只能由已进入 main 的 Wan-Verified annotated tag 触发的 GitHub Actions job 执行,禁止本地或账外 kv put;必须先完成 preview 验证再执行 production;每次导入的 PR body 与 records 均须留痕。该通道只允许声明的 KV 内容导入,不改变 D1/R2 默认只读与 cctest 约束。
 证据归档窄豁免:经 Wan 逐次明确授权的证据归档工作流,可对生产 R2 执行一次性、纯加法写入,且仅限授权中指名的固定新对象;前置存在性检查,目标对象已存在即拒绝执行;禁止删除、覆盖、修改任何既有对象;每次执行必须回报行数与哈希守恒证据。
 手动操作权益留痕:任何开通、延期、调整、补偿、撤销权益的手动操作,必须走脚本写入 entitlement_log;禁止只改 KV 或后台状态而不留痕。
 测试邮件红线:禁止向真实用户地址发测试邮件;邮件链路测试只允许使用 cctest 范围或 Wan 明确指定的测试地址,不得把真实客户邮箱用于 smoke test / webhook replay / resend retry。
@@ -53,6 +54,7 @@ study 与 mogi（含模拟题预备池）题库内容必须永久不相交(disjo
 电子书权益命名 SOP:电子书权益 ID 格式为 book_<书名英文>-<语言>。语言段小写且必带:简体=zh,英文=en,繁中=tradition。书名英文固定为 script(台本),lipstick(润唇膏),480(480+ 去 + 号)。权益 ID 一经上线不可改名,改名即已购用户权限失效。
 Exit Rule:资产默认可删。每季度清点 shared 层资产:90天零引用移入 /deprecated/,保留一个版本周期后物理删除。Repo/Product 级退出由 Wan 单独裁决。FREEZE.md 覆盖区不适用。禁止以"历史兼容"为由无限期保留;确需兼容者写明截止日。
 (空位):留给盘点后确认的真全局项。
+
 <!--WAN-CONSTITUTION-END-->
 
 # CLAUDE.md — fishing.nice.okinawa
