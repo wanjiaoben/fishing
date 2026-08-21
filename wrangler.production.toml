@@ -43,6 +43,8 @@ PAYPAL_AUTH_CURRENCY = "JPY"
 PAYPAL_AUTH_VALIDITY_REMINDER_DAYS = "3"
 PAYPAL_AUTH_WORKER_ORIGIN = "https://activity.nice.okinawa"
 
+# Configure out of band: npx wrangler secret put RESEND_API_KEY --config wrangler.production.toml
+
 # Secrets are injected by Wan, never committed:
 # npx wrangler secret put PAYPAL_PRODUCTION_CLIENT_ID --config wrangler.production.toml
 # npx wrangler secret put PAYPAL_PRODUCTION_CLIENT_SECRET --config wrangler.production.toml
