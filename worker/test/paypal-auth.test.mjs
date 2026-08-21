@@ -55,6 +55,10 @@ test("customer page states authorization is not an immediate charge", async () =
   const text = await response.text();
   assert.match(text, /Your card will be authorized for JPY 66,000, but you will not be charged at this time\./);
   assert.match(text, /I understand and agree to the authorization and cancellation policy\./);
+  assert.match(text, /translate="no"/);
+  assert.match(text, /name="google" content="notranslate"/);
+  assert.match(text, /enable-funding=card/);
+  assert.match(text, /Card form didn't load — use the PayPal button or open in Safari/);
   assert.doesNotMatch(text, /Paid/i);
 });
 

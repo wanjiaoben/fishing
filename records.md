@@ -121,4 +121,5 @@
 | 2026-06-10 | Codex | 运行日更记录检查；核对 2026-06-09 提交与当前工作区，确认昨日规则初始化与命名调整已记录，未发现除 `records.md` 外的未完成工作 | ✅ |
 | 2026-06-11 | Codex | 运行 Daily repo records updater，核对 2026-06-10 提交与当前工作区，未发现相关变更 | ✅ |
 | 2026-08-21 | Codex | FISH-0821-05 后台客人字段、ORDER_CREATED 作废、状态分组、Resend 通知幂等施工；RESEND_API_KEY 仅待 Wan 通过 secret 注入，未发送邮件/未触发真实支付 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-01 PayPal 卡入口补充 guest card funding、翻译保护与 8 秒兜底提示；待生产发布 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-08 trip report 渔获清单更新为 25 fish，并同步 title/description/OG/Article headline；待发布 | ⏳ |
