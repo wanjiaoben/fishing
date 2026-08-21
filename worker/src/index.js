@@ -1174,7 +1174,7 @@ function renderButtons() {
       });
       const result = await res.json();
       if (!res.ok || !result.ok) throw new Error(result.error || 'Authorization failed');
-      show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: ' + result.paypal_authorization_id + '\\nExpiration: ' + result.authorization_expiration_time);
+      show('Hold placed ✓ — we\\'ll be in touch shortly\\nThis page is safe to close.');
     },
     onError: (err) => show('Authorization failed. Please contact us.\\n' + (err && err.message ? err.message : err))
   };
@@ -1220,14 +1220,43 @@ document.getElementById('agree').onchange=e=>{};
 
 // Keep the PayPal and Square embeds isolated while allowing each provider's iframe hosts.
 async function customerPageForOrder(request, env, orderId) {
-  const response = await customerPageForOrderLegacy(request, env, orderId);
-  if (!response.headers.get("content-type")?.startsWith("text/html")) return response;
-  const body = await response.text();
-  const configMatch = body.match(/const cfg=(\{[\s\S]*?\}); const box=/);
-  const configJson = configMatch ? configMatch[1] : "{}";
-  const fixed = body.replace(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>/gi, "")
-    .replace(/<script>[\s\S]*?<\/script>/, `<textarea id="authorize-config" hidden>${escapeHtml(configJson)}</textarea><script src="/assets/authorize-page.js" defer></script>`);
-  return html(fixed, { headers: {
+  const row = await getAuthorizationByOrder(env, orderId);
+  if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+  const c = config(env);
+  const brand = brandConfig(row.brand);
+  const isSnorkel = brand.key === "snorkel";
+  const shortCode = row.short_code || "";
+  const brandLabel = isSnorkel ? "Snorkel Okinawa" : "Fishing Okinawa";
+  const tripNoun = isSnorkel ? "tour" : "trip";
+  const cancellationActor = isSnorkel ? "we cancel" : "the captain cancels";
+  const amountText = `${row.currency} ${Number(row.amount).toLocaleString("en-US")}`;
+  const policyUrl = isSnorkel ? "https://snorkel.nice.okinawa/#how-booking-works" : "https://fishing.nice.okinawa/#booking";
+  const guestName = String(row.guest_name || "").trim();
+  const participants = String(row.headcount || row.participants || "").trim();
+  const snorkelGuests = participants ? ` for ${escapeHtml(participants)} guests` : "";
+  const supportNote = isSnorkel
+    ? `The hold covers the tour fee${snorkelGuests}. Snorkel gear and life jackets are included.`
+    : "The hold covers the charter fee and any gear rental listed in your confirmation email.";
+  const status = String(row.authorization_status || "ORDER_CREATED");
+  const cfg = { clientId: c.clientId || "", currency: row.currency, policyVersion: row.policy_version,
+    amount: row.amount, activity: row.activity, activityDate: row.activity_date, orderId, paypalJsBase: c.jsBase,
+    squareApplicationId: c.squareApplicationId || "", squareLocationId: c.squareLocationId || "", squareJsBase: c.squareJsBase,
+    shortCode, brand: brand.key, brandName: brand.name, brandTitle: brand.title, brandAccent: brand.accent,
+    brandBackground: brand.background, returnUrl: brand.returnUrl };
+  const pageCss = `:root{--blue:#0060B4;--sky:#009CD8;--cyan:#00B4C0;--mint:#3CC090;--soft:#F2F8FA;--text:#1F2A37;--muted:#526170;--line:#D8E7EE;--card:#FFFFFF}*{box-sizing:border-box}body{margin:0;background:var(--soft);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.auth-page{max-width:600px;margin:0 auto;padding:22px 16px 28px}.auth-shell{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 18px 44px rgba(31,42,55,.08)}.top{text-align:center;margin-bottom:20px}.logo-text{font-weight:900;letter-spacing:.02em;color:var(--blue);font-size:1.1rem}.brand-sub{margin-top:4px;color:var(--muted);font-size:.88rem}.eyebrow{display:inline-flex;align-items:center;justify-content:center;margin:2px 0 14px;padding:6px 12px;border-radius:999px;background:rgba(60,192,144,.14);color:#13795b;font-size:.76rem;font-weight:900;letter-spacing:.08em}.auth-shell h1{margin:0 0 10px;text-align:center;color:var(--blue);font-size:2rem;line-height:1.12}.lead{margin:0 auto 18px;max-width:520px;text-align:center;color:#344353}.order-card,.trust-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}.order-row{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-top:1px solid #edf4f7}.order-row:first-child{border-top:0}.order-row strong{color:#526170;font-size:.84rem}.order-row span{text-align:right;font-weight:750}.next{margin:22px 0}.next h2,.pay-block h2{margin:0 0 12px;color:var(--text);font-size:1.2rem}.check-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}.check-list li{position:relative;padding-left:30px}.check-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--mint);font-weight:900}.fine-print{margin:12px 0 0;color:var(--muted);font-size:.9rem}.agree{display:flex;gap:10px;align-items:flex-start;margin:18px 0;color:#263443;font-weight:650}.agree input{margin-top:5px}.agree a,.notice-link{color:#00B4C0;text-decoration:underline;text-underline-offset:2px}.agree a:hover,.agree a:active,.notice-link:hover,.notice-link:active{color:#009CD8}.pay-block{margin-top:20px}.or-card{margin:10px 0 14px;text-align:center;color:var(--muted);font-size:.9rem}.square{border-top:1px solid var(--line);padding-top:18px;transition:background .2s,border-color .2s,box-shadow .2s}.square.square-highlight{background:rgba(0,180,192,.08);border:1px solid rgba(0,180,192,.35);border-radius:16px;padding:18px;box-shadow:0 0 0 4px rgba(0,180,192,.12)}.square h3{margin:0 0 8px;color:var(--text);font-size:1.05rem}.processor-note{margin:8px 0 12px;color:var(--muted);font-size:.86rem}.status{white-space:pre-wrap;background:#eef7fb;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;color:#264052}button{appearance:none;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:850;padding:13px 16px;min-height:48px}button:disabled{opacity:.5}.square button{margin-top:14px}.trust-card{color:#334155}.trust-card p{margin:8px 0}.footer{text-align:center;color:var(--muted);font-size:.82rem;margin:18px 0 0}.safe-close{color:var(--muted);font-size:.92rem}.booking-ref{font-weight:750}.confirmation-card h1{text-align:left}.status-pill{display:inline-flex;border-radius:999px;background:rgba(0,96,180,.1);color:var(--blue);font-weight:900;padding:7px 12px;font-size:.78rem;letter-spacing:.04em}@media(max-width:430px){.auth-page{padding:16px 12px}.auth-shell{padding:20px 16px;border-radius:18px}.auth-shell h1{font-size:1.75rem}.order-row{display:block}.order-row span{display:block;text-align:left;margin-top:2px}}`;
+  const shellTop = `<div class="top"><div class="logo-text">Okinawa Private Tour</div><div class="brand-sub">${escapeHtml(brandLabel)}</div></div>`;
+  const orderRows = [
+    ["Booking reference", shortCode],
+    guestName ? ["Guest", guestName] : null,
+    ["Activity", row.activity],
+    ["Date", row.activity_date],
+    participants ? ["Participants", participants] : null,
+    ["Temporary authorization — no charge today", amountText]
+  ].filter(Boolean).map(([label, value]) => `<div class="order-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join("");
+  const statusBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Hold placed ✓ — we'll be in touch shortly</h1><p>We've placed a temporary hold of ${escapeHtml(amountText)} on your card for ${escapeHtml(row.activity)} on ${escapeHtml(row.activity_date)}. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We'll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you've completed this step — it helps us move faster.</li><li>Once everything is confirmed, you'll receive our confirmation email. That email is your booking.</li><li>After the trip, the hold is released the same day (your bank may take a few days to show it).</li></ul><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
+  const formBody = `<main class="auth-page"><section class="auth-shell">${shellTop}<h1>Secure Your Booking</h1><div class="eyebrow">NO CHARGE TODAY</div><p class="lead">To confirm your reservation, PayPal or Square will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today.</p><div class="order-card">${orderRows}</div><section class="next"><h2>What happens next</h2><ul class="check-list"><li>Join the ${escapeHtml(tripNoun)} as scheduled and we release the full hold the same day. No payment is taken.</li><li>If ${escapeHtml(cancellationActor)} for weather or sea conditions, we release it in full.</li><li>Only a late cancellation or no-show may be charged, up to the hold amount, per our cancellation policy.</li></ul><p class="fine-print">${supportNote}</p><p class="fine-print">After release, your bank may take a few days to remove the pending hold.</p></section><label class="agree"><input id="agree" type="checkbox" data-legacy-policy-copy="I understand and agree to the authorization and cancellation policy"><span>I agree to the hold and the <a href="${escapeHtml(policyUrl)}" target="_blank" rel="noopener">cancellation policy</a></span></label><section class="pay-block"><h2>Pay securely</h2><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><p class="processor-note">Processed by PayPal. Your card details never touch our server.</p><p class="or-card">or pay by card below</p><div class="square notranslate"><h3>Pay by card (Square)</h3><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Place hold securely</button><p class="processor-note">Processed by Square. Your card details never touch our server.</p></div><div id="paypal-status" class="status" hidden></div><div id="status" class="status" hidden></div></section><section class="trust-card"><p>Every trip is run by a licensed local captain or guide we work with regularly.</p><p>Booking & English support: Wan · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p></section></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main><textarea id="authorize-config" hidden>${escapeHtml(JSON.stringify(cfg))}</textarea><script src="/assets/authorize-page.js" defer></script>`;
+  const body = status === "ORDER_CREATED" ? formBody : statusBody;
+  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Secure your booking · ${escapeHtml(brand.name)}</title><style>${pageCss}</style></head><body>${body}</body></html>`, { headers: {
     "content-security-policy-report-only": customerReportOnlyHeaders()
   } });
 }
