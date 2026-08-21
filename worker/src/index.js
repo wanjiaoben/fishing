@@ -1301,7 +1301,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
