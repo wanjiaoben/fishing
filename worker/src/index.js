@@ -1207,9 +1207,11 @@ async function customerPageForOrder(request, env, orderId) {
   const configJson = configMatch ? configMatch[1] : "{}";
   const fixed = body.replace(
     /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
-    `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:">`
+    ""
   ).replace(/<script>[\s\S]*?<\/script>/, `<textarea id="authorize-config" hidden>${escapeHtml(configJson)}</textarea><script src="/assets/authorize-page.js" defer></script>`);
-  return html(fixed);
+  return html(fixed, { headers: {
+    "content-security-policy-report-only": "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com; font-src 'self' data: https://*.squarecdn.com; img-src 'self' data: https:; report-uri /__csp-report"
+  } });
 }
 
 function adminPage() {
@@ -1340,6 +1342,11 @@ async function handleRequest(request, env) {
     if (url.pathname === "/payment/authorize-static" && request.method === "GET") return staticAuthorizePage();
     if (url.pathname === "/assets/authorize-page.js" && request.method === "GET") {
       return new Response(AUTHORIZE_PAGE_SCRIPT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "public, max-age=300" } });
+    }
+    if (url.pathname === "/__csp-report" && request.method === "POST") {
+      const report = await request.text();
+      console.log("CSP_REPORT", report.slice(0, 8000));
+      return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
     }
     if (url.pathname === "/admin/paypal-authorizations" && request.method === "GET") return adminPage();
     if (url.pathname === "/api/paypal/client-config" && request.method === "GET") {

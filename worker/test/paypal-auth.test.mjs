@@ -371,11 +371,21 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(text, /sandbox\.web\.squarecdn\.com/);
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
-  assert.match(text, /pci-connect\.squareupsandbox\.com/);
-  assert.match(text, /script-src 'self' https:\/\/www\.paypal\.com/);
-  assert.doesNotMatch(text, /script-src[^;]*nonce-/);
+  assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
+  assert.match(page.headers.get("content-security-policy-report-only"), /script-src 'self' https:\/\/www\.paypal\.com/);
+  assert.doesNotMatch(text, /Content-Security-Policy/);
   assert.doesNotMatch(text, /script-src[^;]*unsafe-inline/);
   assert.match(await (await adminPage()).text(), /Square: full capture only/);
+});
+
+test("customer page uses report-only CSP and report endpoint is non-blocking", async () => {
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-CSP"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-CSP", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  assert.match(page.headers.get("content-security-policy-report-only"), /report-uri \/__csp-report/);
+  assert.equal(page.headers.get("content-security-policy"), null);
+  const report = await handleRequest(new Request("https://activity.nice.okinawa/__csp-report", { method: "POST", body: JSON.stringify({ "csp-report": { "blocked-uri": "https://example.test" } }) }), env());
+  assert.equal(report.status, 204);
 });
 
 test("rendered customer HTML and external authorization script are syntactically valid", async () => {

@@ -128,3 +128,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 HOTFIX：补 Square/PayPal iframe CSP 主机白名单与客户页 provider 隔离；Sandbox Worker 版本 `addfcf26-716a-40f2-b851-a932e2d3d07e`，待 Wan 复测短链 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 Console 修复：内联初始化脚本改为每响应 nonce，CSP 不含 `unsafe-inline`；Sandbox Worker 版本 `4ef6c534-8da6-480d-bcdc-4d8c88518b14` | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 第三次 Console 修复：客户页脚本外置为 `worker/src/authorize-page.js`，加入 HTML 脚本语法门禁与 CI `node --check`；Sandbox Worker 版本 `0e29936c-a381-476e-aa8b-2e4a31a79414` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 CSP 定案：客人页改 HTTP `Content-Security-Policy-Report-Only`，`/__csp-report` 写 Worker 日志；Playwright Chromium 安装因 npm registry DNS 失败未完成 | ⏳ |
