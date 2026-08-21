@@ -82,6 +82,7 @@
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
 | 2026-08-20 | Codex | FISH-0820-05：合并 #31；新建生产 D1 并应用五表 migration；补生产 wrangler 配置、任意订单 API/客户专属授权页、后台新建单 UI、生产 tag 发布 workflow；未注入 Live secrets、未部署 | ✅ 前置施工完成，待 FISH-0820-06 |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加⑦：将 Square 初始化兜底改为 25 秒，加入加载进度提示并补成功状态清理/按钮启用测试 | ✅ 本地测试通过 |
 | 2026-08-20 | Codex | FISH-0820-02 新增 isolated PayPal Authorization Sandbox Worker/D1 施工稿：AUTHORIZE 订单、客户授权页、后台 void/capture、webhook 验签、audit log 与 Sandbox runbook；未上生产 | ⚠️ |
 | 2026-08-19 | Codex | FISH-0819-01 新增 `/en/guides/okinawa-fishing-packages/` 英文引流内容页：Chatan 私人船钓 4h 与 Kadena Kayak/SUP+Fishing 两套餐，CTA 导 WhatsApp/email 询盘，并收录 sitemap/llms | ✅ |
 | 2026-08-17 | Codex | FISH-0817-01 强化英文首页 AI 询盘路径：前置真实出发港、2/3 人包船示例与 WhatsApp CTA；新增 `/en/guides/where-to-stay-fishing/` 住宿区域指南并收录 sitemap/llms | ✅ |
@@ -124,6 +125,7 @@
 | 2026-08-21 | Codex | FISH-0821-05 后台客人字段、ORDER_CREATED 作废、状态分组、Resend 通知幂等施工；RESEND_API_KEY 仅待 Wan 通过 secret 注入，未发送邮件/未触发真实支付 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-01 PayPal 卡入口补充 guest card funding、翻译保护与 8 秒兜底提示；待生产发布 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-08 trip report 渔获清单更新为 25 fish，并同步 title/description/OG/Article headline；待发布 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加⑦：Square 客人页兜底延长至 25 秒，加入加载进度文案；初始化成功清除兜底状态并启用按钮 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02：新增 Square Web Payments delayed authorization、短链、provider/square_payment_id、后台全额 Complete/Cancel、Sandbox 配置与回归测试；未注入 secret、未部署、未发起真实支付 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 HOTFIX：补 Square/PayPal iframe CSP 主机白名单与客户页 provider 隔离；Sandbox Worker 版本 `addfcf26-716a-40f2-b851-a932e2d3d07e`，待 Wan 复测短链 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 Console 修复：内联初始化脚本改为每响应 nonce，CSP 不含 `unsafe-inline`；Sandbox Worker 版本 `4ef6c534-8da6-480d-bcdc-4d8c88518b14` | ⏳ |
