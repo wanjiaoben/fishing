@@ -2,6 +2,7 @@ export const WORKER_PUBLIC_PATHS = Object.freeze([
   "/payment/*",
   "/p/*",
   "/api/paypal/*",
+  "/api/square/*",
   "/assets/*",
   "/__csp-report",
   "/__client-error",
