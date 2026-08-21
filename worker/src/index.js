@@ -1175,7 +1175,7 @@ function renderButtons() {
 </html>`);
 }
 
-async function customerPageForOrder(request, env, orderId) {
+async function customerPageForOrderLegacy(request, env, orderId) {
   const row = await getAuthorizationByOrder(env, orderId);
   if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
   const c = config(env);
@@ -1193,6 +1193,18 @@ document.getElementById('agree').onchange=e=>document.getElementById('load-paypa
   function render(){const shared={createOrder:()=>Promise.resolve(cfg.orderId),onApprove:async data=>{clearTimeout(cardTimer);const r=await fetch('/api/paypal/authorize-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:data.orderID,accepted_policy:true,policy_version:cfg.policyVersion,idempotency_key:'authorize-'+data.orderID})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Authorization failed');show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: '+(d.paypal_authorization_id||d.square_payment_id)+'\\nExpiration: '+(d.authorization_expiration_time||''))},onError:e=>show('Authorization failed. Please contact us.\\n'+(e&&e.message||e))};paypal.Buttons({...shared,fundingSource:paypal.FUNDING.PAYPAL,style:{color:'gold'}}).render('#paypal-buttons');paypal.Buttons({...shared,fundingSource:paypal.FUNDING.CARD,style:{color:'black'},onClick:()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>show("Card form didn't load — use the PayPal button or open in Safari"),8000)}}).render('#paypal-card-buttons')}
   (async()=>{const status=document.getElementById('square-status');const button=document.getElementById('square-pay');const timeout=setTimeout(()=>{status.textContent="Card form didn't load — use the PayPal button or open in Safari"},8000);try{if(!cfg.squareApplicationId||!cfg.squareLocationId){throw new Error('Square is not configured');}const s=document.createElement('script');s.src=cfg.squareJsBase;s.onload=async()=>{try{const payments=window.Square.payments(cfg.squareApplicationId,cfg.squareLocationId);const card=await payments.card();await card.attach('#square-card-container');clearTimeout(timeout);status.textContent='Card details are handled securely by Square.';button.disabled=false;button.onclick=async()=>{button.disabled=true;const token=await card.tokenize();if(token.status!=='OK')throw new Error('Card verification failed');const r=await fetch('/api/square/create-payment',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:cfg.orderId,source_id:token.token,accepted_policy:true,policy_version:cfg.policyVersion})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Square authorization failed');show('AUTHORIZED – NOT CHARGED\\nSquare payment ID: '+d.square_payment_id);};}catch(e){status.textContent="Card form didn't load — use the PayPal button or open in Safari";}};s.onerror=()=>{clearTimeout(timeout);status.textContent="Card form didn't load — use the PayPal button or open in Safari"};document.head.appendChild(s)})()
 </script></body></html>`);
+}
+
+// Keep the PayPal and Square embeds isolated while allowing each provider's iframe hosts.
+async function customerPageForOrder(request, env, orderId) {
+  const response = await customerPageForOrderLegacy(request, env, orderId);
+  if (!response.headers.get("content-type")?.startsWith("text/html")) return response;
+  const body = await response.text();
+  const fixed = body.replace(
+    /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
+    `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:">`
+  );
+  return html(fixed);
 }
 
 function adminPage() {

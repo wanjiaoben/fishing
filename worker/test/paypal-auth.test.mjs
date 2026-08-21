@@ -364,9 +364,12 @@ test("Square create-payment uses delayed full authorization and short-code idemp
 test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {
   const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SQ"), env({ rows: { byOrder: {
     paypal_order_id: "ORDER-SQ", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
-  } } }));
+  } }, env: { SQUARE_SANDBOX_APPLICATION_ID: "sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA", SQUARE_SANDBOX_LOCATION_ID: "L10P89476GMB8" } }));
   const text = await page.text();
   assert.match(text, /Pay by card \(Square\)/);
   assert.match(text, /sandbox\.web\.squarecdn\.com/);
+  assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
+  assert.match(text, /L10P89476GMB8/);
+  assert.match(text, /pci-connect\.squareupsandbox\.com/);
   assert.match(await (await adminPage()).text(), /Square: full capture only/);
 });
