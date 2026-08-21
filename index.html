@@ -1998,10 +1998,10 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
     },
     {
       "@type": "Question",
-      "name": "Do I need to bring fishing gear?",
+      "name": "Is fishing gear included?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No — all tackle is provided or available to rent. Bring your own if you prefer, just let us know in advance."
+        "text": "Gear is rented per person and priced by fishing style — around ¥6,000 per person as a guide. Bring your own if you prefer. We'll confirm the exact amount in your confirmation email."
       }
     },
     {
@@ -2065,7 +2065,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "name": "What's included in the price?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Our price includes a private boat charter with a licensed local captain; rods, reels, tackle and bait; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day."
+        "text": "Our price includes a private boat charter with a licensed local captain; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day. Tackle and bait are rented separately per person."
       }
     },
     {
@@ -2073,7 +2073,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "name": "What's not included in the price?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences."
+        "text": "Tackle and bait rental — approx. ¥6,000 per person, depending on the fishing style. Paid on the day. Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences."
       }
     },
     {
@@ -2677,12 +2677,12 @@ function buildServiceA(lang) {
 
 function buildIncludedBlock(lang) {
   const copy = {
-      en: { title:'Included in the price', included:['Private boat charter with a licensed local captain','Rods, reels, tackle and bait','Life jackets and safety equipment','English booking support and WhatsApp coordination before and on the day'], notTitle:'Not included', not:['Food and drinks — please bring your own. We keep it this way because of allergies and personal preferences.'], freeTitle:'Free on request — just tell us when you book', free:['A styrofoam cooler box with ice and basic utensils so you can take your catch home (yours to keep)','Reservation at a local restaurant that will cook your catch for you (you pay the restaurant directly)','Child life jackets, snorkel gear on combo trips'], foot:'None of the above options carry an extra charge from us.' },
-    zh: { title:'价格包含的内容', included:['持证当地船长的包船服务','鱼竿、渔轮、钓具和鱼饵','救生衣及安全设备','出发前及当天的英语预约支持和 WhatsApp 协调'], notTitle:'价格不包含', not:['食物和饮料——请自备。考虑到过敏和个人偏好，我们保持这种安排。'], freeTitle:'免费选项——预约时告诉我们', free:['冰桶、冰块和基本餐具，方便您带走渔获','预订当地餐厅代为烹调渔获（餐费直接支付给餐厅）','儿童救生衣；组合行程提供浮潜装备'], foot:'以上选项均不会向您收取额外费用。' },
-    'zh-TW': { title:'費用包含的內容', included:['持證當地船長的包船服務','魚竿、捲線器、釣具和魚餌','救生衣及安全設備','出發前及當天的英語預約支援與 WhatsApp 協調'], notTitle:'費用不包含', not:['食物和飲料——請自備。考慮到過敏和個人偏好，我們維持這樣的安排。'], freeTitle:'免費選項——預約時告訴我們', free:['冰桶、冰塊和基本餐具，方便您帶走漁獲','預訂當地餐廳代為烹調漁獲（餐費直接支付給餐廳）','兒童救生衣；組合行程提供浮潛裝備'], foot:'以上選項均不會向您收取額外費用。' },
-      ja: { title:'料金に含まれるもの', included:['資格を持つ地元船長による貸切ボート','ロッド、リール、タックル、餌','ライフジャケットと安全装備','出発前と当日の英語予約サポート・WhatsApp対応'], notTitle:'含まれないもの', not:['食べ物・飲み物——各自でご持参ください。アレルギーや好みに配慮し、この形にしています。'], freeTitle:'無料オプション', free:['発泡スチロールのクーラーボックス（氷・簡単な食器付き、お持ち帰り可）','釣った魚を調理してくれる地元レストランの予約（料金はレストランへ直接お支払い）','お子様用ライフジャケット、コンボ行程のシュノーケル用品'], foot:'上記のオプションに追加料金はかかりません。' },
-    ko: { title:'가격에 포함된 내용', included:['자격을 갖춘 현지 선장과의 전세 보트','낚싯대, 릴, 태클 및 미끼','구명조끼와 안전 장비','출항 전 및 당일 영어 예약 지원과 WhatsApp 조율'], notTitle:'포함되지 않는 내용', not:['음식과 음료 — 직접 준비해 주세요. 알레르기와 개인 취향을 고려한 방식입니다.'], freeTitle:'무료 옵션 — 예약할 때 알려 주세요', free:['얼음과 기본 식기가 있는 쿨러 박스(잡은 물고기를 가져갈 수 있음)','잡은 물고기를 요리해 주는 현지 레스토랑 예약(식사 비용은 레스토랑에 직접 지불)','어린이 구명조끼, 콤보 일정의 스노클 장비'], foot:'위 옵션에는 추가 요금이 없습니다.' },
-    th: { title:'สิ่งที่รวมอยู่ในราคา', included:['เรือเช่าเหมาลำพร้อมกัปตันท้องถิ่นที่มีใบอนุญาต','คันเบ็ด รอก อุปกรณ์และเหยื่อ','เสื้อชูชีพและอุปกรณ์ความปลอดภัย','การจองภาษาอังกฤษและประสานงาน WhatsApp ก่อนและในวันเดินทาง'], notTitle:'ไม่รวม', not:['อาหารและเครื่องดื่ม — โปรดนำมาเอง เราจัดแบบนี้เพื่อคำนึงถึงอาการแพ้และความชอบส่วนบุคคล'], freeTitle:'ตัวเลือกฟรี — แจ้งเราเมื่อจอง', free:['กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ','จองร้านอาหารท้องถิ่นให้ปรุงปลาที่จับได้ (ชำระเงินกับร้านโดยตรง)','เสื้อชูชีพเด็ก อุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ'], foot:'ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา' }
+      en: { title:'Included in the price', included:['Private boat charter with a licensed local captain','Life jackets and safety equipment','English booking support and WhatsApp coordination before and on the day'], notTitle:'Not included', not:['Tackle and bait rental — approx. ¥6,000 per person, depending on the fishing style. Paid on the day.','Food and drinks — please bring your own. We keep it this way because of allergies and personal preferences.'], freeTitle:'Free on request — just tell us when you book', free:['A styrofoam cooler box with ice and basic utensils so you can take your catch home (yours to keep)','Reservation at a local restaurant that will cook your catch for you (you pay the restaurant directly)','Child life jackets, snorkel gear on combo trips'], foot:'None of the above options carry an extra charge from us.' },
+    zh: { title:'价格包含的内容', included:['持证当地船长的包船服务','救生衣及安全设备','出发前及当天的英语预约支持和 WhatsApp 协调'], notTitle:'价格不包含', not:['渔具和鱼饵租赁——根据钓法约 ¥6,000/人，当天支付。','食物和饮料——请自备。考虑到过敏和个人偏好，我们保持这种安排。'], freeTitle:'免费选项——预约时告诉我们', free:['冰桶、冰块和基本餐具，方便您带走渔获','预订当地餐厅代为烹调渔获（餐费直接支付给餐厅）','儿童救生衣；组合行程提供浮潜装备'], foot:'以上选项均不会向您收取额外费用。' },
+    'zh-TW': { title:'費用包含的內容', included:['持證當地船長的包船服務','救生衣及安全設備','出發前及當天的英語預約支援與 WhatsApp 協調'], notTitle:'費用不包含', not:['釣具和魚餌租借——依釣法約 ¥6,000/人，當天支付。','食物和飲料——請自備。考慮到過敏和個人偏好，我們維持這樣的安排。'], freeTitle:'免費選項——預約時告訴我們', free:['冰桶、冰塊和基本餐具，方便您帶走漁獲','預訂當地餐廳代為烹調漁獲（餐費直接支付給餐廳）','兒童救生衣；組合行程提供浮潛裝備'], foot:'以上選項均不會向您收取額外費用。' },
+      ja: { title:'料金に含まれるもの', included:['資格を持つ地元船長による貸切ボート','ライフジャケットと安全装備','出発前と当日の英語予約サポート・WhatsApp対応'], notTitle:'含まれないもの', not:['釣具・エサのレンタルは別途、釣り方により1名あたり約6,000円目安、当日お支払い。','食べ物・飲み物——各自でご持参ください。アレルギーや好みに配慮し、この形にしています。'], freeTitle:'無料オプション', free:['発泡スチロールのクーラーボックス（氷・簡単な食器付き、お持ち帰り可）','釣った魚を調理してくれる地元レストランの予約（料金はレストランへ直接お支払い）','お子様用ライフジャケット、コンボ行程のシュノーケル用品'], foot:'上記のオプションに追加料金はかかりません。' },
+    ko: { title:'가격에 포함된 내용', included:['자격을 갖춘 현지 선장과의 전세 보트','구명조끼와 안전 장비','출항 전 및 당일 영어 예약 지원과 WhatsApp 조율'], notTitle:'포함되지 않는 내용', not:['낚시 장비와 미끼 대여 — 낚시 스타일에 따라 1인 약 ¥6,000, 당일 결제.','음식과 음료 — 직접 준비해 주세요. 알레르기와 개인 취향을 고려한 방식입니다.'], freeTitle:'무료 옵션 — 예약할 때 알려 주세요', free:['얼음과 기본 식기가 있는 쿨러 박스(잡은 물고기를 가져갈 수 있음)','잡은 물고기를 요리해 주는 현지 레스토랑 예약(식사 비용은 레스토랑에 직접 지불)','어린이 구명조끼, 콤보 일정의 스노클 장비'], foot:'위 옵션에는 추가 요금이 없습니다.' },
+    th: { title:'สิ่งที่รวมอยู่ในราคา', included:['เรือเช่าเหมาลำพร้อมกัปตันท้องถิ่นที่มีใบอนุญาต','เสื้อชูชีพและอุปกรณ์ความปลอดภัย','การจองภาษาอังกฤษและประสานงาน WhatsApp ก่อนและในวันเดินทาง'], notTitle:'ไม่รวม', not:['ค่าเช่าอุปกรณ์และเหยื่อ — ประมาณ ¥6,000 ต่อคน ขึ้นอยู่กับวิธีตกปลา ชำระในวันเดินทาง','อาหารและเครื่องดื่ม — โปรดนำมาเอง เราจัดแบบนี้เพื่อคำนึงถึงอาการแพ้และความชอบส่วนบุคคล'], freeTitle:'ตัวเลือกฟรี — แจ้งเราเมื่อจอง', free:['กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ','จองร้านอาหารท้องถิ่นให้ปรุงปลาที่จับได้ (ชำระเงินกับร้านโดยตรง)','เสื้อชูชีพเด็ก อุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ'], foot:'ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา' }
   };
   const c = copy[lang] || copy.en;
   const list = items => items.map(item => `<li>${item}</li>`).join('');
@@ -3318,16 +3318,16 @@ const FAQS = [
     a_th: "สำหรับแผนส่วนใหญ่ ไม่ต้องมีประสบการณ์ การตกปลา GT เป็นข้อยกเว้น — ต้องใช้อุปกรณ์หนักและประสบการณ์การโยนระยะไกล"
   },
   {
-    q_en: "Do I need to bring fishing gear?",
+    q_en: "Is fishing gear included?",
     q_zh: "需要自带钓鱼装备吗？",
     'q_zh-TW': "需要自帶釣魚裝備嗎？",
     q_ja: "釣り道具は持参する必要がありますか？",
     q_ko: "낚시 장비를 가져와야 하나요?",
     q_th: "ต้องนำอุปกรณ์ตกปลามาเองไหม?",
-    a_en: "No — all tackle is provided or available to rent. Bring your own if you prefer, just let us know in advance.",
+    a_en: "Gear is rented per person and priced by fishing style — around ¥6,000 per person as a guide. Bring your own if you prefer. We'll confirm the exact amount in your confirmation email.",
     a_zh: "不需要，全套装备提供或可租赁。如想自带，提前告知即可。",
     'a_zh-TW': "不需要，全套裝備提供或可租借。如想自帶，提前告知即可。",
-    a_ja: "不要です。全タックル提供またはレンタル可能。持参希望の場合は事前にご連絡ください。",
+    a_ja: "釣具・エサのレンタルは別途、釣り方により1名あたり約6,000円目安、当日お支払い。",
     a_ko: "아니요 — 모든 장비가 제공되거나 대여 가능합니다. 원하시면 직접 가져오셔도 됩니다. 미리 알려주세요.",
     a_th: "ไม่ — อุปกรณ์ทั้งหมดจัดเตรียมให้หรือเช่าได้ นำมาเองได้หากต้องการ แค่แจ้งล่วงหน้า"
   },
@@ -3436,10 +3436,10 @@ const FAQS = [
     q_ja: "料金には何が含まれますか？",
     q_ko: "가격에는 무엇이 포함되나요?",
     q_th: "ราคานี้รวมอะไรบ้าง?",
-    a_en: "Our price includes a private boat charter with a licensed local captain; rods, reels, tackle and bait; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day.",
-    a_zh: "我们的价格包括持证当地船长的包船服务、鱼竿渔轮钓具和鱼饵、救生衣及安全设备，以及出发前和当天的英语预约支持与 WhatsApp 协调。",
-    'a_zh-TW': "我們的價格包括持證當地船長的包船服務、魚竿捲線器釣具和魚餌、救生衣及安全設備，以及出發前和當天的英語預約支援與 WhatsApp 協調。",
-    a_ja: "料金には資格を持つ地元船長による貸切ボート、ロッド・リール・タックル・餌、ライフジャケットと安全装備、出発前と当日の英語予約サポート・WhatsApp対応が含まれます。",
+    a_en: "Our price includes a private boat charter with a licensed local captain; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day. Tackle and bait are rented separately per person.",
+    a_zh: "我们的价格包括持证当地船长的包船服务、救生衣及安全设备，以及出发前和当天的英语预约支持与 WhatsApp 协调。渔具和鱼饵需按人另行租赁。",
+    'a_zh-TW': "我們的價格包括持證當地船長的包船服務、救生衣及安全設備，以及出發前和當天的英語預約支援與 WhatsApp 協調。釣具和魚餌需按人另行租借。",
+    a_ja: "料金には資格を持つ地元船長による貸切ボート、ライフジャケットと安全装備、出発前と当日の英語予約サポート・WhatsApp対応が含まれます。釣具・エサのレンタルは別途です。",
     a_ko: "가격에는 자격을 갖춘 현지 선장과의 전세 보트, 낚싯대·릴·태클·미끼, 구명조끼와 안전 장비, 출항 전 및 당일 영어 예약 지원과 WhatsApp 조율이 포함됩니다.",
     a_th: "ราคานี้รวมเรือเช่าเหมาลำพร้อมกัปตันท้องถิ่นที่มีใบอนุญาต คันเบ็ด รอก อุปกรณ์และเหยื่อ เสื้อชูชีพและอุปกรณ์ความปลอดภัย รวมถึงการจองภาษาอังกฤษและประสานงาน WhatsApp ก่อนและในวันเดินทาง"
   },
@@ -3450,7 +3450,7 @@ const FAQS = [
     q_ja: "料金に含まれないものは何ですか？",
     q_ko: "가격에 포함되지 않는 것은 무엇인가요?",
     q_th: "ไม่รวมอะไรในราคาบ้าง?",
-    a_en: "Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences.",
+    a_en: "Tackle and bait rental — approx. ¥6,000 per person, depending on the fishing style. Paid on the day. Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences.",
     a_zh: "价格不包含食物和饮料——请自备。考虑到过敏和个人偏好，我们保持这种安排。",
     'a_zh-TW': "費用不包含食物和飲料——請自備。考慮到過敏和個人偏好，我們維持這樣的安排。",
     a_ja: "食べ物・飲み物は含まれません。各自でご持参ください。アレルギーや好みに配慮し、この形にしています。",
