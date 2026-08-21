@@ -460,3 +460,13 @@ test("customer page passes short code into Square client diagnostics", async () 
   const text = await page.text();
   assert.match(text, /&quot;shortCode&quot;:&quot;ABC123&quot;/);
 });
+
+test("terminal customer short-link pages stay HTTP 200", async () => {
+  for (const authorization_status of ["AUTHORIZED", "VOIDED / RELEASED", "CAPTURED", "CANCELLED"]) {
+    const page = await handleRequest(new Request("https://activity.nice.okinawa/p/ABC123"), env({ rows: {
+      byOrder: { paypal_order_id: "ORDER-TERMINAL", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", authorization_status },
+      byShortCode: { paypal_order_id: "ORDER-TERMINAL", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", authorization_status }
+    } }));
+    assert.equal(page.status, 200, authorization_status);
+  }
+});
