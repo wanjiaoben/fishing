@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-21 | Codex | FISH-0821-04 将 PayPal 客人页路由扩展至 activity.nice.okinawa，新增订单 brand（fishing/snorkel）与品牌化客人页，保留 fishing 旧链接；待 Wan 完成 ¥100 snorkel 真浏览器授权与 Release 验收 |
 | 2026-08-21 | Codex | FISH-0821-02 补充 Chatan Amberjack trip report 的同日餐厅处理与 ATM 事实，价格改为 4 人总额 ¥166,000，并同步 llms.txt 摘要；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0821-01 新建 Chatan 全日 Amberjack trip report、列表页、两档无 EXIF WebP 图片；同步首页/套餐页入口、sitemap 与 llms.txt；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0820-10 在首页与英文套餐页价格表下新增 Included / Not included / Free on request 三段内容及 FAQPage 对应问答；Fishing licence 因待 Wan 确认未写入 |

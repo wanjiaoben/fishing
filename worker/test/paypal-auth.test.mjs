@@ -231,7 +231,7 @@ test("admin custom order endpoint is admin-only and fixes currency to JPY", asyn
     if (String(url).endsWith("/v2/checkout/orders")) return Response.json({ id: "ORDER-CUSTOM", status: "CREATED" });
     throw new Error(`unexpected fetch ${url}`);
   });
-  const e = env({ env: { PAYPAL_AUTH_WORKER_ORIGIN: "https://fishing.nice.okinawa" } });
+  const e = env({ env: { PAYPAL_AUTH_WORKER_ORIGIN: "https://activity.nice.okinawa" } });
   const response = await handleRequest(new Request("https://worker.test/api/admin/orders", {
     method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
     body: JSON.stringify({ activity: "Test Charter", activity_date: "2026-08-24", amount: 100, currency: "USD" })
@@ -245,8 +245,40 @@ test("admin custom order endpoint is admin-only and fixes currency to JPY", asyn
   }), e);
   const goodData = await good.json();
   assert.equal(goodData.ok, true);
-  assert.match(goodData.authorize_url, /fishing\.nice\.okinawa\/payment\/authorize\?order=ORDER-CUSTOM/);
+  assert.match(goodData.authorize_url, /activity\.nice\.okinawa\/payment\/authorize\?order=ORDER-CUSTOM/);
+  assert.equal(goodData.brand, "fishing");
   const payload = JSON.parse(captured.find(c => c.url.endsWith("/v2/checkout/orders")).init.body);
   assert.equal(payload.purchase_units[0].amount.currency_code, "JPY");
   assert.equal(payload.purchase_units[0].amount.value, "100");
+});
+
+test("admin custom order accepts snorkel brand and customer page renders brand return link", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
+    if (String(url).endsWith("/v2/checkout/orders")) return Response.json({ id: "ORDER-SNORKEL", status: "CREATED" });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ env: { PAYPAL_AUTH_WORKER_ORIGIN: "https://activity.nice.okinawa" } });
+  const response = await handleRequest(new Request("https://fishing.test/api/admin/orders", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ brand: "snorkel", activity: "Snorkel Test", activity_date: "2026-08-24", amount: 100, currency: "JPY" })
+  }), e);
+  const data = await response.json();
+  assert.equal(data.ok, true);
+  assert.equal(data.brand, "snorkel");
+  assert.match(data.authorize_url, /activity\.nice\.okinawa\/payment\/authorize\?order=ORDER-SNORKEL/);
+
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SNORKEL"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-SNORKEL", brand: "snorkel", activity: "Snorkel Test", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  const text = await page.text();
+  assert.match(text, /Snorkel Nice Okinawa/);
+  assert.match(text, /https:\/\/snorkel\.nice\.okinawa\//);
+  assert.match(text, /I understand and agree to the authorization and cancellation policy/);
+
+  const legacy = await handleRequest(new Request("https://fishing.nice.okinawa/payment/authorize?order=ORDER-SNORKEL"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-SNORKEL", brand: "snorkel", activity: "Snorkel Test", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  assert.equal(legacy.status, 200);
+  assert.match(await legacy.text(), /Snorkel Nice Okinawa/);
 });
