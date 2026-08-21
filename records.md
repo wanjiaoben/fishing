@@ -131,3 +131,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 CSP 定案：客人页改 HTTP `Content-Security-Policy-Report-Only`，`/__csp-report` 写 Worker 日志；Playwright Chromium 安装因 npm registry DNS 失败未完成 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02：补齐无订单 `/payment/authorize` 也返回 Report-Only CSP；Sandbox Worker 版本 `a437c315-5915-43fd-b662-bd877574cc71` | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02：Square delayed capture 改 P7D/CANCEL；后台日期超过今天+7天提示「请在出发前 7 天内发链接」；待 Sandbox 第二笔 Capture | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 生产：PR #51 squash merge `b8c03d0`；生产 D1 0004 前备份 `/private/tmp/fish-0821-hotfix02-prod-d1-before-0004.sql` SHA256 `b242f429c88ce6f497f881e289fb65e460f4ec97b545556ce62d1a8b5bf4aa68`；tag `fishing-paypal-auth-v2026.08.21-fish-0821-hotfix-02`；Actions deploy version `b1e66ba7-e75e-48cf-90d0-03486db5f5ed` | ⏳ |
