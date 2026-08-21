@@ -20,6 +20,7 @@ function fakeDb(rows = {}) {
         },
         async first() {
           if (sql.includes("WHERE paypal_order_id")) return rows.byOrder || null;
+          if (sql.includes("WHERE short_code")) return rows.byShortCode || null;
           if (sql.includes("WHERE id = ? OR paypal_authorization_id")) return rows.byId || null;
           if (sql.includes("payment_audit_log")) return rows.audit || null;
           if (sql.includes("paypal_webhook_events")) return rows.webhook || null;
@@ -241,12 +242,14 @@ test("admin custom order endpoint is admin-only and fixes currency to JPY", asyn
   assert.equal(data.error, "INVALID_ORDER_FIELDS");
   const good = await handleRequest(new Request("https://worker.test/api/admin/orders", {
     method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
-    body: JSON.stringify({ activity: "Test Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY" })
+    body: JSON.stringify({ activity: "Test Charter", activity_date: "2026-08-24", amount: 100, headcount: 3, guest_name: "Test Guest", guest_email: "guest@example.com", currency: "JPY" })
   }), e);
   const goodData = await good.json();
   assert.equal(goodData.ok, true);
-  assert.match(goodData.authorize_url, /activity\.nice\.okinawa\/payment\/authorize\?order=ORDER-CUSTOM/);
+  assert.match(goodData.authorize_url, /activity\.nice\.okinawa\/p\/[A-Z0-9]{6}$/);
+  assert.match(goodData.short_code, /^[A-Z0-9]{6}$/);
   assert.equal(goodData.brand, "fishing");
+  assert.ok(e.DB.calls.some(call => call.sql.includes("guest_name") && call.values.includes("Test Guest") && call.values.includes(3)));
   const payload = JSON.parse(captured.find(c => c.url.endsWith("/v2/checkout/orders")).init.body);
   assert.equal(payload.purchase_units[0].amount.currency_code, "JPY");
   assert.equal(payload.purchase_units[0].amount.value, "100");
@@ -266,21 +269,33 @@ test("admin custom order accepts snorkel brand and customer page renders brand r
   const data = await response.json();
   assert.equal(data.ok, true);
   assert.equal(data.brand, "snorkel");
-  assert.match(data.authorize_url, /activity\.nice\.okinawa\/payment\/authorize\?order=ORDER-SNORKEL/);
+  assert.match(data.authorize_url, /activity\.nice\.okinawa\/p\/[A-Z0-9]{6}$/);
 
   const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SNORKEL"), env({ rows: { byOrder: {
     paypal_order_id: "ORDER-SNORKEL", brand: "snorkel", activity: "Snorkel Test", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
   } } }));
   const text = await page.text();
-  assert.match(text, /Snorkel Nice Okinawa/);
+  assert.match(text, /Snorkel Okinawa/);
   assert.match(text, /https:\/\/snorkel\.nice\.okinawa\//);
-  assert.match(text, /I understand and agree to the authorization and cancellation policy/);
+  assert.match(text, /I understand this is a temporary card authorization, not a payment today/);
 
   const legacy = await handleRequest(new Request("https://fishing.nice.okinawa/payment/authorize?order=ORDER-SNORKEL"), env({ rows: { byOrder: {
     paypal_order_id: "ORDER-SNORKEL", brand: "snorkel", activity: "Snorkel Test", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
   } } }));
   assert.equal(legacy.status, 200);
-  assert.match(await legacy.text(), /Snorkel Nice Okinawa/);
+  assert.match(await legacy.text(), /Snorkel Okinawa/);
+});
+
+test("short-code customer route renders the light brand-safe booking page", async () => {
+  const e = env({ rows: { byShortCode: { paypal_order_id: "ORDER-SHORT", short_code: "ABC234", brand: "snorkel", activity: "Snorkel Tour", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20", headcount: 2 } } });
+  const response = await handleRequest(new Request("https://activity.nice.okinawa/p/ABC234"), e);
+  assert.equal(response.status, 200);
+  const text = await response.text();
+  assert.match(text, /Secure Your Booking/);
+  assert.match(text, /Snorkel Okinawa/);
+  assert.match(text, /Booking reference/);
+  assert.match(text, /Participants/);
+  assert.doesNotMatch(text, /Fishing Okinawa/);
 });
 
 test("ORDER_CREATED can be cancelled without calling PayPal, AUTHORIZED cannot", async () => {

@@ -165,6 +165,23 @@ function id(prefix) {
   return `${prefix}_${crypto.randomUUID()}`;
 }
 
+const SHORT_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function randomShortCode() {
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map(byte => SHORT_CODE_ALPHABET[byte % SHORT_CODE_ALPHABET.length]).join("");
+}
+
+async function createUniqueShortCode(env) {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const code = randomShortCode();
+    const existing = await env.DB.prepare(`SELECT id FROM paypal_authorizations WHERE short_code = ?`).bind(code).first();
+    if (!existing) return code;
+  }
+  throw new Error("SHORT_CODE_GENERATION_FAILED");
+}
+
 async function sha256Hex(input) {
   const bytes = new TextEncoder().encode(input || "");
   const digest = await crypto.subtle.digest("SHA-256", bytes);
@@ -217,6 +234,12 @@ async function getAuthorizationByOrder(env, orderId) {
   return await env.DB.prepare(
     `SELECT * FROM paypal_authorizations WHERE paypal_order_id = ?`
   ).bind(orderId).first();
+}
+
+async function getAuthorizationByShortCode(env, shortCode) {
+  return await env.DB.prepare(
+    `SELECT * FROM paypal_authorizations WHERE short_code = ?`
+  ).bind(shortCode).first();
 }
 
 async function getAuthorizationById(env, authId) {
@@ -340,12 +363,14 @@ async function createAdminOrder(request, env) {
   const brand = normalizeBrand(body.brand);
   const guestName = String(body.guest_name || "").trim().slice(0, 200);
   const guestEmail = String(body.guest_email || "").trim().toLowerCase().slice(0, 320);
-  if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY" || (guestEmail && !/^\S+@\S+\.\S+$/.test(guestEmail))) {
-    return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY", "guest_name?", "guest_email?"] }, { status: 400 });
+  const headcount = body.headcount === "" || body.headcount === null || body.headcount === undefined ? null : Number(body.headcount);
+  if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY" || (guestEmail && !/^\S+@\S+\.\S+$/.test(guestEmail)) || (headcount !== null && (!Number.isInteger(headcount) || headcount < 1 || headcount > 100))) {
+    return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY", "guest_name?", "guest_email?", "headcount?"] }, { status: 400 });
   }
   const localId = id("auth");
   const createdAt = nowIso();
   const orderKey = body.idempotency_key || id("admin_order");
+  const shortCode = await createUniqueShortCode(env);
   const paypalOrder = await paypalFetch(env, "/v2/checkout/orders", {
     method: "POST",
     headers: { "PayPal-Request-Id": orderKey },
@@ -358,13 +383,13 @@ async function createAdminOrder(request, env) {
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
      (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
-      paypal_create_response, policy_version, guest_name, guest_email, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      paypal_create_response, policy_version, guest_name, guest_email, headcount, short_code, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(localId, paypalOrder.id, brand, activity, activityDate, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
-    JSON.stringify(paypalOrder), c.policyVersion, guestName || null, guestEmail || null, createdAt, createdAt).run();
+    JSON.stringify(paypalOrder), c.policyVersion, guestName || null, guestEmail || null, headcount, shortCode, createdAt, createdAt).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
   return json({ ok: true, local_authorization_id: localId, paypal_order_id: paypalOrder.id,
-    authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`, brand });
+    authorize_url: `${c.workerOrigin || new URL(request.url).origin}/p/${shortCode}`, short_code: shortCode, brand });
 }
 
 async function createOrderWithSandboxTestCard(request, env) {
@@ -632,7 +657,7 @@ async function listAuthorizations(request, env) {
   }
   const rows = await env.DB.prepare(
     `SELECT id, paypal_order_id, paypal_authorization_id, brand, activity, activity_date, amount, currency,
-            guest_name, guest_email,
+            guest_name, guest_email, headcount, short_code,
             authorization_status, paypal_status, authorization_create_time, authorization_expiration_time,
             honor_period_ends_at, created_at, updated_at
      FROM paypal_authorizations
@@ -645,7 +670,9 @@ async function listAuthorizations(request, env) {
     const honorEnds = r.honor_period_ends_at ? new Date(r.honor_period_ends_at).getTime() : null;
     return {
       ...r,
-      authorize_url: `${config(env).workerOrigin || "https://activity.nice.okinawa"}/payment/authorize?order=${encodeURIComponent(r.paypal_order_id)}`,
+      authorize_url: r.short_code
+        ? `${config(env).workerOrigin || "https://activity.nice.okinawa"}/p/${r.short_code}`
+        : `${config(env).workerOrigin || "https://activity.nice.okinawa"}/payment/authorize?order=${encodeURIComponent(r.paypal_order_id)}`,
       status_label: r.authorization_status === "AUTHORIZED" ? "AUTHORIZED – NOT CHARGED" : r.authorization_status,
       days_until_expiration: expiresAt ? Math.ceil((expiresAt - now) / 86400000) : null,
       in_honor_period: honorEnds ? now <= honorEnds : false,
@@ -1037,6 +1064,55 @@ function renderButtons() {
 
 async function customerPageForOrder(request, env, orderId) {
   const row = await getAuthorizationByOrder(env, orderId);
+  return row ? renderAuthorizationPage(env, row) : json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+}
+
+async function customerPageForShortCode(request, env, shortCode) {
+  const row = await getAuthorizationByShortCode(env, shortCode);
+  return row ? renderAuthorizationPage(env, row) : json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+}
+
+function renderAuthorizationPage(env, row) {
+  const c = config(env);
+  const brand = brandConfig(row.brand);
+  const isSnorkel = brand.key === "snorkel";
+  const displayName = isSnorkel ? "Snorkel Okinawa" : "Fishing Okinawa";
+  const tripWord = isSnorkel ? "tour" : "trip";
+  const cancelActor = isSnorkel ? "we" : "the captain";
+  const cancelVerb = isSnorkel ? "cancel" : "cancels";
+  const logoUrl = "https://fishing.nice.okinawa/assets/brand/okinawa-private-tour.png";
+  const amount = `${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}`;
+  const guestLine = row.guest_name ? `<div class="order-row"><span>Guest</span><strong>${escapeHtml(row.guest_name)}</strong></div>` : "";
+  const headcountLine = row.headcount ? `<div class="order-row"><span>Participants</span><strong>${escapeHtml(row.headcount)}</strong></div>` : "";
+  const supportName = "[Wan name pending]";
+  const trustLine = isSnorkel
+    ? `Your guide: ${supportName} — Okinawa-based snorkel guide; in the water with you the whole time.`
+    : `Your captain: [Captain name pending] — Local captain, fishing these waters for [N] years.`;
+  const brandSmall = isSnorkel ? "Snorkel Okinawa" : "Fishing Okinawa";
+  const extraNote = isSnorkel
+    ? `The authorization covers the tour fee${row.headcount ? ` for ${escapeHtml(row.headcount)} guests` : " stated in your confirmation email"}. Snorkel gear and life jackets are included.`
+    : "The authorization covers the charter fee and any gear rental listed in your confirmation email.";
+  const cfg = { clientId: c.clientId || "", currency: row.currency, policyVersion: row.policy_version, orderId: row.paypal_order_id, paypalJsBase: c.jsBase };
+  return html(`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Secure your booking · ${displayName}</title>
+<style>
+:root{--blue:#1F6FB2;--teal:#2BB5A0;--orange:#F08A24;--yellow:#F5C542;--white:#fff;--ink:#1F2A37;--muted:#637083;--line:#dfe7ef;--page:#f5f8fb}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}main{width:min(600px,100%);margin:0 auto;padding:28px 16px 42px}.header{text-align:center}.logo{display:block;width:min(170px,55vw);height:auto;margin:0 auto 6px}.brand-name{font-size:.82rem;color:var(--muted);font-weight:700;letter-spacing:.04em}.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:20px;box-shadow:0 8px 24px rgba(31,42,55,.06)}h1{font-size:clamp(1.8rem,7vw,2.5rem);line-height:1.1;text-align:center;margin:18px 0 12px;color:var(--ink)}.badge{display:block;width:max-content;margin:0 auto 12px;background:var(--teal);color:#fff;border-radius:999px;padding:5px 12px;font-size:.74rem;font-weight:800;letter-spacing:.08em}.intro{text-align:center;color:var(--muted);margin:0 auto;max-width:520px}.order-card{margin-top:20px}.order-card h2,.next h2,.trust h2{font-size:1.12rem;margin:0 0 12px}.order-row{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding:10px 0;font-size:.94rem}.order-row span{color:var(--muted)}.order-row strong{text-align:right}.next{margin-top:24px}.check{display:flex;gap:10px;margin:12px 0;color:var(--ink);font-size:.94rem}.check b{color:var(--teal);font-size:1.2rem;line-height:1}.note{font-size:.78rem;color:var(--muted);margin:14px 0 0}.policy{font-size:.9rem;color:var(--blue);font-weight:700;margin-top:18px}.agree{display:flex;gap:10px;align-items:flex-start;margin:22px 0 16px;font-size:.9rem}.agree input{margin-top:5px;accent-color:var(--blue)}button{border:0;border-radius:10px;min-height:50px;width:100%;padding:12px 16px;background:var(--blue);color:#fff;font-weight:800;font-size:1rem;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.secure{text-align:center;color:var(--muted);font-size:.75rem;margin:10px 0 0}.status{white-space:pre-wrap;background:#eef6fb;border-radius:10px;padding:12px;margin-top:14px;color:var(--ink)}.trust{margin-top:20px}.trust-top{display:flex;gap:14px;align-items:center}.avatar{width:58px;height:58px;object-fit:contain;border-radius:50%;border:1px solid var(--line);background:#fff}.trust p{margin:0;font-size:.9rem}.company{color:var(--muted);font-size:.76rem;margin-top:14px;line-height:1.65}.company a{color:var(--blue)}footer{text-align:center;color:var(--muted);font-size:.74rem;padding:0 16px 30px}@media(min-width:600px){main{padding-top:42px}}
+</style></head><body><main>
+<header class="header"><img class="logo" src="${logoUrl}" alt="Okinawa Private Tour"><div class="brand-name">${brandSmall}</div></header>
+<h1>Secure Your Booking</h1><span class="badge">NO CHARGE TODAY</span>
+<p class="intro">To confirm your reservation, PayPal will place a temporary authorization of ${amount} on your card. This is not a payment, and no money will be collected today.</p>
+<section class="card order-card"><h2>Booking details</h2><div class="order-row"><span>Booking reference</span><strong>${escapeHtml(row.short_code || row.paypal_order_id)}</strong></div>${guestLine}<div class="order-row"><span>Activity</span><strong>${escapeHtml(row.activity)}</strong></div><div class="order-row"><span>Date</span><strong>${escapeHtml(row.activity_date)}</strong></div>${headcountLine}<div class="order-row"><span>Temporary authorization — no charge today</span><strong>${amount}</strong></div></section>
+<section class="next"><h2>What happens next</h2><div class="check"><b>✓</b><span>If you join the ${tripWord} as scheduled, we release the full authorization on the same day. No payment is taken.</span></div><div class="check"><b>✓</b><span>If ${cancelActor} ${cancelVerb} because of weather or sea conditions, we release the full authorization.</span></div><div class="check"><b>✓</b><span>Only in the case of a late cancellation or no-show may we collect the applicable cancellation fee stated in our policy, up to the authorized amount.</span></div><p class="note">${extraNote}</p><p class="note">After we release the authorization, your bank may need a few days to remove the pending hold from your account.</p><a class="policy" href="${escapeHtml(brand.returnUrl)}#cancellation">View cancellation policy</a></section>
+<section class="card"><label class="agree"><input id="agree" type="checkbox"><span>I understand this is a temporary card authorization, not a payment today, and I agree to the cancellation policy.</span></label><button id="load-paypal" disabled>Continue securely with PayPal</button><p class="secure">No charge will be made today. · Securely processed by PayPal. Your card details are handled by PayPal and are never stored on this website.</p><div id="paypal-buttons"></div><div id="status" class="status" hidden></div></section>
+<section class="card trust"><h2>Who you're booking with</h2><div class="trust-top"><img class="avatar" src="${logoUrl}" alt="Okinawa Private Tour"><p>${trustLine}</p></div><p class="company">Bookings &amp; English support: ${supportName} · WhatsApp +81 70-8952-3968 · <a href="mailto:info@nice.okinawa">info@nice.okinawa</a><br>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p><p class="company"><a href="${escapeHtml(brand.returnUrl)}">${brandSmall}</a></p></section>
+</main><footer>© CATALINA JAPAN K.K. · Okinawa Private Tour</footer>
+<script>const cfg=${JSON.stringify(cfg)};const box=document.getElementById('status');const show=m=>{box.hidden=false;box.textContent=m};document.getElementById('agree').onchange=e=>document.getElementById('load-paypal').disabled=!e.target.checked;document.getElementById('load-paypal').onclick=()=>{if(!cfg.clientId){show('PayPal is not configured yet. Please contact us.');return}const s=document.createElement('script');s.src=cfg.paypalJsBase+'?client-id='+encodeURIComponent(cfg.clientId)+'&currency='+encodeURIComponent(cfg.currency)+'&intent=authorize';s.onload=render;s.onerror=()=>show('Failed to load PayPal. Please contact us.');document.head.appendChild(s)};function render(){paypal.Buttons({createOrder:()=>Promise.resolve(cfg.orderId),onApprove:async data=>{const r=await fetch('/api/paypal/authorize-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:data.orderID,accepted_policy:true,policy_version:cfg.policyVersion,idempotency_key:'authorize-'+data.orderID})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Authorization failed');show('Authorization confirmed — no charge today.\nAuthorization ID: '+d.paypal_authorization_id)},onError:e=>show('Authorization failed. Please contact us.\n'+(e&&e.message||e))}).render('#paypal-buttons')}</script></body></html>`);
+}
+
+async function legacyCustomerPageForOrder(request, env, orderId) {
+  const row = await getAuthorizationByOrder(env, orderId);
   if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
   const c = config(env);
   const brand = brandConfig(row.brand);
@@ -1081,7 +1157,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"> <input id="new-headcount" inputmode="numeric" placeholder="Guests (optional)"></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -1092,7 +1168,7 @@ document.getElementById('load').onclick = load;
 document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
-  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
+  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),headcount:document.getElementById('new-headcount').value,guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
   const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<a href="'+data.authorize_url+'">'+data.authorize_url+'</a>' : (data.error||'Failed');
 }
 async function load(){
@@ -1173,6 +1249,8 @@ async function handleRequest(request, env) {
       const orderId = url.searchParams.get("order");
       return orderId ? await customerPageForOrder(request, env, orderId) : customerPage(env);
     }
+    const shortCodeMatch = url.pathname.match(/^\/p\/([A-Z0-9]{6})$/i);
+    if (shortCodeMatch && request.method === "GET") return await customerPageForShortCode(request, env, shortCodeMatch[1].toUpperCase());
     if (url.pathname === "/payment/authorize-static" && request.method === "GET") return staticAuthorizePage();
     if (url.pathname === "/admin/paypal-authorizations" && request.method === "GET") return adminPage();
     if (url.pathname === "/api/paypal/client-config" && request.method === "GET") {
