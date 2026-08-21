@@ -338,8 +338,10 @@ async function createAdminOrder(request, env) {
   const amount = Number(body.amount);
   const currency = String(body.currency || "JPY").trim().toUpperCase();
   const brand = normalizeBrand(body.brand);
-  if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY") {
-    return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY"] }, { status: 400 });
+  const guestName = String(body.guest_name || "").trim().slice(0, 200);
+  const guestEmail = String(body.guest_email || "").trim().toLowerCase().slice(0, 320);
+  if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY" || (guestEmail && !/^\S+@\S+\.\S+$/.test(guestEmail))) {
+    return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY", "guest_name?", "guest_email?"] }, { status: 400 });
   }
   const localId = id("auth");
   const createdAt = nowIso();
@@ -356,10 +358,10 @@ async function createAdminOrder(request, env) {
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
      (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
-      paypal_create_response, policy_version, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      paypal_create_response, policy_version, guest_name, guest_email, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(localId, paypalOrder.id, brand, activity, activityDate, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
-    JSON.stringify(paypalOrder), c.policyVersion, createdAt, createdAt).run();
+    JSON.stringify(paypalOrder), c.policyVersion, guestName || null, guestEmail || null, createdAt, createdAt).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
   return json({ ok: true, local_authorization_id: localId, paypal_order_id: paypalOrder.id,
     authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`, brand });
@@ -608,6 +610,7 @@ async function storeAuthorizedOrder(env, row, orderId, paypalAuth) {
     event_status: authorization.status || paypalAuth.status,
     payload: paypalAuth
   });
+  await notifyInfoOnce(env, { ...row, authorization_status: "AUTHORIZED", paypal_authorization_id: authorizationId }, "AUTHORIZED");
 
   return json({
     ok: true,
@@ -629,6 +632,7 @@ async function listAuthorizations(request, env) {
   }
   const rows = await env.DB.prepare(
     `SELECT id, paypal_order_id, paypal_authorization_id, brand, activity, activity_date, amount, currency,
+            guest_name, guest_email,
             authorization_status, paypal_status, authorization_create_time, authorization_expiration_time,
             honor_period_ends_at, created_at, updated_at
      FROM paypal_authorizations
@@ -641,6 +645,7 @@ async function listAuthorizations(request, env) {
     const honorEnds = r.honor_period_ends_at ? new Date(r.honor_period_ends_at).getTime() : null;
     return {
       ...r,
+      authorize_url: `${config(env).workerOrigin || "https://activity.nice.okinawa"}/payment/authorize?order=${encodeURIComponent(r.paypal_order_id)}`,
       status_label: r.authorization_status === "AUTHORIZED" ? "AUTHORIZED – NOT CHARGED" : r.authorization_status,
       days_until_expiration: expiresAt ? Math.ceil((expiresAt - now) / 86400000) : null,
       in_honor_period: honorEnds ? now <= honorEnds : false,
@@ -655,6 +660,58 @@ async function previouslySucceeded(env, action, idempotencyKey) {
   return await env.DB.prepare(
     `SELECT * FROM payment_audit_log WHERE action = ? AND idempotency_key = ? AND result_status = 'SUCCESS' ORDER BY created_at DESC LIMIT 1`
   ).bind(action, idempotencyKey).first();
+}
+
+async function notifyInfoOnce(env, row, eventName) {
+  const idempotencyKey = `NOTIFY_${eventName}:${row.id}`;
+  if (await previouslySucceeded(env, `NOTIFY_${eventName}`, idempotencyKey)) return { ok: true, idempotent: true };
+  const amount = Number(row.amount || 0).toLocaleString("en-US");
+  const subject = `[${brandConfig(row.brand).name}] ${row.activity} · ${row.activity_date} · ${row.currency} ${amount} · ${eventName}`;
+  const text = [
+    `Authorization event: ${eventName}`,
+    `Activity: ${row.activity}`,
+    `Brand: ${brandConfig(row.brand).name}`,
+    `Date: ${row.activity_date}`,
+    `Amount: ${row.currency} ${amount}`,
+    `Status: ${row.authorization_status || ""}`,
+    "",
+    "Admin: https://fishing.nice.okinawa/admin/paypal-authorizations"
+  ].join("\n");
+  if (!env.RESEND_API_KEY) {
+    await audit(env, { authorization_id: row.id, action: `NOTIFY_${eventName}`, actor: "system", idempotency_key: idempotencyKey, request_payload: { eventName }, response_payload: { error: "RESEND_API_KEY missing" }, result_status: "FAILED" });
+    return { ok: false, error: "RESEND_API_KEY_MISSING" };
+  }
+  let responsePayload = {};
+  let resultStatus = "FAILED";
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({ from: "noreply@nice.okinawa", to: ["info@nice.okinawa"], subject, text })
+    });
+    responsePayload = await response.json().catch(() => ({}));
+    resultStatus = response.ok ? "SUCCESS" : "FAILED";
+  } catch (error) {
+    responsePayload = { error: error.message || "RESEND_REQUEST_FAILED" };
+  }
+  await audit(env, { authorization_id: row.id, action: `NOTIFY_${eventName}`, actor: "system", idempotency_key: idempotencyKey, request_payload: { eventName, subject }, response_payload: responsePayload, result_status: resultStatus });
+  return { ok: resultStatus === "SUCCESS", response: responsePayload };
+}
+
+async function cancelAuthorization(request, env, authId) {
+  if (!requireAdmin(request, env)) return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const body = await readJson(request);
+  if (body.confirm !== true) return json({ ok: false, error: "SECOND_CONFIRMATION_REQUIRED" }, { status: 400 });
+  if (!body.idempotency_key) return json({ ok: false, error: "IDEMPOTENCY_KEY_REQUIRED" }, { status: 400 });
+  const existing = await previouslySucceeded(env, "CANCEL_AUTHORIZATION", body.idempotency_key);
+  if (existing) return json({ ok: true, idempotent: true, status: "CANCELLED" });
+  const row = await getAuthorizationById(env, authId);
+  if (!row) return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
+  if (row.authorization_status !== "ORDER_CREATED") return json({ ok: false, error: "AUTHORIZATION_NOT_CANCELLABLE", current_status: row.authorization_status }, { status: 409 });
+  await env.DB.prepare(`UPDATE paypal_authorizations SET authorization_status = ?, paypal_status = ?, updated_at = ? WHERE id = ?`).bind("CANCELLED", "CANCELLED", nowIso(), row.id).run();
+  await audit(env, { authorization_id: row.id, paypal_order_id: row.paypal_order_id, action: "CANCEL_AUTHORIZATION", actor: adminActor(request), idempotency_key: body.idempotency_key, request_payload: { confirm: true }, response_payload: { status: "CANCELLED" }, result_status: "SUCCESS" });
+  await insertEvent(env, { authorization_id: row.id, paypal_order_id: row.paypal_order_id, event_type: "ORDER_CANCELLED", event_status: "CANCELLED", payload: { source: "admin" } });
+  return json({ ok: true, status: "CANCELLED" });
 }
 
 async function voidAuthorization(request, env, authId) {
@@ -706,6 +763,7 @@ async function voidAuthorization(request, env, authId) {
     event_status: response.status || "VOIDED",
     payload: response
   });
+  await notifyInfoOnce(env, { ...row, authorization_status: "VOIDED / RELEASED" }, "RELEASED");
   return json({ ok: true, status: "VOIDED / RELEASED", paypal_response: response });
 }
 
@@ -773,6 +831,7 @@ async function captureAuthorization(request, env, authId) {
     event_status: response.status || nextStatus,
     payload: response
   });
+  await notifyInfoOnce(env, { ...row, authorization_status: nextStatus }, "CAPTURED");
   return json({ ok: true, status: nextStatus, paypal_response: response });
 }
 
@@ -856,6 +915,8 @@ async function handleWebhook(request, env) {
         event_status: resource.status || null,
         payload: body
       });
+      const notifyEvent = {"PAYMENT.AUTHORIZATION.CREATED":"AUTHORIZED","PAYMENT.AUTHORIZATION.VOIDED":"RELEASED","PAYMENT.CAPTURE.COMPLETED":"CAPTURED"}[eventType];
+      if (notifyEvent) await notifyInfoOnce(env, { ...row, authorization_status: statusMap[eventType] }, notifyEvent);
       processed = "PROCESSED";
     }
   }
@@ -1009,6 +1070,10 @@ function adminPage() {
     .status{color:#00b4c8;font-weight:800}
     .warn{color:#e4c06a}
     .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .terminal{opacity:.62;filter:grayscale(.7)}
+    .group-title{margin:28px 0 8px;color:#00b4c8}
+    .order-link{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;word-break:break-all}
+    .order-link a{color:#9feaf0}
     @media(max-width:760px){.meta{grid-template-columns:1fr}.actions{display:grid}}
   </style>
 </head>
@@ -1016,7 +1081,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -1027,32 +1092,40 @@ document.getElementById('load').onclick = load;
 document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
-  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
-  const data=await res.json(); document.getElementById('new-result').textContent=data.ok ? data.authorize_url : (data.error||'Failed');
+  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
+  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<a href="'+data.authorize_url+'">'+data.authorize_url+'</a>' : (data.error||'Failed');
 }
 async function load(){
   const res = await fetch('/api/admin/authorizations', {headers: headers()});
   const data = await res.json();
   if(!res.ok){ list.textContent = data.error || 'Failed'; return; }
-  list.innerHTML = data.authorizations.map(render).join('');
+  const rows=data.authorizations||[];
+  const authorized=rows.filter(r=>r.authorization_status==='AUTHORIZED').sort((a,b)=>(b.days_until_expiration??-Infinity)-(a.days_until_expiration??-Infinity));
+  const created=rows.filter(r=>r.authorization_status==='ORDER_CREATED');
+  const terminal=rows.filter(r=>!['AUTHORIZED','ORDER_CREATED'].includes(r.authorization_status));
+  list.innerHTML = group('AUTHORIZED',authorized,false)+group('ORDER_CREATED',created,false)+group('Released / Captured / Cancelled',terminal,true);
 }
+function group(title,rows,collapsed){ return rows.length ? '<h2 class="group-title">'+title+' ('+rows.length+')</h2>'+rows.map(r=>render(r)).join('') : ''; }
+function esc(value){ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function render(row){
-  return '<div class="row"><h2>'+row.activity+' <small>('+row.brand+')</small></h2>'+
+  const terminal=!['AUTHORIZED','ORDER_CREATED'].includes(row.authorization_status);
+  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? '<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\')">Capture Authorization</button>');
+  return '<div class="row '+(terminal?'terminal':'')+'"><h2>'+esc(row.activity)+' <small>· '+esc(row.brand)+' · '+esc(row.guest_name||'Guest name not provided')+'</small></h2>'+
     '<div class="meta">'+
-    '<div>Status: <span class="status">'+row.status_label+'</span></div>'+
-    '<div>Amount: '+row.currency+' '+Number(row.amount).toLocaleString('en-US')+'</div>'+
-    '<div>Date: '+row.activity_date+'</div>'+
-    '<div>Authorization: '+(row.paypal_authorization_id||'-')+'</div>'+
-    '<div>Expires: '+(row.authorization_expiration_time||'-')+'</div>'+
+    '<div>Status: <span class="status">'+esc(row.status_label)+'</span></div>'+
+    '<div>Amount: '+esc(row.currency)+' '+Number(row.amount).toLocaleString('en-US')+'</div>'+
+    '<div>Date: '+esc(row.activity_date)+'</div>'+
+    '<div>Created: '+esc(row.created_at||'-')+'</div>'+
+    '<div>Authorization: '+esc(row.paypal_authorization_id||'-')+'</div>'+
+    '<div>Expires: '+esc(row.authorization_expiration_time||'-')+'</div>'+
     '<div>Days left: '+(row.days_until_expiration ?? '-')+' '+(row.reminder ? '<span class="warn">'+row.reminder+'</span>' : '')+'</div>'+
     '<div>Honor period: '+(row.in_honor_period ? 'within first 3 days' : 'outside 3-day honor period')+'</div>'+
     '</div>'+
-    '<div class="actions">'+
-    '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button>'+
-    '<input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY">'+
-    '<button onclick="captureAuth(\\''+row.id+'\\')">Capture Authorization</button>'+
-    '</div></div>';
+    '<div class="order-link"><a href="'+esc(row.authorize_url)+'">'+esc(row.authorize_url)+'</a><button onclick="copyLink(\\''+esc(row.authorize_url)+'\\')">Copy link</button></div>'+
+    '<div class="actions">'+actions+'</div></div>';
 }
+async function copyLink(link){ try{await navigator.clipboard.writeText(link); alert('Link copied');}catch(e){alert(link);} }
+async function cancelAuth(id){ if(!confirm('Cancel this ORDER_CREATED order? No PayPal call will be made.')) return; const key='cancel-'+id+'-'+crypto.randomUUID(); const res=await fetch('/api/admin/authorizations/'+id+'/cancel',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})}); alert(JSON.stringify(await res.json(),null,2)); load(); }
 async function releaseAuth(id){
   if(operationLocks.has('void-'+id)) return;
   if(!confirm('Release this authorization? This voids the authorization and does not charge the customer.')) return;
@@ -1125,6 +1198,8 @@ async function handleRequest(request, env) {
     if (url.pathname === "/api/admin/authorizations" && request.method === "GET") return await listAuthorizations(request, env);
     const voidMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/void$/);
     if (voidMatch && request.method === "POST") return await voidAuthorization(request, env, voidMatch[1]);
+    const cancelMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/cancel$/);
+    if (cancelMatch && request.method === "POST") return await cancelAuthorization(request, env, cancelMatch[1]);
     const captureMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/capture$/);
     if (captureMatch && request.method === "POST") return await captureAuthorization(request, env, captureMatch[1]);
     return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
