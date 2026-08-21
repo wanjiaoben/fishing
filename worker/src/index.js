@@ -1214,6 +1214,17 @@ async function customerPageForOrder(request, env, orderId) {
   } });
 }
 
+function customerReportOnlyHeaders() {
+  return "default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com https://*.sentry.io; style-src 'self' 'unsafe-inline' https://*.squarecdn.com; font-src 'self' data: https://*.squarecdn.com; img-src 'self' data: https:; report-uri /__csp-report";
+}
+
+function asCustomerReportOnly(response) {
+  const headers = new Headers(response.headers);
+  headers.set("content-security-policy-report-only", customerReportOnlyHeaders());
+  headers.delete("content-security-policy");
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 function adminPage() {
   return html(`<!doctype html>
 <html lang="en">
@@ -1333,7 +1344,7 @@ async function handleRequest(request, env) {
   try {
     if (url.pathname === "/payment/authorize" && request.method === "GET") {
       const orderId = url.searchParams.get("order");
-      return orderId ? await customerPageForOrder(request, env, orderId) : customerPage(env);
+      return orderId ? await customerPageForOrder(request, env, orderId) : asCustomerReportOnly(customerPage(env));
     }
     if (url.pathname.match(/^\/p\/[A-Za-z0-9]{6}$/) && request.method === "GET") {
       const row = await getAuthorizationByShortCode(env, url.pathname.split("/").pop().toUpperCase());

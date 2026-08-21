@@ -386,6 +386,9 @@ test("customer page uses report-only CSP and report endpoint is non-blocking", a
   assert.equal(page.headers.get("content-security-policy"), null);
   const report = await handleRequest(new Request("https://activity.nice.okinawa/__csp-report", { method: "POST", body: JSON.stringify({ "csp-report": { "blocked-uri": "https://example.test" } }) }), env());
   assert.equal(report.status, 204);
+  const generic = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize"), env());
+  assert.match(generic.headers.get("content-security-policy-report-only"), /report-uri \/__csp-report/);
+  assert.equal(generic.headers.get("content-security-policy"), null);
 });
 
 test("rendered customer HTML and external authorization script are syntactically valid", async () => {
