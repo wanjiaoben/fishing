@@ -371,5 +371,8 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
   assert.match(text, /pci-connect\.squareupsandbox\.com/);
+  assert.match(text, /script-src 'self' 'nonce-[a-f0-9]{32}'/);
+  assert.match(text, /<script nonce="[a-f0-9]{32}">/);
+  assert.doesNotMatch(text, /script-src[^;]*unsafe-inline/);
   assert.match(await (await adminPage()).text(), /Square: full capture only/);
 });

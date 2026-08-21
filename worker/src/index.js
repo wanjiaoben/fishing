@@ -1200,10 +1200,11 @@ async function customerPageForOrder(request, env, orderId) {
   const response = await customerPageForOrderLegacy(request, env, orderId);
   if (!response.headers.get("content-type")?.startsWith("text/html")) return response;
   const body = await response.text();
+  const nonce = crypto.randomUUID().replace(/-/g, "");
   const fixed = body.replace(
     /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
-    `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:">`
-  );
+    `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-${nonce}' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:">`
+  ).replace("<script>\nconst cfg=", `<script nonce="${nonce}">\nconst cfg=`);
   return html(fixed);
 }
 
