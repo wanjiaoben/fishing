@@ -932,9 +932,10 @@ async function handleWebhook(request, env) {
 function customerPage(env) {
   const c = config(env);
   return html(`<!doctype html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
   <meta charset="utf-8">
+  <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Authorize Card | Private Fishing Charter</title>
   <style>
@@ -975,7 +976,8 @@ function customerPage(env) {
       <span>I understand and agree to the authorization and cancellation policy.</span>
     </label>
     <button id="load-paypal" disabled>Continue to PayPal Authorization</button>
-    <div id="paypal-buttons"></div>
+    <div id="paypal-buttons" class="notranslate"></div>
+    <div id="paypal-card-buttons" class="notranslate"></div>
     <div id="status" class="status" hidden></div>
   </div>
 </main>
@@ -996,13 +998,15 @@ document.getElementById('load-paypal').addEventListener('click', async () => {
   if (!cfg.clientId) { show('PayPal sandbox client ID is not configured yet.'); return; }
   document.getElementById('load-paypal').disabled = true;
   const sdk = document.createElement('script');
-  sdk.src = cfg.paypalJsBase + '?client-id=' + encodeURIComponent(cfg.clientId) + '&currency=' + encodeURIComponent(cfg.currency) + '&intent=authorize';
-  sdk.onload = renderButtons;
+  sdk.src = cfg.paypalJsBase + '?client-id=' + encodeURIComponent(cfg.clientId) + '&currency=' + encodeURIComponent(cfg.currency) + '&intent=authorize&components=buttons&enable-funding=card';
+  sdk.onload = () => { renderButtons(); };
   sdk.onerror = () => show('Failed to load PayPal. Please contact us.');
+  setTimeout(() => show("Card form didn't load — use the PayPal button or open in Safari"), 8000);
   document.head.appendChild(sdk);
 });
 function renderButtons() {
-  paypal.Buttons({
+  let cardTimer;
+  const shared = {
     createOrder: async () => {
       const res = await fetch('/api/paypal/create-order', {
         method: 'POST',
@@ -1028,7 +1032,12 @@ function renderButtons() {
       show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: ' + result.paypal_authorization_id + '\\nExpiration: ' + result.authorization_expiration_time);
     },
     onError: (err) => show('Authorization failed. Please contact us.\\n' + (err && err.message ? err.message : err))
-  }).render('#paypal-buttons');
+  };
+  paypal.Buttons({...shared, fundingSource: paypal.FUNDING.PAYPAL, style: {color: 'gold'}}).render('#paypal-buttons');
+  paypal.Buttons({...shared, fundingSource: paypal.FUNDING.CARD, style: {color: 'gold'}, onClick: () => {
+    clearTimeout(cardTimer);
+    cardTimer = setTimeout(() => show("Card form didn't load — use the PayPal button or open in Safari"), 8000);
+  }}).render('#paypal-card-buttons');
 }
 </script>
 </body>
@@ -1044,11 +1053,12 @@ async function customerPageForOrder(request, env, orderId) {
     amount: row.amount, activity: row.activity, activityDate: row.activity_date, orderId, paypalJsBase: c.jsBase,
     brand: brand.key, brandName: brand.name, brandTitle: brand.title, brandAccent: brand.accent,
     brandBackground: brand.background, returnUrl: brand.returnUrl };
-  return html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(brand.title)} | ${escapeHtml(row.activity)}</title><style>:root{--accent:${brand.accent};--background:${brand.background}}body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--background);color:#fff;margin:0;line-height:1.6}main{max-width:760px;margin:auto;padding:32px 18px}.brand{color:var(--accent);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:24px}.fact{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}.fact strong{color:var(--accent)}.notice{background:rgba(200,164,74,.12);border:1px solid rgba(200,164,74,.35);border-radius:12px;padding:16px;margin:18px 0}button{background:#c8a44a;color:#06101d;border:0;border-radius:8px;padding:12px 16px;font-weight:800;min-height:46px}button:disabled{opacity:.45}.status{white-space:pre-wrap;background:rgba(0,0,0,.25);border-radius:8px;padding:12px;margin-top:18px}footer{max-width:760px;margin:auto;padding:0 18px 28px;color:rgba(255,255,255,.65)}footer a{color:var(--accent)}@media(max-width:520px){.fact{grid-template-columns:1fr}}</style></head><body><main><div class="card"><div class="brand">${escapeHtml(brand.name)}</div><h1>${escapeHtml(brand.title)}</h1><p>Your card will be authorized, not charged immediately.</p><div class="fact"><strong>Activity</strong><span>${escapeHtml(row.activity)}</span></div><div class="fact"><strong>Date</strong><span>${escapeHtml(row.activity_date)}</span></div><div class="fact"><strong>Authorized amount</strong><span>${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}</span></div><div class="notice"><p>Your card will be authorized for ${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}, but you will not be charged at this time.</p><p>The hold amount covers the charter fee plus any gear rental stated in your confirmation email. Nothing is charged unless you do not show up.</p><p>If you participate as scheduled, the authorization will be released.</p><p>If you cancel or do not attend, the applicable cancellation fee may be charged according to the cancellation policy you agreed to.</p><p>If the operator cancels due to weather or unsafe sea conditions, the authorization will be released without charge.</p></div><label><input id="agree" type="checkbox"> I understand and agree to the authorization and cancellation policy.</label><button id="load-paypal" disabled>Continue to PayPal Authorization</button><div id="paypal-buttons"></div><div id="status" class="status" hidden></div></div></main><footer><a href="${escapeHtml(brand.returnUrl)}">Return to ${escapeHtml(brand.name)}</a></footer><script>
+  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(brand.title)} | ${escapeHtml(row.activity)}</title><style>:root{--accent:${brand.accent};--background:${brand.background}}body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--background);color:#fff;margin:0;line-height:1.6}main{max-width:760px;margin:auto;padding:32px 18px}.brand{color:var(--accent);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:24px}.fact{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}.fact strong{color:var(--accent)}.notice{background:rgba(200,164,74,.12);border:1px solid rgba(200,164,74,.35);border-radius:12px;padding:16px;margin:18px 0}button{background:#c8a44a;color:#06101d;border:0;border-radius:8px;padding:12px 16px;font-weight:800;min-height:46px}button:disabled{opacity:.45}.status{white-space:pre-wrap;background:rgba(0,0,0,.25);border-radius:8px;padding:12px;margin-top:18px}footer{max-width:760px;margin:auto;padding:0 18px 28px;color:rgba(255,255,255,.65)}footer a{color:var(--accent)}@media(max-width:520px){.fact{grid-template-columns:1fr}}</style></head><body><main><div class="card"><div class="brand">${escapeHtml(brand.name)}</div><h1>${escapeHtml(brand.title)}</h1><p>Your card will be authorized, not charged immediately.</p><div class="fact"><strong>Activity</strong><span>${escapeHtml(row.activity)}</span></div><div class="fact"><strong>Date</strong><span>${escapeHtml(row.activity_date)}</span></div><div class="fact"><strong>Authorized amount</strong><span>${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}</span></div><div class="notice"><p>Your card will be authorized for ${escapeHtml(row.currency)} ${Number(row.amount).toLocaleString("en-US")}, but you will not be charged at this time.</p><p>The hold amount covers the charter fee plus any gear rental stated in your confirmation email. Nothing is charged unless you do not show up.</p><p>If you participate as scheduled, the authorization will be released.</p><p>If you cancel or do not attend, the applicable cancellation fee may be charged according to the cancellation policy you agreed to.</p><p>If the operator cancels due to weather or unsafe sea conditions, the authorization will be released without charge.</p></div><label><input id="agree" type="checkbox"> I understand and agree to the authorization and cancellation policy.</label><button id="load-paypal" disabled>Continue to PayPal Authorization</button><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><div id="status" class="status" hidden></div></div></main><footer><a href="${escapeHtml(brand.returnUrl)}">Return to ${escapeHtml(brand.name)}</a></footer><script>
 const cfg=${JSON.stringify(cfg)}; const box=document.getElementById('status'); const show=m=>{box.hidden=false;box.textContent=m};
 document.getElementById('agree').onchange=e=>document.getElementById('load-paypal').disabled=!e.target.checked;
-document.getElementById('load-paypal').onclick=()=>{const s=document.createElement('script');s.src=cfg.paypalJsBase+'?client-id='+encodeURIComponent(cfg.clientId)+'&currency='+encodeURIComponent(cfg.currency)+'&intent=authorize';s.onload=render;s.onerror=()=>show('Failed to load PayPal. Please contact us.');document.head.appendChild(s)};
-function render(){paypal.Buttons({createOrder:()=>Promise.resolve(cfg.orderId),onApprove:async data=>{const r=await fetch('/api/paypal/authorize-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:data.orderID,accepted_policy:true,policy_version:cfg.policyVersion,idempotency_key:'authorize-'+data.orderID})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Authorization failed');show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: '+d.paypal_authorization_id+'\\nExpiration: '+(d.authorization_expiration_time||''))},onError:e=>show('Authorization failed. Please contact us.\\n'+(e&&e.message||e))}).render('#paypal-buttons')}
+  let cardTimer;
+  document.getElementById('load-paypal').onclick=()=>{const s=document.createElement('script');s.src=cfg.paypalJsBase+'?client-id='+encodeURIComponent(cfg.clientId)+'&currency='+encodeURIComponent(cfg.currency)+'&intent=authorize&components=buttons&enable-funding=card';s.onload=render;s.onerror=()=>show('Failed to load PayPal. Please contact us.');setTimeout(()=>show("Card form didn't load — use the PayPal button or open in Safari"),8000);document.head.appendChild(s)};
+  function render(){const shared={createOrder:()=>Promise.resolve(cfg.orderId),onApprove:async data=>{clearTimeout(cardTimer);const r=await fetch('/api/paypal/authorize-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({order_id:data.orderID,accepted_policy:true,policy_version:cfg.policyVersion,idempotency_key:'authorize-'+data.orderID})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Authorization failed');show('AUTHORIZED – NOT CHARGED\\nAuthorization ID: '+d.paypal_authorization_id+'\\nExpiration: '+(d.authorization_expiration_time||''))},onError:e=>show('Authorization failed. Please contact us.\\n'+(e&&e.message||e))};paypal.Buttons({...shared,fundingSource:paypal.FUNDING.PAYPAL,style:{color:'gold'}}).render('#paypal-buttons');paypal.Buttons({...shared,fundingSource:paypal.FUNDING.CARD,style:{color:'gold'},onClick:()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>show("Card form didn't load — use the PayPal button or open in Safari"),8000)}}).render('#paypal-card-buttons')}
 </script></body></html>`);
 }
 
