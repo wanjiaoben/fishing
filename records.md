@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-21 | Codex | FISH-0821-02 补充 Chatan Amberjack trip report 的同日餐厅处理与 ATM 事实，价格改为 4 人总额 ¥166,000，并同步 llms.txt 摘要；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0821-01 新建 Chatan 全日 Amberjack trip report、列表页、两档无 EXIF WebP 图片；同步首页/套餐页入口、sitemap 与 llms.txt；待 PR 验收 |
 | 2026-08-21 | Codex | FISH-0820-10 在首页与英文套餐页价格表下新增 Included / Not included / Free on request 三段内容及 FAQPage 对应问答；Fishing licence 因待 Wan 确认未写入 |
 | 2026-08-21 | Codex | FISH-0820-08 全站价格改为五档 all-inclusive 套餐，首页与英文套餐页同步 FAQ/Offer JSON-LD、llms.txt 与协调口径；待 PR 合并后记录生产 merge SHA |
