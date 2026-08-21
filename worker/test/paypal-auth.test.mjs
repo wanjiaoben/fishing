@@ -335,6 +335,23 @@ test("ORDER_CREATED can be cancelled without calling PayPal, AUTHORIZED cannot",
   assert.equal((await blocked.json()).error, "AUTHORIZATION_NOT_CANCELLABLE");
 });
 
+test("admin can edit trip date only for active authorizations and writes audit", async () => {
+  const e = env({ rows: { byId: { id: "auth-date", paypal_order_id: "ORDER-DATE", activity_date: "2026-08-23", amount: 66000, currency: "JPY", authorization_status: "AUTHORIZED" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-date/date", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token", "x-admin-user": "Wan" },
+    body: JSON.stringify({ confirm: true, activity_date: "2026-08-24", idempotency_key: "date-auth-date" })
+  }), e);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).activity_date, "2026-08-24");
+  assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log")));
+  const terminal = env({ rows: { byId: { id: "auth-terminal", activity_date: "2026-08-23", authorization_status: "CANCELLED" } } });
+  const blocked = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-terminal/date", {
+    method: "POST", headers: { authorization: "Bearer admin-token", "content-type": "application/json" },
+    body: JSON.stringify({ confirm: true, activity_date: "2026-08-24", idempotency_key: "date-auth-terminal" })
+  }), terminal);
+  assert.equal(blocked.status, 409);
+});
+
 test("admin order list exposes guest fields, created time and activity-domain link", async () => {
   const e = env({ rows: { all: [{ id: "auth-1", paypal_order_id: "ORDER-1", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 66000, currency: "JPY", guest_name: "Guest", guest_email: "guest@example.com", authorization_status: "ORDER_CREATED", created_at: "2026-08-21T00:00:00Z" }] } });
   const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations", { headers: { authorization: "Bearer admin-token" } }), e);

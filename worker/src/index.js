@@ -854,6 +854,34 @@ async function cancelAuthorization(request, env, authId) {
   return json({ ok: true, status: "CANCELLED" });
 }
 
+async function editTripDate(request, env, authId) {
+  if (!requireAdmin(request, env)) return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const body = await readJson(request);
+  const activityDate = String(body.activity_date || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(activityDate)) return json({ ok: false, error: "INVALID_TRIP_DATE" }, { status: 400 });
+  if (!body.confirm || !body.idempotency_key) return json({ ok: false, error: "CONFIRMATION_REQUIRED" }, { status: 400 });
+  const existing = await previouslySucceeded(env, "EDIT_TRIP_DATE", body.idempotency_key);
+  if (existing) return json({ ok: true, idempotent: true, activity_date: activityDate });
+  const row = await getAuthorizationById(env, authId);
+  if (!row) return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
+  if (!["ORDER_CREATED", "AUTHORIZED"].includes(row.authorization_status)) {
+    return json({ ok: false, error: "TRIP_DATE_NOT_EDITABLE", current_status: row.authorization_status }, { status: 409 });
+  }
+  const previousDate = row.activity_date;
+  await env.DB.prepare(`UPDATE paypal_authorizations SET activity_date = ?, updated_at = ? WHERE id = ?`).bind(activityDate, nowIso(), row.id).run();
+  await audit(env, {
+    authorization_id: row.id,
+    paypal_order_id: row.paypal_order_id,
+    action: "EDIT_TRIP_DATE",
+    actor: adminActor(request),
+    idempotency_key: body.idempotency_key,
+    request_payload: { confirm: true, from: previousDate, to: activityDate },
+    response_payload: { activity_date: activityDate },
+    result_status: "SUCCESS"
+  });
+  return json({ ok: true, activity_date: activityDate, previous_activity_date: previousDate });
+}
+
 async function voidAuthorization(request, env, authId) {
   if (!requireAdmin(request, env)) {
     return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
@@ -1337,7 +1365,8 @@ function group(title,rows,collapsed){ return rows.length ? '<h2 class="group-tit
 function esc(value){ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function render(row){
   const terminal=!['AUTHORIZED','ORDER_CREATED'].includes(row.authorization_status);
-  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? '<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
+  const editDateButton = terminal ? '' : '<button onclick="editDate(\\''+row.id+'\\',\\''+esc(row.activity_date)+'\\')">Edit trip date</button>';
+  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? editDateButton+'<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? editDateButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : editDateButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
   return '<div class="row '+(terminal?'terminal':'')+'"><h2>'+esc(row.activity)+' <small>· '+esc(row.brand)+' · '+esc(row.guest_name||'Guest name not provided')+'</small></h2>'+
     '<div class="meta">'+
     '<div>Status: <span class="status">'+esc(row.status_label)+'</span></div>'+
@@ -1354,6 +1383,7 @@ function render(row){
 }
 async function copyLink(link){ try{await navigator.clipboard.writeText(link); alert('Link copied');}catch(e){alert(link);} }
 async function cancelAuth(id){ if(!confirm('Cancel this ORDER_CREATED order? No PayPal call will be made.')) return; const key='cancel-'+id+'-'+crypto.randomUUID(); const res=await fetch('/api/admin/authorizations/'+id+'/cancel',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})}); alert(JSON.stringify(await res.json(),null,2)); load(); }
+async function editDate(id,current){ const value=prompt('Trip date (YYYY-MM-DD)',current); if(!value||value===current||!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return; const key='date-'+id+'-'+value; const res=await fetch('/api/admin/authorizations/'+id+'/date',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,activity_date:value,idempotency_key:key})}); const data=await res.json(); alert(res.ok&&data.ok?'Trip date updated to '+value:(data.error||'Date update failed')); load(); }
 async function releaseAuth(id){
   if(operationLocks.has('void-'+id)) return;
   if(!confirm('Release this authorization? This voids the authorization and does not charge the customer.')) return;
@@ -1453,6 +1483,8 @@ async function handleRequest(request, env) {
     if (voidMatch && request.method === "POST") return await voidAuthorization(request, env, voidMatch[1]);
     const cancelMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/cancel$/);
     if (cancelMatch && request.method === "POST") return await cancelAuthorization(request, env, cancelMatch[1]);
+    const dateMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/date$/);
+    if (dateMatch && request.method === "POST") return await editTripDate(request, env, dateMatch[1]);
     const captureMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/capture$/);
     if (captureMatch && request.method === "POST") return await captureAuthorization(request, env, captureMatch[1]);
     return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
