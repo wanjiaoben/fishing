@@ -536,7 +536,7 @@ async function createOrderWithSandboxTestCard(request, env) {
   }, paypalOrder.id, paypalOrder);
 }
 
-async function authorizeOrder(request, env) {
+async function authorizeOrder(request, env, ctx) {
   const body = await readJson(request);
   const orderId = body.order_id;
   if (!orderId) {
@@ -572,10 +572,10 @@ async function authorizeOrder(request, env) {
     body: "{}"
   });
 
-  return await storeAuthorizedOrder(env, row, orderId, paypalAuth);
+  return await storeAuthorizedOrder(env, row, orderId, paypalAuth, ctx);
 }
 
-async function createSquarePayment(request, env) {
+async function createSquarePayment(request, env, ctx) {
   const body = await readJson(request);
   const orderId = String(body.order_id || "").trim();
   const sourceId = String(body.source_id || "").trim();
@@ -632,6 +632,7 @@ async function createSquarePayment(request, env) {
   });
   await insertEvent(env, { authorization_id: row.id, paypal_order_id: row.paypal_order_id, event_type: "SQUARE_PAYMENT_AUTHORIZED", event_status: payment.status, payload: response });
   await notifyInfoOnce(env, { ...row, provider: "square", square_payment_id: payment.id, authorization_status: "AUTHORIZED" }, "AUTHORIZED");
+  queueCustomerAuthorizationEmail(ctx, env, { ...row, provider: "square", square_payment_id: payment.id, authorization_status: "AUTHORIZED", authorization_expiration_time: expiration });
   return json({ ok: true, status: "AUTHORIZED", charged: false, message: "AUTHORIZED – NOT CHARGED", square_payment_id: payment.id, amount: row.amount, currency: row.currency, authorization_expiration_time: expiration, honor_period_ends_at: honorPeriod });
 }
 
@@ -661,7 +662,7 @@ function sandboxTestCardPaymentSource() {
   };
 }
 
-async function authorizeOrderWithSandboxTestCard(request, env) {
+async function authorizeOrderWithSandboxTestCard(request, env, ctx) {
   const c = config(env);
   if (c.paypalEnv !== "sandbox") {
     return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
@@ -696,10 +697,10 @@ async function authorizeOrderWithSandboxTestCard(request, env) {
     body: JSON.stringify({ payment_source: sandboxTestCardPaymentSource() })
   });
 
-  return await storeAuthorizedOrder(env, row, orderId, paypalAuth);
+  return await storeAuthorizedOrder(env, row, orderId, paypalAuth, ctx);
 }
 
-async function storeAuthorizedOrder(env, row, orderId, paypalAuth) {
+async function storeAuthorizedOrder(env, row, orderId, paypalAuth, ctx) {
   const authorization = paypalAuth.purchase_units?.[0]?.payments?.authorizations?.[0] || {};
   const authorizationId = authorization.id;
   if (!authorizationId) {
@@ -750,6 +751,7 @@ async function storeAuthorizedOrder(env, row, orderId, paypalAuth) {
     payload: paypalAuth
   });
   await notifyInfoOnce(env, { ...row, authorization_status: "AUTHORIZED", paypal_authorization_id: authorizationId }, "AUTHORIZED");
+  queueCustomerAuthorizationEmail(ctx, env, { ...row, authorization_status: "AUTHORIZED", paypal_authorization_id: authorizationId, authorization_expiration_time: expiration });
 
   return json({
     ok: true,
@@ -800,6 +802,82 @@ async function previouslySucceeded(env, action, idempotencyKey) {
   return await env.DB.prepare(
     `SELECT * FROM payment_audit_log WHERE action = ? AND idempotency_key = ? AND result_status = 'SUCCESS' ORDER BY created_at DESC LIMIT 1`
   ).bind(action, idempotencyKey).first();
+}
+
+function authorizationPolicyUrl(row) {
+  return brandConfig(row.brand).key === "snorkel"
+    ? "https://snorkel.nice.okinawa/#how-booking-works"
+    : "https://fishing.nice.okinawa/#booking";
+}
+
+async function sendResendEmail(env, payload) {
+  if (!env.RESEND_API_KEY) throw new Error("RESEND_API_KEY_MISSING");
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { authorization: "Bearer " + env.RESEND_API_KEY, "content-type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const responsePayload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error("RESEND_" + response.status);
+    error.responsePayload = responsePayload;
+    throw error;
+  }
+  return responsePayload;
+}
+
+async function sendCustomerAuthorizationEmail(env, row) {
+  const recipient = String(row.guest_email || "").trim().toLowerCase();
+  const idempotencyKey = "CUSTOMER_AUTH_EMAIL:" + row.id;
+  if (!recipient) {
+    await audit(env, { authorization_id: row.id, action: "CUSTOMER_AUTH_EMAIL", actor: "system", idempotency_key: idempotencyKey, request_payload: { reason: "NO_CUSTOMER_EMAIL" }, response_payload: {}, result_status: "SKIPPED" });
+    return;
+  }
+  if (await previouslySucceeded(env, "CUSTOMER_AUTH_EMAIL", idempotencyKey)) return;
+  const amount = row.currency + " " + Number(row.amount || 0).toLocaleString("en-US");
+  const expiration = row.authorization_expiration_time ? new Date(row.authorization_expiration_time).toISOString().slice(0, 10) : "within 7 days";
+  const subject = "Authorization received · " + row.activity + " · " + row.activity_date;
+  const text = [
+    "Your card authorization has been received.",
+    "",
+    "Authorized amount: " + amount,
+    "Activity: " + row.activity,
+    "Trip date: " + row.activity_date,
+    "Authorization validity: until " + expiration + "; no charge is made during the first 7 days of the hold.",
+    "",
+    "This authorization is not the final booking confirmation. We will check the details and send a confirmation email. Please also reply to this email or message us on WhatsApp to let us know you completed this step.",
+    "",
+    "Cancellation policy: " + authorizationPolicyUrl(row),
+    "WhatsApp: +81 70-8952-3968",
+    "Email: info@nice.okinawa"
+  ].join("\n");
+  try {
+    const responsePayload = await sendResendEmail(env, { from: "noreply@nice.okinawa", to: [recipient], subject, text });
+    await audit(env, { authorization_id: row.id, action: "CUSTOMER_AUTH_EMAIL", actor: "system", idempotency_key: idempotencyKey, request_payload: { recipient, subject }, response_payload: responsePayload, result_status: "SUCCESS" });
+  } catch (error) {
+    const responsePayload = { error: error.message || "CUSTOMER_AUTH_EMAIL_FAILED", resend: error.responsePayload || null };
+    console.error("CUSTOMER_AUTH_EMAIL_FAILED", JSON.stringify({ authorization_id: row.id, recipient, error: responsePayload }));
+    await audit(env, { authorization_id: row.id, action: "CUSTOMER_AUTH_EMAIL", actor: "system", idempotency_key: idempotencyKey, request_payload: { recipient, subject }, response_payload: responsePayload, result_status: "FAILED" });
+    if (recipient !== "info@nice.okinawa") {
+      try {
+        await sendResendEmail(env, {
+          from: "noreply@nice.okinawa",
+          to: ["info@nice.okinawa"],
+          subject: "Customer authorization email failed · " + row.activity + " · " + row.activity_date,
+          text: "The authorization email to " + recipient + " failed.\n\nActivity: " + row.activity + "\nTrip date: " + row.activity_date + "\nAmount: " + amount + "\nAuthorization ID: " + row.id + "\nError: " + responsePayload.error
+        });
+      } catch (copyError) {
+        console.error("CUSTOMER_AUTH_EMAIL_COPY_FAILED", JSON.stringify({ authorization_id: row.id, error: copyError.message || String(copyError) }));
+      }
+    }
+  }
+}
+
+function queueCustomerAuthorizationEmail(ctx, env, row) {
+  const task = sendCustomerAuthorizationEmail(env, row).catch(error => {
+    console.error("CUSTOMER_AUTH_EMAIL_UNHANDLED", JSON.stringify({ authorization_id: row.id, error: error.message || String(error) }));
+  });
+  if (ctx?.waitUntil) ctx.waitUntil(task);
 }
 
 async function notifyInfoOnce(env, row, eventName) {
@@ -1416,7 +1494,7 @@ function staticAuthorizePage() {
   return html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PayPal Authorization</title></head><body><main style="font-family:system-ui;max-width:720px;margin:40px auto;padding:0 16px"><h1>PayPal Authorization</h1><p>This static page requires the PayPal Authorization Worker route. Open the Worker-backed URL <code>/payment/authorize</code> after sandbox deployment.</p><p><a href="/">Back to fishing.nice.okinawa</a></p></main></body></html>`);
 }
 
-async function handleRequest(request, env) {
+async function handleRequest(request, env, ctx) {
   const url = new URL(request.url);
   if (request.method === "OPTIONS") {
     return new Response(null, {
@@ -1477,9 +1555,9 @@ async function handleRequest(request, env) {
     if (url.pathname === "/api/paypal/create-order" && request.method === "POST") return await createOrder(request, env);
     if (url.pathname === "/api/admin/orders" && request.method === "POST") return await createAdminOrder(request, env);
     if (url.pathname === "/api/paypal/sandbox/create-authorize-test-card" && request.method === "POST") return await createOrderWithSandboxTestCard(request, env);
-    if (url.pathname === "/api/paypal/authorize-order" && request.method === "POST") return await authorizeOrder(request, env);
-    if (url.pathname === "/api/square/create-payment" && request.method === "POST") return await createSquarePayment(request, env);
-    if (url.pathname === "/api/paypal/sandbox/authorize-test-card" && request.method === "POST") return await authorizeOrderWithSandboxTestCard(request, env);
+    if (url.pathname === "/api/paypal/authorize-order" && request.method === "POST") return await authorizeOrder(request, env, ctx);
+    if (url.pathname === "/api/square/create-payment" && request.method === "POST") return await createSquarePayment(request, env, ctx);
+    if (url.pathname === "/api/paypal/sandbox/authorize-test-card" && request.method === "POST") return await authorizeOrderWithSandboxTestCard(request, env, ctx);
     if (url.pathname === "/api/paypal/webhook" && request.method === "POST") return await handleWebhook(request, env);
     if (url.pathname === "/api/admin/authorizations" && request.method === "GET") return await listAuthorizations(request, env);
     const voidMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/void$/);

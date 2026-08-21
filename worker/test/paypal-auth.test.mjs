@@ -380,18 +380,20 @@ test("authorization notification is audited and does not block payment when Rese
 
 test("Square create-payment uses delayed full authorization and short-code idempotency", async (t) => {
   const captured = [];
+  const waits = [];
   t.mock.method(globalThis, "fetch", async (url, init = {}) => {
     captured.push({ url: String(url), init });
     if (String(url).includes("connect.squareupsandbox.com/v2/payments")) {
       return Response.json({ payment: { id: "SQ-PAY-1", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-24T00:00:00Z" } });
     }
+    if (String(url).includes("api.resend.com/emails")) return Response.json({ id: "email-test" });
     throw new Error(`unexpected fetch ${url}`);
   });
-  const e = env({ rows: { byOrder: { id: "auth-square", paypal_order_id: "ORDER-SQ", short_code: "ABC123", activity: "Private Fishing Charter", activity_date: "2026-08-24", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: "fishing-paypal-auth-v2026-08-20", brand: "fishing" } } });
+  const e = env({ env: { RESEND_API_KEY: "test-resend-key" }, rows: { byOrder: { id: "auth-square", paypal_order_id: "ORDER-SQ", short_code: "ABC123", guest_email: "sandbox@example.test", activity: "Private Fishing Charter", activity_date: "2026-08-24", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: "fishing-paypal-auth-v2026-08-20", brand: "fishing" } } });
   const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
     method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ order_id: "ORDER-SQ", source_id: "cnon:test", accepted_policy: true, policy_version: "fishing-paypal-auth-v2026-08-20" })
-  }), e);
+  }), e, { waitUntil(promise) { waits.push(promise); } });
   const data = await response.json();
   assert.equal(response.status, 200);
   assert.equal(data.status, "AUTHORIZED");
@@ -403,6 +405,12 @@ test("Square create-payment uses delayed full authorization and short-code idemp
   assert.equal(payload.amount_money.amount, 66000);
   assert.equal(payload.idempotency_key, "ABC123");
   assert.equal(call.init.headers["idempotency-key"], "ABC123");
+  await Promise.all(waits);
+  const customerMail = captured.find(entry => String(entry.url).includes("api.resend.com/emails") && JSON.parse(entry.init.body).to[0] === "sandbox@example.test");
+  assert.ok(customerMail);
+  assert.match(JSON.parse(customerMail.init.body).text, /Authorized amount: JPY 66,000/);
+  assert.match(JSON.parse(customerMail.init.body).text, /This authorization is not the final booking confirmation/);
+  assert.ok(e.DB.calls.some(entry => entry.sql.includes("payment_audit_log") && entry.values.includes("CUSTOMER_AUTH_EMAIL")));
 });
 
 test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {

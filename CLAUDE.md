@@ -1,5 +1,5 @@
-<!--WAN-CONSTITUTION-START version=v1.14-->
-# WAN Constitution v1.14
+<!--WAN-CONSTITUTION-START version=v1.15-->
+# WAN Constitution v1.15
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 设计背景参考:docs/REVIEW_2026-0707_SYSTEM_DESIGN.md;CC 开工前必读 rules/ANTI_PATTERNS.md。该引用为 v1.8 设计背景与执法清单,非新增宪法条文。
@@ -16,6 +16,16 @@ Evidence before Abstraction:任何抽象(共享模块/schema/generator/框架)�
 Needs pool 门禁:新条目必填 reuse/auto/compound 三布尔 + platform|product 标注。三否且未标 [一次性但必要] 者,默认不排期。
 
 二、红线条款
+
+### 支付与付费客人红线
+
+总红线:任何改动——无论大小、无论哪个仓——不得影响①已付费客人的学习使用、②支付系统收钱、③预授权系统。任一项受影响即 P0。每车发车回报必须显式写明“对三项零影响”,并附证据:付费账号回归、建单/下单探针、授权页铁律四项。
+
+海外客人支付红线:客人支付/授权页不得以只对部分国家开放的嵌入式组件(如 PayPal Advanced Card Fields)作为唯一卡付路径;卡付必须有一条不挑买家国家的通道。支付容器必须 `notranslate`。任何支付组件加载必须有超时兜底文案,不许静默转圈。发车前 CC 必须在日本实际点通页面上每一个支付按钮(改样式也算碰支付)。上线后第一位海外客人走通前由克劳德盯住,出问题当天修。
+
+支付页零回归铁律:凡触碰客人支付/授权页(文案、样式、版式、后台、路由、配置,不论多小)的车,发车前必做四项:①diff 限定在声明的文件,不碰未声明的 Worker 逻辑/路由/配置;②CC 用真实浏览器开生产或 preview 短链截图,PayPal 钮、卡付表单、引导文同屏可见;③无卡 POST 探测支付接口返业务 400(非 404/405),证明路由在;④发布后 10 分钟内复核生产一次。四项缺一不得宣布完成。
+
+附则:Worker 自有路径必须由单一常量表生成全部域名的路由,并有“每条路径 × 每个域”的测试断言(0821 四次漏路由的教训)。
 
 付费状态机:任何产生费用的操作必须且只能处于以下三态之一:①禁止:无有效授权,不得执行;②单次授权:Wan 明确授权一个具体付费动作,授权仅对该次动作有效,动作完成、取消或条件变化后立即回到禁止态;③额度预授权:Wan 明确指定服务、用途、额度上限和有效期,仅可在全部边界内执行,额度耗尽、到期或条件变化后立即回到禁止态。ElevenLabs 不超过 5000 credits 的授权归入额度预授权态。状态不明确时按禁止态处理。发信、联络客人不进入本状态机,一律禁止由 agent 执行。
 部署五步:分支 → 预览 → Wan 隐身验收 → merge → tag。永不直碰 main。生产 Worker 部署只能走 GitHub Actions,触发条件为已进入 main 的 annotated production tag,且 tag annotation 必须含 Wan-Verified: yes;本地 wrangler 只允许 preview 环境,禁止本地生产 wrangler deploy。
@@ -54,7 +64,6 @@ study 与 mogi（含模拟题预备池）题库内容必须永久不相交(disjo
 电子书权益命名 SOP:电子书权益 ID 格式为 book_<书名英文>-<语言>。语言段小写且必带:简体=zh,英文=en,繁中=tradition。书名英文固定为 script(台本),lipstick(润唇膏),480(480+ 去 + 号)。权益 ID 一经上线不可改名,改名即已购用户权限失效。
 Exit Rule:资产默认可删。每季度清点 shared 层资产:90天零引用移入 /deprecated/,保留一个版本周期后物理删除。Repo/Product 级退出由 Wan 单独裁决。FREEZE.md 覆盖区不适用。禁止以"历史兼容"为由无限期保留;确需兼容者写明截止日。
 (空位):留给盘点后确认的真全局项。
-
 <!--WAN-CONSTITUTION-END-->
 
 # CLAUDE.md — fishing.nice.okinawa
