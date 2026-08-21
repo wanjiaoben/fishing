@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { handleRequest, customerPage, adminPage } from "../src/index.js";
+import { AUTHORIZE_PAGE_SCRIPT } from "../src/authorize-page.js";
 
 function fakeDb(rows = {}) {
   const calls = [];
@@ -371,8 +372,19 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
   assert.match(text, /pci-connect\.squareupsandbox\.com/);
-  assert.match(text, /script-src 'self' 'nonce-[a-f0-9]{32}'/);
-  assert.match(text, /<script nonce="[a-f0-9]{32}">/);
+  assert.match(text, /script-src 'self' https:\/\/www\.paypal\.com/);
+  assert.doesNotMatch(text, /script-src[^;]*nonce-/);
   assert.doesNotMatch(text, /script-src[^;]*unsafe-inline/);
   assert.match(await (await adminPage()).text(), /Square: full capture only/);
+});
+
+test("rendered customer HTML and external authorization script are syntactically valid", async () => {
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SYNTAX"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-SYNTAX", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  const text = await page.text();
+  const scripts = [...text.matchAll(/<script(?![^>]*\bsrc=)(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
+  assert.equal(scripts.length, 0, "customer page must use the external authorization script");
+  assert.match(text, /<script src="\/assets\/authorize-page\.js" defer><\/script>/);
+  assert.doesNotThrow(() => new Function(AUTHORIZE_PAGE_SCRIPT));
 });

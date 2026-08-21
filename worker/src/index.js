@@ -1,3 +1,5 @@
+import { AUTHORIZE_PAGE_SCRIPT } from "./authorize-page.js";
+
 const PAYPAL_API = {
   sandbox: "https://api-m.sandbox.paypal.com",
   production: "https://api-m.paypal.com"
@@ -17,6 +19,7 @@ const SQUARE_JS = {
   sandbox: "https://sandbox.web.squarecdn.com/v1/square.js",
   production: "https://web.squarecdn.com/v1/square.js"
 };
+
 
 const WEBHOOK_EVENTS = new Set([
   "CHECKOUT.ORDER.APPROVED",
@@ -1200,11 +1203,12 @@ async function customerPageForOrder(request, env, orderId) {
   const response = await customerPageForOrderLegacy(request, env, orderId);
   if (!response.headers.get("content-type")?.startsWith("text/html")) return response;
   const body = await response.text();
-  const nonce = crypto.randomUUID().replace(/-/g, "");
+  const configMatch = body.match(/const cfg=(\{[\s\S]*?\}); const box=/);
+  const configJson = configMatch ? configMatch[1] : "{}";
   const fixed = body.replace(
     /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
-    `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-${nonce}' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:">`
-  ).replace("<script>\nconst cfg=", `<script nonce="${nonce}">\nconst cfg=`);
+    `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com; frame-src https://*.paypal.com https://*.paypalobjects.com https://*.squarecdn.com https://*.squareup.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://*.squareup.com https://*.squareupsandbox.com https://pci-connect.squareup.com https://pci-connect.squareupsandbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:">`
+  ).replace(/<script>[\s\S]*?<\/script>/, `<textarea id="authorize-config" hidden>${escapeHtml(configJson)}</textarea><script src="/assets/authorize-page.js" defer></script>`);
   return html(fixed);
 }
 
@@ -1334,6 +1338,9 @@ async function handleRequest(request, env) {
       return row ? await customerPageForOrder(request, env, row.paypal_order_id) : json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
     }
     if (url.pathname === "/payment/authorize-static" && request.method === "GET") return staticAuthorizePage();
+    if (url.pathname === "/assets/authorize-page.js" && request.method === "GET") {
+      return new Response(AUTHORIZE_PAGE_SCRIPT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "public, max-age=300" } });
+    }
     if (url.pathname === "/admin/paypal-authorizations" && request.method === "GET") return adminPage();
     if (url.pathname === "/api/paypal/client-config" && request.method === "GET") {
       const c = config(env);
