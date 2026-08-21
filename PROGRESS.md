@@ -10,3 +10,4 @@ T0706-24 WAN 宪法 v1.5 已同步到 CLAUDE.md；新增域名/API入口切换�
 
 T0707-14 WAN 宪法 v1.6 已同步到 CLAUDE.md，FREEZE.md 冻结区同步到仓库根目录；新增冻结区、任务三分类、CC 交付六栏规则。
 M0731-18 fishing 真提交验收补强：固定 `site=fishing` 与 `sourceSite=fishing.nice.okinawa`，并以自动测试保证仅后端成功后显示已收到。
+FISH-0821-HOTFIX-04 生产 Square 卡表单真实 Chromium 复验可渲染；补前端 stage 错误上报、`?debug=1` 明文诊断与 Square 字体 CSP 白名单，待 PR/Wan-Verified 发布。

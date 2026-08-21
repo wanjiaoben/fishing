@@ -23,6 +23,7 @@ function fakeDb(rows = {}) {
         },
         async first() {
           if (sql.includes("WHERE paypal_order_id")) return rows.byOrder || null;
+          if (sql.includes("WHERE short_code")) return rows.byShortCode || null;
           if (sql.includes("WHERE id = ? OR paypal_authorization_id")) return rows.byId || null;
           if (sql.includes("payment_audit_log")) return rows.audit || null;
           if (sql.includes("paypal_webhook_events")) return rows.webhook || null;
@@ -410,6 +411,7 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(AUTHORIZE_PAGE_SCRIPT, /debug.*URLSearchParams/);
   assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
   assert.match(page.headers.get("content-security-policy-report-only"), /d1g145x70srn7h\.cloudfront\.net/);
+  assert.match(page.headers.get("content-security-policy-report-only"), /cash-f\.squarecdn\.com/);
   assert.doesNotMatch(text, /http-equiv=["']Content-Security-Policy["']/i);
   assert.match(page.headers.get("content-security-policy-report-only"), /script-src 'self' https:\/\/www\.paypal\.com/);
   assert.doesNotMatch(text, /Content-Security-Policy/);
@@ -439,4 +441,19 @@ test("rendered customer HTML and external authorization script are syntactically
   assert.equal(scripts.length, 0, "customer page must use the external authorization script");
   assert.match(text, /<script src="\/assets\/authorize-page\.js" defer><\/script>/);
   assert.doesNotThrow(() => new Function(AUTHORIZE_PAGE_SCRIPT));
+});
+
+test("customer page passes short code into Square client diagnostics", async () => {
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/p/ABC123?debug=1"), env({ rows: {
+    byOrder: {
+      paypal_order_id: "ORDER-SHORT", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24",
+      amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+    },
+    byShortCode: {
+      paypal_order_id: "ORDER-SHORT", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24",
+      amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+    }
+  } }));
+  const text = await page.text();
+  assert.match(text, /&quot;shortCode&quot;:&quot;ABC123&quot;/);
 });
