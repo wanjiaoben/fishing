@@ -378,20 +378,82 @@ test("authorization notification is audited and does not block payment when Rese
   assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log") && call.values.includes("NOTIFY_AUTHORIZED")));
 });
 
+test("customer authorization email failures (500, timeout, invalid key) do not fail authorization and notify info", async (t) => {
+  const scenarios = [
+    ["500", () => Response.json({ message: "upstream failure" }, { status: 500 })],
+    ["timeout", () => { throw new Error("network timeout"); }],
+    ["invalid key", () => Response.json({ message: "invalid api key" }, { status: 401 })]
+  ];
+  let resendFailure;
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    const target = String(url);
+    if (target.includes("connect.squareupsandbox.com/v2/payments")) {
+      return Response.json({ payment: { id: "SQ-FAIL-MAIL", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-28T00:00:00Z" } });
+    }
+    if (target.includes("api.resend.com/emails")) {
+      const payload = JSON.parse(init.body);
+      captured.push(payload);
+      if (payload.to?.[0] === "delivered@resend.dev") return resendFailure();
+      return Response.json({ id: "failure-copy-email" });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+
+  for (const [label, failure] of scenarios) {
+    captured.length = 0;
+    resendFailure = failure;
+    const waits = [];
+    const e = env({
+      env: { RESEND_API_KEY: "test-resend-key" },
+      rows: { byOrder: {
+        id: `auth-mail-${label.replaceAll(" ", "-")}`,
+        paypal_order_id: `ORDER-MAIL-${label}`,
+        short_code: `MAIL${label.length}`,
+        guest_email: "delivered@resend.dev",
+        activity: "Private Fishing Charter",
+        activity_date: "2026-08-24",
+        amount: 100,
+        currency: "JPY",
+        authorization_status: "ORDER_CREATED",
+        policy_version: "fishing-paypal-auth-v2026-08-20",
+        brand: "fishing"
+      } }
+    });
+    const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ order_id: `ORDER-MAIL-${label}`, source_id: "cnon:test", accepted_policy: true, policy_version: "fishing-paypal-auth-v2026-08-20" })
+    }), e, { waitUntil(promise) { waits.push(promise); } });
+    assert.equal(response.status, 200, `${label}: authorization response must stay successful`);
+    assert.equal((await response.json()).status, "AUTHORIZED");
+    await Promise.all(waits);
+    const customerMail = captured.find(mail => mail.to[0] === "delivered@resend.dev");
+    const failureNotice = captured.find(mail => mail.to[0] === "info@nice.okinawa" && /failed/i.test(`${mail.subject || ""} ${mail.text || ""}`));
+    assert.ok(customerMail, `${label}: customer mail attempted`);
+    assert.ok(failureNotice, `${label}: info failure notice attempted`);
+    const auditValues = e.DB.calls.filter(call => call.sql.includes("payment_audit_log")).flatMap(call => call.values);
+    assert.ok(auditValues.includes("CUSTOMER_AUTH_EMAIL"), `${label}: customer email audit action`);
+    assert.ok(auditValues.includes("FAILED"), `${label}: failed email audit status`);
+  }
+});
+
 test("Square create-payment uses delayed full authorization and short-code idempotency", async (t) => {
   const captured = [];
+  const waits = [];
   t.mock.method(globalThis, "fetch", async (url, init = {}) => {
     captured.push({ url: String(url), init });
     if (String(url).includes("connect.squareupsandbox.com/v2/payments")) {
       return Response.json({ payment: { id: "SQ-PAY-1", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-24T00:00:00Z" } });
     }
+    if (String(url).includes("api.resend.com/emails")) return Response.json({ id: "email-test" });
     throw new Error(`unexpected fetch ${url}`);
   });
-  const e = env({ rows: { byOrder: { id: "auth-square", paypal_order_id: "ORDER-SQ", short_code: "ABC123", activity: "Private Fishing Charter", activity_date: "2026-08-24", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: "fishing-paypal-auth-v2026-08-20", brand: "fishing" } } });
+  const e = env({ env: { RESEND_API_KEY: "test-resend-key" }, rows: { byOrder: { id: "auth-square", paypal_order_id: "ORDER-SQ", short_code: "ABC123", guest_email: "sandbox@example.test", activity: "Private Fishing Charter", activity_date: "2026-08-24", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: "fishing-paypal-auth-v2026-08-20", brand: "fishing" } } });
   const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
     method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ order_id: "ORDER-SQ", source_id: "cnon:test", accepted_policy: true, policy_version: "fishing-paypal-auth-v2026-08-20" })
-  }), e);
+  }), e, { waitUntil(promise) { waits.push(promise); } });
   const data = await response.json();
   assert.equal(response.status, 200);
   assert.equal(data.status, "AUTHORIZED");
@@ -403,6 +465,12 @@ test("Square create-payment uses delayed full authorization and short-code idemp
   assert.equal(payload.amount_money.amount, 66000);
   assert.equal(payload.idempotency_key, "ABC123");
   assert.equal(call.init.headers["idempotency-key"], "ABC123");
+  await Promise.all(waits);
+  const customerMail = captured.find(entry => String(entry.url).includes("api.resend.com/emails") && JSON.parse(entry.init.body).to[0] === "sandbox@example.test");
+  assert.ok(customerMail);
+  assert.match(JSON.parse(customerMail.init.body).text, /Authorized amount: JPY 66,000/);
+  assert.match(JSON.parse(customerMail.init.body).text, /This authorization is not the final booking confirmation/);
+  assert.ok(e.DB.calls.some(entry => entry.sql.includes("payment_audit_log") && entry.values.includes("CUSTOMER_AUTH_EMAIL")));
 });
 
 test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {

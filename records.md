@@ -142,3 +142,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-03 追加④：集中公开路径表，补 activity/fishing 的 `/assets/*`、`/__csp-report`、`/__client-error`、`/__diag` Workers Routes；加入双域 × 路径断言与无 secret 诊断接口 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04：真实 Chromium 打开 `https://activity.nice.okinawa/p/E80E6F?debug=1` 已看到 Square 生产卡号框；补 `/__client-error` stage 上报与 debug 明文输出，未触发付款/未读 secret/未本地生产部署 | ✅ 测试通过，待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：确认 Square 前端提交 URL 为 `/api/square/create-payment`，生产路由漏 `/api/square/*`；已补两域路由与提交失败专用错误文案/`authorize-submit` 上报 | ✅ 本地测试通过，待 PR/Wan-Verified 发布 |
+| 2026-08-21 | Codex | FISH-0821-12：授权成功后以 waitUntil 异步发送客人确认邮件，失败写 audit/日志并通知 info@；CLAUDE.md 同步 wan-rules v1.15；未发送真实邮件、未部署生产 | ⏳ |
