@@ -396,6 +396,10 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(text, /sandbox\.web\.squarecdn\.com/);
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /Loading secure card form… this can take up to 20 seconds/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /Card form didn't load — use the PayPal button or open in Safari/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /}, 25000\)/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /clearTimeout\(squareTimeout\);[\s\S]*squareStatus\.textContent = 'Card details are handled securely by Square\.';[\s\S]*squareButton\.disabled = false;/);
   assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
   assert.match(page.headers.get("content-security-policy-report-only"), /d1g145x70srn7h\.cloudfront\.net/);
   assert.doesNotMatch(text, /http-equiv=["']Content-Security-Policy["']/i);
