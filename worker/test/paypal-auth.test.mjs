@@ -389,17 +389,25 @@ test("Square create-payment uses delayed full authorization and short-code idemp
 
 test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {
   const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SQ"), env({ rows: { byOrder: {
-    paypal_order_id: "ORDER-SQ", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+    paypal_order_id: "ORDER-SQ", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
   } }, env: { SQUARE_SANDBOX_APPLICATION_ID: "sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA", SQUARE_SANDBOX_LOCATION_ID: "L10P89476GMB8" } }));
   const text = await page.text();
   assert.match(text, /Pay by card \(Square\)/);
   assert.match(text, /sandbox\.web\.squarecdn\.com/);
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
+  assert.match(text, /ABC123/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /Loading secure card form… this can take up to 20 seconds/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /Card form didn't load — use the PayPal button or open in Safari/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /}, 25000\)/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /clearTimeout\(squareTimeout\);[\s\S]*squareStatus\.textContent = 'Card details are handled securely by Square\.';[\s\S]*squareButton\.disabled = false;/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /__client-error/);
+  for (const field of ["stage", "square_loaded", "appId", "locId", "ua", "shortCode"]) assert.match(AUTHORIZE_PAGE_SCRIPT, new RegExp(field));
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /sdk-load/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /payments-init/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /card-init/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /card-attach/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /debug.*URLSearchParams/);
   assert.match(page.headers.get("content-security-policy-report-only"), /pci-connect\.squareupsandbox\.com/);
   assert.match(page.headers.get("content-security-policy-report-only"), /d1g145x70srn7h\.cloudfront\.net/);
   assert.doesNotMatch(text, /http-equiv=["']Content-Security-Policy["']/i);
