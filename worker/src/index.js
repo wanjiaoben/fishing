@@ -1034,7 +1034,7 @@ function renderButtons() {
     onError: (err) => show('Authorization failed. Please contact us.\\n' + (err && err.message ? err.message : err))
   };
   paypal.Buttons({...shared, fundingSource: paypal.FUNDING.PAYPAL, style: {color: 'gold'}}).render('#paypal-buttons');
-  paypal.Buttons({...shared, fundingSource: paypal.FUNDING.CARD, style: {color: 'gold'}, onClick: () => {
+  paypal.Buttons({...shared, fundingSource: paypal.FUNDING.CARD, style: {color: 'black'}, onClick: () => {
     clearTimeout(cardTimer);
     cardTimer = setTimeout(() => show("Card form didn't load — use the PayPal button or open in Safari"), 8000);
   }}).render('#paypal-card-buttons');
