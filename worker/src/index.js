@@ -436,9 +436,13 @@ async function createAdminOrder(request, env) {
   const shortCode = makeShortCode();
   await env.DB.prepare(`UPDATE paypal_authorizations SET short_code = ? WHERE id = ?`).bind(shortCode, localId).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
+  const squareLimit = new Date();
+  squareLimit.setHours(0, 0, 0, 0);
+  squareLimit.setDate(squareLimit.getDate() + 7);
+  const squareLinkWarning = new Date(`${activityDate}T00:00:00Z`) > squareLimit;
   return json({ ok: true, local_authorization_id: localId, paypal_order_id: paypalOrder.id,
     authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`,
-    short_code: shortCode, short_url: `${c.workerOrigin || new URL(request.url).origin}/p/${shortCode}`, brand });
+    short_code: shortCode, short_url: `${c.workerOrigin || new URL(request.url).origin}/p/${shortCode}`, brand, square_link_warning: squareLinkWarning });
 }
 
 async function createOrderWithSandboxTestCard(request, env) {
@@ -603,7 +607,7 @@ async function createSquarePayment(request, env) {
       idempotency_key: shortCode,
       amount_money: { amount: Number(row.amount), currency: row.currency },
       autocomplete: false,
-      delay_duration: "P3D",
+      delay_duration: "P7D",
       delay_action: "CANCEL",
       location_id: c.squareLocationId,
       note: `${row.activity} ${row.activity_date}`
@@ -1266,8 +1270,9 @@ document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
   const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
-  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<div><a href="'+data.short_url+'">'+data.short_url+'</a> <button onclick="copyLink(\\''+data.short_url+'\\')">Copy link</button></div><div><small>Legacy link: '+data.authorize_url+'</small></div>' : (data.error||'Failed');
+  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<div><a href="'+data.short_url+'">'+data.short_url+'</a> <button onclick="copyLink(\\''+data.short_url+'\\')">Copy link</button></div><div><small>Legacy link: '+data.authorize_url+'</small></div>'+(data.square_link_warning?'<p class="warn">请在出发前 7 天内发链接</p>':'') : (data.error||'Failed');
 }
+document.getElementById('new-date').addEventListener('change',()=>{const value=document.getElementById('new-date').value;const limit=new Date();limit.setHours(0,0,0,0);limit.setDate(limit.getDate()+7);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}hint.textContent=value&&new Date(value+'T00:00:00')>limit?'请在出发前 7 天内发链接':''});
 async function load(){
   const res = await fetch('/api/admin/authorizations', {headers: headers()});
   const data = await res.json();

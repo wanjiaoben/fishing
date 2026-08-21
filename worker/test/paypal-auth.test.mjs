@@ -356,7 +356,7 @@ test("Square create-payment uses delayed full authorization and short-code idemp
   const call = captured[0];
   const payload = JSON.parse(call.init.body);
   assert.equal(payload.autocomplete, false);
-  assert.equal(payload.delay_duration, "P3D");
+  assert.equal(payload.delay_duration, "P7D");
   assert.equal(payload.amount_money.amount, 66000);
   assert.equal(payload.idempotency_key, "ABC123");
   assert.equal(call.init.headers["idempotency-key"], "ABC123");

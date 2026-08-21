@@ -130,3 +130,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 第三次 Console 修复：客户页脚本外置为 `worker/src/authorize-page.js`，加入 HTML 脚本语法门禁与 CI `node --check`；Sandbox Worker 版本 `0e29936c-a381-476e-aa8b-2e4a31a79414` | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02 CSP 定案：客人页改 HTTP `Content-Security-Policy-Report-Only`，`/__csp-report` 写 Worker 日志；Playwright Chromium 安装因 npm registry DNS 失败未完成 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02：补齐无订单 `/payment/authorize` 也返回 Report-Only CSP；Sandbox Worker 版本 `a437c315-5915-43fd-b662-bd877574cc71` | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02：Square delayed capture 改 P7D/CANCEL；后台日期超过今天+7天提示「请在出发前 7 天内发链接」；待 Sandbox 第二笔 Capture | ⏳ |
