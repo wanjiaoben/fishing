@@ -854,6 +854,34 @@ async function cancelAuthorization(request, env, authId) {
   return json({ ok: true, status: "CANCELLED" });
 }
 
+async function editTripDate(request, env, authId) {
+  if (!requireAdmin(request, env)) return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const body = await readJson(request);
+  const activityDate = String(body.activity_date || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(activityDate)) return json({ ok: false, error: "INVALID_TRIP_DATE" }, { status: 400 });
+  if (!body.confirm || !body.idempotency_key) return json({ ok: false, error: "CONFIRMATION_REQUIRED" }, { status: 400 });
+  const existing = await previouslySucceeded(env, "EDIT_TRIP_DATE", body.idempotency_key);
+  if (existing) return json({ ok: true, idempotent: true, activity_date: activityDate });
+  const row = await getAuthorizationById(env, authId);
+  if (!row) return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
+  if (!["ORDER_CREATED", "AUTHORIZED"].includes(row.authorization_status)) {
+    return json({ ok: false, error: "TRIP_DATE_NOT_EDITABLE", current_status: row.authorization_status }, { status: 409 });
+  }
+  const previousDate = row.activity_date;
+  await env.DB.prepare(`UPDATE paypal_authorizations SET activity_date = ?, updated_at = ? WHERE id = ?`).bind(activityDate, nowIso(), row.id).run();
+  await audit(env, {
+    authorization_id: row.id,
+    paypal_order_id: row.paypal_order_id,
+    action: "EDIT_TRIP_DATE",
+    actor: adminActor(request),
+    idempotency_key: body.idempotency_key,
+    request_payload: { confirm: true, from: previousDate, to: activityDate },
+    response_payload: { activity_date: activityDate },
+    result_status: "SUCCESS"
+  });
+  return json({ ok: true, activity_date: activityDate, previous_activity_date: previousDate });
+}
+
 async function voidAuthorization(request, env, authId) {
   if (!requireAdmin(request, env)) {
     return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
@@ -1254,10 +1282,19 @@ async function customerPageForOrder(request, env, orderId) {
     participants ? ["Participants", participants] : null,
     ["Temporary authorization — no charge today", amountText]
   ].filter(Boolean).map(([label, value]) => `<div class="order-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join("");
-  const statusBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Hold placed ✓ — we'll be in touch shortly</h1><p>We've placed a temporary hold of ${escapeHtml(amountText)} on your card for ${escapeHtml(displayActivity)} on ${escapeHtml(row.activity_date)}. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We'll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you've completed this step — it helps us move faster.</li><li>Once everything is confirmed, you'll receive our confirmation email. That email is your booking.</li><li>After the trip, the hold is released the same day (your bank may take a few days to show it).</li></ul><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
+  const terminalMessage = status === "VOIDED / RELEASED" || status === "RELEASED"
+    ? "This hold has been released — nothing was charged."
+    : status === "CAPTURED"
+      ? "This authorization was captured according to the cancellation policy."
+      : status === "CANCELLED"
+        ? "This booking authorization was cancelled — nothing was charged."
+        : "This authorization is no longer available for payment.";
+  const authorizedBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Hold placed ✓ — we'll be in touch shortly</h1><p>We've placed a temporary hold of ${escapeHtml(amountText)} on your card for ${escapeHtml(displayActivity)} on ${escapeHtml(row.activity_date)}. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We'll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you've completed this step — it helps us move faster.</li><li>Once everything is confirmed, you'll receive our confirmation email. That email is your booking.</li><li>After the trip, the hold is released the same day (your bank may take a few days to show it).</li></ul><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
+  const terminalBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Booking status</h1><p>${escapeHtml(terminalMessage)}</p><p>Activity: ${escapeHtml(displayActivity)} · ${escapeHtml(row.activity_date)}</p><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
+  const statusBody = status === "AUTHORIZED" ? authorizedBody : terminalBody;
   const formBody = `<main class="auth-page"><section class="auth-shell">${shellTop}<h1>Secure Your Booking</h1><div class="eyebrow">NO CHARGE TODAY</div><p class="lead">To confirm your reservation, PayPal or Square will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today.</p><div class="order-card">${orderRows}</div><section class="next"><h2>What happens next</h2><ul class="check-list"><li>Join the ${escapeHtml(tripNoun)} as scheduled and we release the full hold the same day. No payment is taken.</li><li>If ${escapeHtml(cancellationActor)} for weather or sea conditions, we release it in full.</li><li>Only a late cancellation or no-show may be charged, up to the hold amount, per our cancellation policy.</li></ul><p class="fine-print">${supportNote}</p><p class="fine-print">After release, your bank may take a few days to remove the pending hold.</p></section><label class="agree"><input id="agree" type="checkbox" data-legacy-policy-copy="I understand and agree to the authorization and cancellation policy"><span>I agree to the hold and the <a href="${escapeHtml(policyUrl)}" target="_blank" rel="noopener">cancellation policy</a></span></label><section class="pay-block"><h2>Pay securely</h2><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><p class="processor-note">Processed by PayPal. Your card details never touch our server.</p><p class="or-card">or pay by card below</p><div class="square notranslate"><h3>Pay by card (Square)</h3><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Place hold securely</button><p class="processor-note">Processed by Square. Your card details never touch our server.</p></div><div id="paypal-status" class="status" hidden></div><div id="status" class="status" hidden></div></section><section class="trust-card"><p>Every trip is run by a licensed local captain or guide we work with regularly.</p><p>Booking & English support: Wan · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p></section></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main><textarea id="authorize-config" hidden>${escapeHtml(JSON.stringify(cfg))}</textarea><script src="/assets/authorize-page.js" defer></script>`;
   const body = status === "ORDER_CREATED" ? formBody : statusBody;
-  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Secure your booking · ${escapeHtml(brand.name)}</title><style>${pageCss}</style></head><body>${body}</body></html>`, { headers: {
+  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Secure your booking · ${escapeHtml(brand.name)}</title><style>${pageCss}</style></head><body>${body}</body></html>`, { status: 200, headers: {
     "content-security-policy-report-only": customerReportOnlyHeaders()
   } });
 }
@@ -1302,7 +1339,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="Activity"> <input id="new-date" type="date"> <input id="new-amount" inputmode="numeric" placeholder="Amount JPY"></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -1331,7 +1368,8 @@ function group(title,rows,collapsed){ return rows.length ? '<h2 class="group-tit
 function esc(value){ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function render(row){
   const terminal=!['AUTHORIZED','ORDER_CREATED'].includes(row.authorization_status);
-  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? '<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : '<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
+  const editDateButton = terminal ? '' : '<button onclick="editDate(\\''+row.id+'\\',\\''+esc(row.activity_date)+'\\')">Edit trip date</button>';
+  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? editDateButton+'<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? editDateButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : editDateButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
   return '<div class="row '+(terminal?'terminal':'')+'"><h2>'+esc(row.activity)+' <small>· '+esc(row.brand)+' · '+esc(row.guest_name||'Guest name not provided')+'</small></h2>'+
     '<div class="meta">'+
     '<div>Status: <span class="status">'+esc(row.status_label)+'</span></div>'+
@@ -1348,6 +1386,7 @@ function render(row){
 }
 async function copyLink(link){ try{await navigator.clipboard.writeText(link); alert('Link copied');}catch(e){alert(link);} }
 async function cancelAuth(id){ if(!confirm('Cancel this ORDER_CREATED order? No PayPal call will be made.')) return; const key='cancel-'+id+'-'+crypto.randomUUID(); const res=await fetch('/api/admin/authorizations/'+id+'/cancel',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})}); alert(JSON.stringify(await res.json(),null,2)); load(); }
+async function editDate(id,current){ const value=prompt('Trip date (YYYY-MM-DD)',current); if(!value||value===current||!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return; const key='date-'+id+'-'+value; const res=await fetch('/api/admin/authorizations/'+id+'/date',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,activity_date:value,idempotency_key:key})}); const data=await res.json(); alert(res.ok&&data.ok?'Trip date updated to '+value:(data.error||'Date update failed')); load(); }
 async function releaseAuth(id){
   if(operationLocks.has('void-'+id)) return;
   if(!confirm('Release this authorization? This voids the authorization and does not charge the customer.')) return;
@@ -1447,6 +1486,8 @@ async function handleRequest(request, env) {
     if (voidMatch && request.method === "POST") return await voidAuthorization(request, env, voidMatch[1]);
     const cancelMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/cancel$/);
     if (cancelMatch && request.method === "POST") return await cancelAuthorization(request, env, cancelMatch[1]);
+    const dateMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/date$/);
+    if (dateMatch && request.method === "POST") return await editTripDate(request, env, dateMatch[1]);
     const captureMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/capture$/);
     if (captureMatch && request.method === "POST") return await captureAuthorization(request, env, captureMatch[1]);
     return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
