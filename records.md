@@ -125,3 +125,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-01 PayPal 卡入口补充 guest card funding、翻译保护与 8 秒兜底提示；待生产发布 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-08 trip report 渔获清单更新为 25 fish，并同步 title/description/OG/Article headline；待发布 | ⏳ |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-02：新增 Square Web Payments delayed authorization、短链、provider/square_payment_id、后台全额 Complete/Cancel、Sandbox 配置与回归测试；未注入 secret、未部署、未发起真实支付 | ⏳ |
+| 2026-08-21 | Codex | FISH-0821-HOTFIX-02 HOTFIX：补 Square/PayPal iframe CSP 主机白名单与客户页 provider 隔离；Sandbox Worker 版本 `addfcf26-716a-40f2-b851-a932e2d3d07e`，待 Wan 复测短链 | ⏳ |
