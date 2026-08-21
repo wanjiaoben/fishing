@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { handleRequest, customerPage, adminPage } from "../src/index.js";
 import { AUTHORIZE_PAGE_SCRIPT } from "../src/authorize-page.js";
 
@@ -54,6 +55,12 @@ function env(overrides = {}) {
     ...(overrides.env || {})
   };
 }
+
+test("production keeps both customer short-link routes", () => {
+  const toml = fs.readFileSync(new URL("../../wrangler.production.toml", import.meta.url), "utf8");
+  assert.match(toml, /pattern = "fishing\.nice\.okinawa\/p\/\*"/);
+  assert.match(toml, /pattern = "activity\.nice\.okinawa\/p\/\*"/);
+});
 
 test("customer page states authorization is not an immediate charge", async () => {
   const response = customerPage(env());
