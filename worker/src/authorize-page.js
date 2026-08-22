@@ -33,7 +33,8 @@ export const AUTHORIZE_PAGE_SCRIPT = `(() => {
     document.body.appendChild(debugBox);
   }
   const reportClientError = (stage, error) => {
-    const payload = { stage, err: String(error && (error.stack || error.message) || error), square_loaded: !!window.Square, appId: cfg.squareApplicationId || "", locId: cfg.squareLocationId || "", ua: navigator.userAgent, shortCode: cfg.shortCode || "" };
+    const errorText = String(error && (error.stack || error.message) || error);
+    const payload = { order_id: cfg.orderId || "", ts: new Date().toISOString(), stage, error: errorText, user_agent: navigator.userAgent, err: errorText, square_loaded: !!window.Square, appId: cfg.squareApplicationId || "", locId: cfg.squareLocationId || "", ua: navigator.userAgent, shortCode: cfg.shortCode || "" };
     const body = JSON.stringify(payload);
     if (debugBox) debugBox.textContent = body;
     fetch("/__client-error", { method: "POST", headers: { "content-type": "application/json" }, body, keepalive: true }).catch(() => {});

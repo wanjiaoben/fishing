@@ -24,12 +24,14 @@ function fakeDb(rows = {}) {
         async first() {
           if (sql.includes("WHERE paypal_order_id")) return rows.byOrder || null;
           if (sql.includes("WHERE short_code")) return rows.byShortCode || null;
+          if (sql.includes("WHERE id = ? LIMIT 1")) return rows.byAuthorizationId || null;
           if (sql.includes("WHERE id = ? OR paypal_authorization_id")) return rows.byId || null;
           if (sql.includes("payment_audit_log")) return rows.audit || null;
           if (sql.includes("paypal_webhook_events")) return rows.webhook || null;
           return null;
         },
         async all() {
+          if (sql.includes("client_error_events")) return { results: rows.clientErrors || [] };
           return { results: rows.all || [] };
         }
       };
@@ -493,7 +495,7 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(AUTHORIZE_PAGE_SCRIPT, /}, 25000\)/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /clearTimeout\(squareTimeout\);[\s\S]*squareStatus\.textContent = 'Card details are handled securely by Square\.';[\s\S]*squareButton\.disabled = false;/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /__client-error/);
-  for (const field of ["stage", "square_loaded", "appId", "locId", "ua", "shortCode"]) assert.match(AUTHORIZE_PAGE_SCRIPT, new RegExp(field));
+  for (const field of ["order_id", "ts", "stage", "error", "user_agent", "square_loaded", "appId", "locId", "ua", "shortCode"]) assert.match(AUTHORIZE_PAGE_SCRIPT, new RegExp(field));
   assert.match(AUTHORIZE_PAGE_SCRIPT, /sdk-load/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /payments-init/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /card-init/);
@@ -562,6 +564,34 @@ test("customer page passes short code into Square client diagnostics", async () 
   } }));
   const text = await page.text();
   assert.match(text, /&quot;shortCode&quot;:&quot;ABC123&quot;/);
+});
+
+test("client errors are persisted with order, timestamp, stage, error and user agent", async () => {
+  const e = env();
+  const response = await handleRequest(new Request("https://activity.nice.okinawa/__client-error", {
+    method: "POST",
+    headers: { "content-type": "application/json", "user-agent": "browser-test" },
+    body: JSON.stringify({ order_id: "ORDER-ERR", ts: "2026-08-22T01:02:03.000Z", stage: "card-attach", error: "attach failed", user_agent: "UA/test", shortCode: "ERR123" })
+  }), e);
+  assert.equal(response.status, 204);
+  const insert = e.DB.calls.find(call => call.sql.includes("INSERT INTO client_error_events"));
+  assert.ok(insert);
+  assert.deepEqual(insert.values.slice(1, 8), ["ORDER-ERR", "ERR123", "2026-08-22T01:02:03.000Z", "card-attach", "attach failed", "UA/test", insert.values[7]]);
+  assert.ok(e.DB.calls.some(call => call.sql.includes("DELETE FROM client_error_events") && call.values.length === 0));
+});
+
+test("admin order details expose client events in reverse chronological order", async () => {
+  const e = env({ rows: {
+    byAuthorizationId: { id: "auth-errors", paypal_order_id: "ORDER-ERR" },
+    clientErrors: [{ id: "evt-2", order_id: "ORDER-ERR", ts: "2026-08-22T02:00:00Z", stage: "card-attach", error: "boom", user_agent: "UA" }]
+  } });
+  const denied = await handleRequest(new Request("https://activity.nice.okinawa/api/admin/authorizations/auth-errors/client-errors"), e);
+  assert.equal(denied.status, 401);
+  const response = await handleRequest(new Request("https://activity.nice.okinawa/api/admin/authorizations/auth-errors/client-errors", { headers: { authorization: "Bearer admin-token" } }), e);
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.events[0].stage, "card-attach");
+  assert.match(await (await adminPage()).text(), /客户端事件/);
 });
 
 test("terminal customer short-link pages stay HTTP 200", async () => {
