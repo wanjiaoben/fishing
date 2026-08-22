@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-08-21
+- **最后更新**：2026-08-22
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-08-22 | Codex | FISH-0822-02 新增客户端错误 D1 落库（30 天清理）、后台订单客户端事件折叠区与诊断字段测试；生产 ¥100 PayPal 单待 Wan 提供/操作 admin token，未伪造订单或支付结果 |
 | 2026-08-21 | Codex | FISH-0821-04 将 PayPal 客人页路由扩展至 activity.nice.okinawa，新增订单 brand（fishing/snorkel）与品牌化客人页，保留 fishing 旧链接；待 Wan 完成 ¥100 snorkel 真浏览器授权与 Release 验收 |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 生产 Square 卡表单真浏览器复验可渲染；补 Square 前端 stage 错误上报、`?debug=1` 明文诊断、短码诊断字段与 Square 字体 CSP 白名单；待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：补两域 `/api/square/*` Worker 路由，Square 提交失败改显示 HTTP 状态码与服务端 message，并以 `authorize-submit` 上报 `/__client-error`；待 PR/Wan-Verified 发布 |
@@ -143,3 +144,4 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04：真实 Chromium 打开 `https://activity.nice.okinawa/p/E80E6F?debug=1` 已看到 Square 生产卡号框；补 `/__client-error` stage 上报与 debug 明文输出，未触发付款/未读 secret/未本地生产部署 | ✅ 测试通过，待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：确认 Square 前端提交 URL 为 `/api/square/create-payment`，生产路由漏 `/api/square/*`；已补两域路由与提交失败专用错误文案/`authorize-submit` 上报 | ✅ 本地测试通过，待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-12：授权成功后以 waitUntil 异步发送客人确认邮件，失败写 audit/日志并通知 info@；CLAUDE.md 同步 wan-rules v1.15；未发送真实邮件、未部署生产 | ⏳ |
+| 2026-08-22 | Codex | FISH-0822-02：客户端错误事件写入 `client_error_events`，按 30 天清理；后台按订单加载客户端事件；本地 27 项测试与脚本语法检查通过，待 PR/生产发布 | ⏳ |

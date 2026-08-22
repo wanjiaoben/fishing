@@ -99,6 +99,21 @@ async function readJson(request) {
   }
 }
 
+async function recordClientError(env, payload) {
+  const now = nowIso();
+  const orderId = String(payload?.order_id || "").trim().slice(0, 200) || null;
+  const shortCode = String(payload?.shortCode || payload?.short_code || "").trim().slice(0, 32) || null;
+  const ts = String(payload?.ts || now).slice(0, 64);
+  const stage = String(payload?.stage || "unknown").slice(0, 80);
+  const error = String(payload?.error || payload?.err || "unknown").slice(0, 4000);
+  const userAgent = String(payload?.user_agent || payload?.ua || "").slice(0, 1000) || null;
+  await env.DB.prepare(
+    `INSERT INTO client_error_events (id, order_id, short_code, ts, stage, error, user_agent, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(crypto.randomUUID(), orderId, shortCode, ts, stage, error, userAgent, now).run();
+  await env.DB.prepare("DELETE FROM client_error_events WHERE julianday(created_at) < julianday('now', '-30 days')").run();
+}
+
 function config(env) {
   const paypalEnv = env.PAYPAL_ENV === "production" ? "production" : "sandbox";
   return {
@@ -797,6 +812,22 @@ async function listAuthorizations(request, env) {
   return json({ ok: true, authorizations: data });
 }
 
+async function listClientErrors(request, env, authorizationId) {
+  if (!requireAdmin(request, env)) {
+    return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  }
+  const authorization = await env.DB.prepare("SELECT id, paypal_order_id FROM paypal_authorizations WHERE id = ? LIMIT 1").bind(authorizationId).first();
+  if (!authorization) return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
+  const rows = await env.DB.prepare(
+    `SELECT id, order_id, short_code, ts, stage, error, user_agent
+       FROM client_error_events
+      WHERE order_id = ?
+      ORDER BY ts DESC
+      LIMIT 100`
+  ).bind(authorization.paypal_order_id).all();
+  return json({ ok: true, events: rows.results || [] });
+}
+
 async function previouslySucceeded(env, action, idempotencyKey) {
   if (!idempotencyKey) return null;
   return await env.DB.prepare(
@@ -1413,6 +1444,10 @@ function adminPage() {
     .group-title{margin:28px 0 8px;color:#00b4c8}
     .order-link{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;word-break:break-all}
     .order-link a{color:#9feaf0}
+    .client-events{margin-top:12px;border-top:1px solid rgba(255,255,255,.12);padding-top:10px}
+    .client-events summary{cursor:pointer;color:#9feaf0}
+    .client-event{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);word-break:break-word}
+    .client-event small{color:rgba(255,255,255,.62)}
     @media(max-width:760px){.meta{grid-template-columns:1fr}.actions{display:grid}}
   </style>
 </head>
@@ -1464,9 +1499,23 @@ function render(row){
     honorPeriodLine+
     '</div>'+
     '<div class="order-link"><a href="'+esc(row.short_url||row.authorize_url)+'">'+esc(row.short_url||row.authorize_url)+'</a><button onclick="copyLink(\\''+esc(row.short_url||row.authorize_url)+'\\')">Copy link</button></div>'+
-    '<div class="actions">'+actions+'</div></div>';
+    '<div class="actions">'+actions+'</div>'+
+    '<details class="client-events" data-authorization-id="'+esc(row.id)+'"><summary>客户端事件</summary><div class="client-events-list">展开后加载</div></details></div>';
 }
 async function copyLink(link){ try{await navigator.clipboard.writeText(link); alert('Link copied');}catch(e){alert(link);} }
+document.addEventListener('toggle',function(event){
+  const details=event.target;
+  if(!details || details.tagName!=='DETAILS' || !details.open || details.dataset.loaded) return;
+  details.dataset.loaded='1';
+  const target=details.querySelector('.client-events-list');
+  fetch('/api/admin/authorizations/'+encodeURIComponent(details.dataset.authorizationId)+'/client-errors',{headers:headers()})
+    .then(r=>r.json().then(data=>({ok:r.ok,data})))
+    .then(({ok,data})=>{
+      if(!ok||!data.ok){target.textContent=data.error||'Failed to load client events';return;}
+      const events=data.events||[];
+      target.innerHTML=events.length?events.map(e=>'<div class="client-event"><b>'+esc(e.ts)+' · '+esc(e.stage)+'</b><div>'+esc(e.error)+'</div><small>UA: '+esc(e.user_agent||'-')+'</small></div>').join(''):'暂无客户端事件';
+    }).catch(error=>{target.textContent=error.message||'Failed to load client events';});
+},true);
 async function cancelAuth(id){ if(!confirm('Cancel this ORDER_CREATED order? No PayPal call will be made.')) return; const key='cancel-'+id+'-'+crypto.randomUUID(); const res=await fetch('/api/admin/authorizations/'+id+'/cancel',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})}); alert(JSON.stringify(await res.json(),null,2)); load(); }
 async function editDate(id,current){ const value=prompt('Trip date (YYYY-MM-DD)',current); if(!value||value===current||!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return; const key='date-'+id+'-'+value; const res=await fetch('/api/admin/authorizations/'+id+'/date',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,activity_date:value,idempotency_key:key})}); const data=await res.json(); alert(res.ok&&data.ok?'Trip date updated to '+value:(data.error||'Date update failed')); load(); }
 async function releaseAuth(id){
@@ -1530,8 +1579,13 @@ async function handleRequest(request, env, ctx) {
       return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
     }
     if (url.pathname === "/__client-error" && request.method === "POST") {
-      const report = await request.text();
-      console.log("CLIENT_ERROR", report.slice(0, 8000));
+      const report = await readJson(request);
+      try {
+        await recordClientError(env, report);
+      } catch (error) {
+        console.error("CLIENT_ERROR_D1_WRITE_FAILED", error?.message || error);
+      }
+      console.log("CLIENT_ERROR", JSON.stringify(report).slice(0, 8000));
       return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
     }
     if (url.pathname === "/__diag" && request.method === "GET") {
@@ -1564,6 +1618,8 @@ async function handleRequest(request, env, ctx) {
     if (url.pathname === "/api/paypal/sandbox/authorize-test-card" && request.method === "POST") return await authorizeOrderWithSandboxTestCard(request, env, ctx);
     if (url.pathname === "/api/paypal/webhook" && request.method === "POST") return await handleWebhook(request, env);
     if (url.pathname === "/api/admin/authorizations" && request.method === "GET") return await listAuthorizations(request, env);
+    const clientErrorsMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/client-errors$/);
+    if (clientErrorsMatch && request.method === "GET") return await listClientErrors(request, env, clientErrorsMatch[1]);
     const voidMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/void$/);
     if (voidMatch && request.method === "POST") return await voidAuthorization(request, env, voidMatch[1]);
     const cancelMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/cancel$/);
