@@ -258,6 +258,11 @@ test("admin list displays AUTHORIZED – NOT CHARGED and reminder fields", async
   assert.equal(data.authorizations[0].in_honor_period, true);
 });
 
+test("admin renderer omits Honor period for Square rows", async () => {
+  const text = await (await adminPage()).text();
+  assert.match(text, /row\.provider === 'square' \? ''/);
+});
+
 test("admin custom order endpoint is admin-only and fixes currency to JPY", async (t) => {
   const captured = [];
   t.mock.method(globalThis, "fetch", async (url, init = {}) => {
@@ -505,6 +510,17 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.doesNotMatch(text, /Content-Security-Policy/);
   assert.doesNotMatch(text, /script-src[^;]*unsafe-inline/);
   assert.match(await (await adminPage()).text(), /Square: full capture only/);
+});
+
+test("customer page hides Square when the trip is more than seven days away", async () => {
+  const future = new Date(Date.now() + (8 * 86400000)).toISOString().slice(0, 10);
+  const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-FUTURE"), env({ rows: { byOrder: {
+    paypal_order_id: "ORDER-FUTURE", short_code: "FUTURE", brand: "fishing", activity: "Charter", activity_date: future, amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+  } } }));
+  const text = await page.text();
+  assert.match(text, /Pay securely/);
+  assert.doesNotMatch(text, /Pay by card \(Square\)/);
+  assert.match(text, /squareAvailable/);
 });
 
 test("customer page uses report-only CSP and report endpoint is non-blocking", async () => {
