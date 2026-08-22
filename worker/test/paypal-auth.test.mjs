@@ -498,6 +498,8 @@ test("Square customer section is independent of PayPal rendering and admin marks
   assert.match(AUTHORIZE_PAGE_SCRIPT, /payments-init/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /card-init/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /card-attach/);
+  assert.match(AUTHORIZE_PAGE_SCRIPT, /paypalCardBox\.hidden = true/);
+  assert.doesNotMatch(AUTHORIZE_PAGE_SCRIPT, /fundingSource: paypal\.FUNDING\.CARD/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /authorize-submit/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /HTTP ' \+ response\.status/);
   assert.match(AUTHORIZE_PAGE_SCRIPT, /Square authorization failed\.\\n/);
