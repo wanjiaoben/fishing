@@ -820,7 +820,7 @@ async function listClientErrors(request, env, authorizationId) {
   if (!authorization) return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
   const rows = await env.DB.prepare(
     `SELECT id, order_id, short_code, ts, stage, error, user_agent
-      FROM client_error_events
+       FROM client_error_events
       WHERE order_id = ?
         AND julianday(created_at) >= julianday('now', '-30 days')
       ORDER BY ts DESC
