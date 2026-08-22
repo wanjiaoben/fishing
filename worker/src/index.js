@@ -822,6 +822,7 @@ async function listClientErrors(request, env, authorizationId) {
     `SELECT id, order_id, short_code, ts, stage, error, user_agent
        FROM client_error_events
       WHERE order_id = ?
+        AND julianday(created_at) >= julianday('now', '-30 days')
       ORDER BY ts DESC
       LIMIT 100`
   ).bind(authorization.paypal_order_id).all();
