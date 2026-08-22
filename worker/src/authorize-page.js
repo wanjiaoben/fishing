@@ -6,6 +6,7 @@ export const AUTHORIZE_PAGE_SCRIPT = `(() => {
   const square = document.querySelector(".square");
   const squareStatus = document.getElementById("square-status");
   const squareButton = document.getElementById("square-pay");
+  const paypalCardBox = document.getElementById("paypal-card-buttons");
   const debugEnabled = new URLSearchParams(location.search).get("debug") === "1";
   const debugBox = debugEnabled ? document.createElement("pre") : null;
   const escapeHtml = value => String(value || "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -78,7 +79,7 @@ export const AUTHORIZE_PAGE_SCRIPT = `(() => {
       onError: error => { highlightSquare(); show("Authorization failed. Please use the card form below or contact us.\\n" + (error && error.message ? error.message : error)); }
     };
     paypal.Buttons({ ...shared, fundingSource: paypal.FUNDING.PAYPAL, style: { color: "gold" } }).render("#paypal-buttons");
-    paypal.Buttons({ ...shared, fundingSource: paypal.FUNDING.CARD, style: { color: "black" } }).render("#paypal-card-buttons");
+    if (paypalCardBox) paypalCardBox.hidden = true;
     if (debugEnabled) show("PayPal buttons ready.");
   }
   const loadSquare = () => {
