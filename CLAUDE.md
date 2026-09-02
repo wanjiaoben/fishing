@@ -1,8 +1,8 @@
-<!--WAN-CONSTITUTION-START version=v1.17-->
-# WAN Constitution v1.17
+<!--WAN-CONSTITUTION-START version=v1.19-->
+# WAN Constitution v1.19
 
-更新日期:2026-08-22
-Changelog:v1.17 新增“常设授权”小节,明确宪法同步、指令内验收动作与外网可审查交付的授权边界。
+更新日期:2026-09-02
+Changelog:v1.19 新增 I18N-SSOT 与 CONTENT-ISOLATION 两项原则;撤销 JST 05:00–09:00 固定生产发布窗口,改为每次高风险生产发布必须取得绑定 release identity 的 Wan 明示授权,其余 release 安全硬门保持不变。
 
 唯一源头:wan-rules 仓库。各 repo CLAUDE.md 中的宪法区间由脚本同步生成,禁止手改。修改仅限 Wan 本人确认,每次修改版本号 +1 并同步全部 repo。
 设计背景参考:docs/REVIEW_2026-0707_SYSTEM_DESIGN.md;CC 开工前必读 rules/ANTI_PATTERNS.md。该引用为 v1.8 设计背景与执法清单,非新增宪法条文。
@@ -48,8 +48,35 @@ Needs pool 门禁:新条目必填 reuse/auto/compound 三布尔 + platform|produ
 
 附则:Worker 自有路径必须由单一常量表生成全部域名的路由,并有“每条路径 × 每个域”的测试断言(0821 四次漏路由的教训)。
 
+### I18N-SSOT
+
+简体中文是所有站点“自然语言内容”的唯一母版(single source of truth)。英文、繁中、日文以及未来新增的其他语言,均为中文母版的派生翻译层,不得反向成为内容真源。
+
+I18N-SSOT 针对自然语言内容,包括标题、正文、产品说明、UI 文案、提示、FAQ、教学解释、gloss / usage / instruction / feedback、SEO 文案及其他用户可读语言内容。
+
+以下 language-neutral canonical facts 不属于“中文翻译母版”:stable ID、course / lesson / step / item ID、price 数值、日期/时间事实、answer identity、audio/video reference、entitlement identifier、progress identity、API contract 及其他结构化业务事实。
+
+正确技术分层目标为:①canonical facts(与语言无关的事实、身份、结构);②zh original(简体中文自然语言母版);③locale overlays(en / zh-Hant / ja / future locales);④UI dictionaries(各语言界面文案层)。
+
+自然语言内容变更必须遵循:中文母版修改 → 其他语言标记 NEEDS_SYNC → 从中文母版更新派生语言 → 检查漏翻 / 旧译文 / stale translation / key mismatch → 测试 → 发布。
+
+禁止只改英文而不回写中文母版;禁止让英文/日文等长期成为事实上的维护真源;禁止多语言页面分别手工演进且无同步检测;禁止因翻译方便复制另一套业务事实。现有历史系统暂未达到此架构者登记迁移债务,不得要求一次性全站重构,但所有新功能与新内容应向该目标收敛。KISO canonical + 中文 original + locale overlay 可作为首个实施样板,但本规则不依赖该实验是否完成。
+
+### CONTENT-ISOLATION
+
+文案、翻译、i18n 与展示层变化不得改变核心业务语义。内容层故障不得等价于业务层故障。
+
+内容/i18n 改动不得改变以下受保护业务域:支付逻辑、支付按钮启用条件、create-order 条件、登录、OTP、authentication、entitlement、membership state、refund / dispute state、progress identity、学习记录及其他核心业务状态机。
+
+文案、语言组件或 translation overlay 出现 translation key 缺失、locale 文件缺失、i18n helper 未初始化、翻译加载异常或 unsupported locale 时,允许的后果最多是 controlled fallback、明确受控错误状态、使用中文母版或既定 fallback locale。
+
+不得因此绕过付款前置条件、禁掉本来可用的支付功能、改变 entitlement、改变登录状态、清空 progress、让购买/学习主链 JS 整体中断,或 fail-open 暴露受保护内容。
+
+安全相关展示层故障仍必须遵守既有 fail-closed 契约;CONTENT-ISOLATION 不得被解释成“安全检查失败也继续放行”。其核心含义是内容层与业务层结构解耦,而不是降低安全门。
+
 付费状态机:任何产生费用的操作必须且只能处于以下三态之一:①禁止:无有效授权,不得执行;②单次授权:Wan 明确授权一个具体付费动作,授权仅对该次动作有效,动作完成、取消或条件变化后立即回到禁止态;③额度预授权:Wan 明确指定服务、用途、额度上限和有效期,仅可在全部边界内执行,额度耗尽、到期或条件变化后立即回到禁止态。ElevenLabs 不超过 5000 credits 的授权归入额度预授权态。状态不明确时按禁止态处理。发信、联络客人不进入本状态机,一律禁止由 agent 执行。
 部署五步:分支 → 预览 → Wan 隐身验收 → merge → tag。永不直碰 main。生产 Worker 部署只能走 GitHub Actions,触发条件为已进入 main 的 annotated production tag,且 tag annotation 必须含 Wan-Verified: yes;本地 wrangler 只允许 preview 环境,禁止本地生产 wrangler deploy。
+生产发布授权纪律:安全、支付、权益及其他高风险生产变更,生产发布前必须取得 Wan 对“该次具体发布”的明示授权;授权不限固定时段。授权至少应绑定 repository / system,以及 candidate SHA / main SHA / release tag / release identifier 中的足够信息,使其能够明确识别“Wan 授权的是哪一次发布”。若候选代码发生实质漂移(例如 main 前进、candidate SHA 改变、release 内容扩大、出现新的高风险 diff),不得自动沿用旧授权,必须重新核验授权范围。纯粹因 workflow retry 或同一 immutable candidate 的恢复操作是否可沿用原授权,按既有 release contract 判定并留证。发布回报必须记录 Wan 明示授权存在、授权对应的 release identity、实际部署 identity;相关仓库如使用 PROGRESS.md / release records,按现有机制同步留痕。取消固定发布时段绝不得解释为允许无授权发布或降低发布安全要求;required checks、Wan-Verified release provenance、annotated/immutable tag 契约、credential preflight、Atomic Release、production deploy gate、paid smoke、rollback anchor、fail-closed、release provenance 及其他现有安全硬门全部保持不变。触及鉴权、资源签名、CSP、限流或同类安全面的生产发布,发前仍必须留存 cctest 按追加验收清单全绿截图;发后 2 小时内每 30 分钟由 cctest 走 Part1 10 题并留证。任何学员路径(音频、图片、登录、购买)异常,先 revert/回退到上一稳定发布,再查根因,不得带病排查。一次安全发布只允许一种安全类别,禁止鉴权、签名、CSP、限流混合发车。
 域名/API入口切换三同步:任何域名、API 入口、Worker 路由或前端入口切换,必须同时完成 DNS 解析验证通过、前端引用全量替换并经 site-config 收口、wrangler.toml 路由固化;三者未齐禁止合并 main。
 冻结区改动红线:触碰 FREEZE.md 定义的冻结区即为高风险任务,必须单独任务、单独分支;指令必须列明允许修改的文件清单,清单外禁止改动。
 密钥零明文:密钥只进 wrangler secret / 环境变量,禁止出现在代码、配置文件、仓库、聊天记录明文中。
