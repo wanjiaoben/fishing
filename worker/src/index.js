@@ -69,6 +69,35 @@ function addDaysIso(inputIso, days) {
   return d.toISOString();
 }
 
+const DAY_MS = 86400000;
+
+function tripDateUtcMs(activityDate) {
+  const value = String(activityDate || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const parsed = Date.parse(`${value}T00:00:00Z`);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function todayUtcMs(now = new Date()) {
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+}
+
+function daysUntilTrip(activityDate, now = new Date()) {
+  const trip = tripDateUtcMs(activityDate);
+  if (trip === null) return null;
+  return Math.ceil((trip - todayUtcMs(now)) / DAY_MS);
+}
+
+function isSquareAllowedForTripDate(activityDate, now = new Date()) {
+  const days = daysUntilTrip(activityDate, now);
+  return days !== null && days <= 7;
+}
+
+function isPayPalLinkAllowedForTripDate(activityDate, now = new Date()) {
+  const days = daysUntilTrip(activityDate, now);
+  return days !== null && days <= 28;
+}
+
 function json(data, init = {}) {
   return new Response(JSON.stringify(data, null, 2), {
     ...init,
@@ -430,6 +459,9 @@ async function createAdminOrder(request, env) {
   if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY" || (guestEmail && !/^\S+@\S+\.\S+$/.test(guestEmail))) {
     return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY", "guest_name?", "guest_email?"] }, { status: 400 });
   }
+  if (!isPayPalLinkAllowedForTripDate(activityDate)) {
+    return json({ ok: false, error: "TRIP_DATE_TOO_FAR_FOR_PAYPAL_AUTH_LINK", message: "PayPal authorization is valid for 29 days. Please send the link within 28 days before the trip." }, { status: 400 });
+  }
   const localId = id("auth");
   const createdAt = nowIso();
   const orderKey = body.idempotency_key || id("admin_order");
@@ -452,10 +484,7 @@ async function createAdminOrder(request, env) {
   const shortCode = makeShortCode();
   await env.DB.prepare(`UPDATE paypal_authorizations SET short_code = ? WHERE id = ?`).bind(shortCode, localId).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
-  const squareLimit = new Date();
-  squareLimit.setHours(0, 0, 0, 0);
-  squareLimit.setDate(squareLimit.getDate() + 7);
-  const squareLinkWarning = new Date(`${activityDate}T00:00:00Z`) > squareLimit;
+  const squareLinkWarning = !isSquareAllowedForTripDate(activityDate);
   return json({ ok: true, local_authorization_id: localId, paypal_order_id: paypalOrder.id,
     authorize_url: `${c.workerOrigin || new URL(request.url).origin}/payment/authorize?order=${encodeURIComponent(paypalOrder.id)}`,
     short_code: shortCode, short_url: `${c.workerOrigin || new URL(request.url).origin}/p/${shortCode}`, brand, square_link_warning: squareLinkWarning });
@@ -597,6 +626,9 @@ async function createSquarePayment(request, env, ctx) {
   if (!orderId || !sourceId) return json({ ok: false, error: "ORDER_ID_AND_SOURCE_ID_REQUIRED" }, { status: 400 });
   const row = await getAuthorizationByOrder(env, orderId);
   if (!row) return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+  if (!isSquareAllowedForTripDate(row.activity_date)) {
+    return json({ ok: false, error: "SQUARE_UNAVAILABLE_FOR_TRIP_DATE", message: "Square card authorization is available only within 7 days before the trip." }, { status: 409 });
+  }
   if (body.accepted_policy !== true || body.policy_version !== row.policy_version) {
     return json({ ok: false, error: "POLICY_AGREEMENT_REQUIRED" }, { status: 400 });
   }
@@ -805,6 +837,9 @@ async function listAuthorizations(request, env) {
       short_url: r.short_code ? `${config(env).workerOrigin || "https://activity.nice.okinawa"}/p/${encodeURIComponent(r.short_code)}` : null,
       status_label: r.authorization_status === "AUTHORIZED" ? "AUTHORIZED – NOT CHARGED" : r.authorization_status,
       days_until_expiration: expiresAt ? Math.ceil((expiresAt - now) / 86400000) : null,
+      payment_method_label: (r.provider || "paypal").toUpperCase(),
+      authorization_expired: expiresAt ? expiresAt < now : false,
+      square_expired: (r.provider || "paypal") === "square" && expiresAt ? expiresAt < now : false,
       in_honor_period: honorEnds ? now <= honorEnds : false,
       reminder: expiresAt && expiresAt - now <= (3 * 86400000) ? "AUTHORIZATION_EXPIRING_SOON" : null
     };
@@ -1368,7 +1403,10 @@ async function customerPageForOrder(request, env, orderId) {
   const tripNoun = isSnorkel ? "tour" : "trip";
   const cancellationActor = isSnorkel ? "we cancel" : "the captain cancels";
   const amountText = `${row.currency} ${Number(row.amount).toLocaleString("en-US")}`;
-  const squareAvailable = !row.activity_date || Number.isNaN(Date.parse(row.activity_date)) || Date.parse(row.activity_date) <= Date.now() + (7 * 86400000);
+  const squareAvailable = isSquareAllowedForTripDate(row.activity_date);
+  const paymentLead = squareAvailable
+    ? `To confirm your reservation, PayPal or Square will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today.`
+    : `To confirm your reservation, PayPal will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today. PayPal authorization is valid for 29 days.`;
   const displayActivity = isSnorkel ? String(row.activity || "").replace(/fishing/gi, "marine activity") : row.activity;
   const policyUrl = isSnorkel ? "https://snorkel.nice.okinawa/#how-booking-works" : "https://fishing.nice.okinawa/#booking";
   const guestName = String(row.guest_name || "").trim();
@@ -1383,7 +1421,7 @@ async function customerPageForOrder(request, env, orderId) {
     squareApplicationId: c.squareApplicationId || "", squareLocationId: c.squareLocationId || "", squareJsBase: c.squareJsBase,
     shortCode, brand: brand.key, brandName: brand.name, brandTitle: brand.title, brandAccent: brand.accent,
     brandBackground: brand.background, returnUrl: brand.returnUrl };
-  const pageCss = `:root{--blue:#0060B4;--sky:#009CD8;--cyan:#00B4C0;--mint:#3CC090;--soft:#F2F8FA;--text:#1F2A37;--muted:#526170;--line:#D8E7EE;--card:#FFFFFF}*{box-sizing:border-box}body{margin:0;background:var(--soft);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.auth-page{max-width:600px;margin:0 auto;padding:22px 16px 28px}.auth-shell{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 18px 44px rgba(31,42,55,.08)}.top{text-align:center;margin-bottom:20px}.logo-text{font-weight:900;letter-spacing:.02em;color:var(--blue);font-size:1.1rem}.brand-sub{margin-top:4px;color:var(--muted);font-size:.88rem}.eyebrow{display:inline-flex;align-items:center;justify-content:center;margin:2px 0 14px;padding:6px 12px;border-radius:999px;background:rgba(60,192,144,.14);color:#13795b;font-size:.76rem;font-weight:900;letter-spacing:.08em}.auth-shell h1{margin:0 0 10px;text-align:center;color:var(--blue);font-size:2rem;line-height:1.12}.lead{margin:0 auto 18px;max-width:520px;text-align:center;color:#344353}.order-card,.trust-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}.order-row{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-top:1px solid #edf4f7}.order-row:first-child{border-top:0}.order-row strong{color:#526170;font-size:.84rem}.order-row span{text-align:right;font-weight:750}.next{margin:22px 0}.next h2,.pay-block h2{margin:0 0 12px;color:var(--text);font-size:1.2rem}.check-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}.check-list li{position:relative;padding-left:30px}.check-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--mint);font-weight:900}.fine-print{margin:12px 0 0;color:var(--muted);font-size:.9rem}.agree{display:flex;gap:10px;align-items:flex-start;margin:18px 0;color:#263443;font-weight:650}.agree input{margin-top:5px}.agree a,.notice-link{color:#00B4C0;text-decoration:underline;text-underline-offset:2px}.agree a:hover,.agree a:active,.notice-link:hover,.notice-link:active{color:#009CD8}.pay-block{margin-top:20px}.or-card{margin:10px 0 14px;text-align:center;color:var(--muted);font-size:.9rem}.square{border-top:1px solid var(--line);padding-top:18px;transition:background .2s,border-color .2s,box-shadow .2s}.square.square-highlight{background:rgba(0,180,192,.08);border:1px solid rgba(0,180,192,.35);border-radius:16px;padding:18px;box-shadow:0 0 0 4px rgba(0,180,192,.12)}.square h3{margin:0 0 8px;color:var(--text);font-size:1.05rem}.processor-note{margin:8px 0 12px;color:var(--muted);font-size:.86rem}.status{white-space:pre-wrap;background:#eef7fb;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;color:#264052}button{appearance:none;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:850;padding:13px 16px;min-height:48px}button:disabled{opacity:.5}.square button{margin-top:14px}.trust-card{color:#334155}.trust-card p{margin:8px 0}.footer{text-align:center;color:var(--muted);font-size:.82rem;margin:18px 0 0}.safe-close{color:var(--muted);font-size:.92rem}.booking-ref{font-weight:750}.confirmation-card h1{text-align:left}.status-pill{display:inline-flex;border-radius:999px;background:rgba(0,96,180,.1);color:var(--blue);font-weight:900;padding:7px 12px;font-size:.78rem;letter-spacing:.04em}@media(max-width:430px){.auth-page{padding:16px 12px}.auth-shell{padding:20px 16px;border-radius:18px}.auth-shell h1{font-size:1.75rem}.order-row{display:block}.order-row span{display:block;text-align:left;margin-top:2px}}`;
+  const pageCss = `:root{--blue:#0060B4;--sky:#009CD8;--cyan:#00B4C0;--mint:#3CC090;--soft:#F2F8FA;--text:#1F2A37;--muted:#526170;--line:#D8E7EE;--card:#FFFFFF}*{box-sizing:border-box}body{margin:0;background:var(--soft);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.auth-page{max-width:600px;margin:0 auto;padding:22px 16px 28px}.auth-shell{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 18px 44px rgba(31,42,55,.08)}.top{text-align:center;margin-bottom:20px}.logo-text{font-weight:900;letter-spacing:.02em;color:var(--blue);font-size:1.1rem}.brand-sub{margin-top:4px;color:var(--muted);font-size:.88rem}.eyebrow{display:inline-flex;align-items:center;justify-content:center;margin:2px 0 14px;padding:6px 12px;border-radius:999px;background:rgba(60,192,144,.14);color:#13795b;font-size:.76rem;font-weight:900;letter-spacing:.08em}.auth-shell h1{margin:0 0 10px;text-align:center;color:var(--blue);font-size:2rem;line-height:1.12}.lead{margin:0 auto 18px;max-width:520px;text-align:center;color:#344353}.order-card,.trust-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}.order-row{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-top:1px solid #edf4f7}.order-row:first-child{border-top:0}.order-row strong{color:#526170;font-size:.84rem}.order-row span{text-align:right;font-weight:750}.next{margin:22px 0}.next h2,.pay-block h2{margin:0 0 12px;color:var(--text);font-size:1.2rem}.check-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}.check-list li{position:relative;padding-left:30px}.check-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--mint);font-weight:900}.fine-print{margin:12px 0 0;color:var(--muted);font-size:.9rem}.agree{display:flex;gap:10px;align-items:flex-start;margin:18px 0;color:#263443;font-weight:650}.agree input{margin-top:5px}.agree a,.notice-link{color:#00B4C0;text-decoration:underline;text-underline-offset:2px}.agree a:hover,.agree a:active,.notice-link:hover,.notice-link:active{color:#009CD8}.pay-block{margin-top:20px}.payment-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.payment-options.paypal-only{grid-template-columns:1fr}.pay-option,.square{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.or-card{margin:10px 0 14px;text-align:center;color:var(--muted);font-size:.9rem}.square{transition:background .2s,border-color .2s,box-shadow .2s}.square.square-highlight{background:rgba(0,180,192,.08);border-color:rgba(0,180,192,.35);box-shadow:0 0 0 4px rgba(0,180,192,.12)}.square h3{margin:0 0 8px;color:var(--text);font-size:1.05rem}.processor-note{margin:8px 0 12px;color:var(--muted);font-size:.86rem}.status{white-space:pre-wrap;background:#eef7fb;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;color:#264052}button{appearance:none;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:850;padding:13px 16px;min-height:48px}button:disabled{opacity:.5}.square button{margin-top:14px}.trust-card{color:#334155}.trust-card p{margin:8px 0}.footer{text-align:center;color:var(--muted);font-size:.82rem;margin:18px 0 0}.safe-close{color:var(--muted);font-size:.92rem}.booking-ref{font-weight:750}.confirmation-card h1{text-align:left}.status-pill{display:inline-flex;border-radius:999px;background:rgba(0,96,180,.1);color:var(--blue);font-weight:900;padding:7px 12px;font-size:.78rem;letter-spacing:.04em}@media(max-width:620px){.payment-options{grid-template-columns:1fr}}@media(max-width:430px){.auth-page{padding:16px 12px}.auth-shell{padding:20px 16px;border-radius:18px}.auth-shell h1{font-size:1.75rem}.order-row{display:block}.order-row span{display:block;text-align:left;margin-top:2px}}`;
   const shellTop = `<div class="top"><div class="logo-text">Okinawa Private Tour</div><div class="brand-sub">${escapeHtml(brandLabel)}</div></div>`;
   const orderRows = [
     ["Booking reference", shortCode],
@@ -1403,8 +1441,9 @@ async function customerPageForOrder(request, env, orderId) {
   const authorizedBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Hold placed ✓ — we'll be in touch shortly</h1><p>We've placed a temporary hold of ${escapeHtml(amountText)} on your card for ${escapeHtml(displayActivity)} on ${escapeHtml(row.activity_date)}. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We'll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you've completed this step — it helps us move faster.</li><li>Once everything is confirmed, you'll receive our confirmation email. That email is your booking.</li><li>After the trip, the hold is released the same day (your bank may take a few days to show it).</li></ul><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
   const terminalBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Booking status</h1><p>${escapeHtml(terminalMessage)}</p><p>Activity: ${escapeHtml(displayActivity)} · ${escapeHtml(row.activity_date)}</p><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
   const statusBody = status === "AUTHORIZED" ? authorizedBody : terminalBody;
-  const squareBlock = squareAvailable ? '<p class="or-card">or pay by card below</p><div class="square notranslate"><h3>Pay by card (Square)</h3><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Place hold securely</button><p class="processor-note">Processed by Square. Your card details never touch our server.</p></div>' : '';
-  const formBody = `<main class="auth-page">${shellTop}<h1>Secure Your Booking</h1><div class="eyebrow">NO CHARGE TODAY</div><p class="lead">To confirm your reservation, PayPal or Square will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today.</p><div class="order-card">${orderRows}</div><section class="next"><h2>What happens next</h2><ul class="check-list"><li>Join the ${escapeHtml(tripNoun)} as scheduled and we release the full hold the same day. No payment is taken.</li><li>If ${escapeHtml(cancellationActor)} for weather or sea conditions, we release it in full.</li><li>Only a late cancellation or no-show may be charged, up to the hold amount, per our cancellation policy.</li></ul><p class="fine-print">${supportNote}</p><p class="fine-print">After release, your bank may take a few days to remove the pending hold.</p></section><label class="agree"><input id="agree" type="checkbox" data-legacy-policy-copy="I understand and agree to the authorization and cancellation policy"><span>I agree to the hold and the <a href="${escapeHtml(policyUrl)}" target="_blank" rel="noopener">cancellation policy</a></span></label><section class="pay-block"><h2>Pay securely</h2><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><p class="processor-note">Processed by PayPal. Your card details never touch our server.</p>${squareBlock}<div id="paypal-status" class="status" hidden></div><div id="status" class="status" hidden></div></section><section class="trust-card"><p>Every trip is run by a licensed local captain or guide we work with regularly.</p><p>Booking & English support: Wan · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main><textarea id="authorize-config" hidden>${escapeHtml(JSON.stringify({...cfg, squareAvailable}))}</textarea><script src="/assets/authorize-page.js" defer></script>`;
+  const squareBlock = squareAvailable ? '<div class="square notranslate"><h3>Pay by card (Square)</h3><p class="or-card">Card authorization is available within 7 days before the trip.</p><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Place hold securely</button><p class="processor-note">Processed by Square. Your card details never touch our server.</p></div>' : '';
+  const paymentOptionsClass = squareAvailable ? "payment-options" : "payment-options paypal-only";
+  const formBody = `<main class="auth-page">${shellTop}<h1>Secure Your Booking</h1><div class="eyebrow">NO CHARGE TODAY</div><p class="lead">${paymentLead}</p><div class="order-card">${orderRows}</div><section class="next"><h2>What happens next</h2><ul class="check-list"><li>Join the ${escapeHtml(tripNoun)} as scheduled and we release the full hold the same day. No payment is taken.</li><li>If ${escapeHtml(cancellationActor)} for weather or sea conditions, we release it in full.</li><li>Only a late cancellation or no-show may be charged, up to the hold amount, per our cancellation policy.</li></ul><p class="fine-print">${supportNote}</p><p class="fine-print">After release, your bank may take a few days to remove the pending hold.</p></section><label class="agree"><input id="agree" type="checkbox" data-legacy-policy-copy="I understand and agree to the authorization and cancellation policy"><span>I agree to the hold and the <a href="${escapeHtml(policyUrl)}" target="_blank" rel="noopener">cancellation policy</a></span></label><section class="pay-block"><h2>Pay securely</h2><div class="${paymentOptionsClass}"><div class="pay-option"><h3>PayPal authorization</h3><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><p class="processor-note">Processed by PayPal. Your card details never touch our server.</p></div>${squareBlock}</div><div id="paypal-status" class="status" hidden></div><div id="status" class="status" hidden></div></section><section class="trust-card"><p>Every trip is run by a licensed local captain or guide we work with regularly.</p><p>Booking & English support: Wan · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main><textarea id="authorize-config" hidden>${escapeHtml(JSON.stringify({...cfg, squareAvailable}))}</textarea><script src="/assets/authorize-page.js" defer></script>`;
   const formBodyWithShell = formBody.replace('<main class="auth-page">', '<main class="auth-page"><section class="auth-shell">').replace('</footer></main>', '</footer></section></main>');
   const body = status === "ORDER_CREATED" ? formBodyWithShell : statusBody;
   return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Secure your booking · ${escapeHtml(brand.name)}</title><style>${pageCss}</style></head><body>${body}</body></html>`, { status: 200, headers: {
@@ -1440,6 +1479,7 @@ function adminPage() {
     .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .status{color:#00b4c8;font-weight:800}
     .warn{color:#e4c06a}
+    .expired{color:#ff9f9f;font-weight:900}
     .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .terminal{opacity:.62;filter:grayscale(.7)}
     .group-title{margin:28px 0 8px;color:#00b4c8}
@@ -1456,7 +1496,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p class="warn">PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。</p><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -1467,10 +1507,13 @@ document.getElementById('load').onclick = load;
 document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
+  if(document.getElementById('create').disabled){ document.getElementById('new-result').textContent='PayPal 授权 29 天有效，请在出团前 28 天内发链接。'; return; }
   const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
-  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<div><a href="'+data.short_url+'">'+data.short_url+'</a> <button onclick="copyLink(\\''+data.short_url+'\\')">Copy link</button></div><div><small>Legacy link: '+data.authorize_url+'</small></div>'+(data.square_link_warning?'<p class="warn">请在出发前 7 天内发链接</p>':'') : (data.error||'Failed');
+  const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<div><a href="'+data.short_url+'">'+data.short_url+'</a> <button onclick="copyLink(\\''+data.short_url+'\\')">Copy link</button></div><div><small>Legacy link: '+data.authorize_url+'</small></div>'+(data.square_link_warning?'<p class="warn">当前链接只显示 PayPal；出团 7 天内页面会加 Square。</p>':'') : (data.message||data.error||'Failed');
 }
-document.getElementById('new-date').addEventListener('change',()=>{const value=document.getElementById('new-date').value;const limit=new Date();limit.setHours(0,0,0,0);limit.setDate(limit.getDate()+7);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}hint.textContent=value&&new Date(value+'T00:00:00')>limit?'请在出发前 7 天内发链接':''});
+function daysUntil(value){ if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value||'')) return null; const now=new Date(); const today=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()); return Math.ceil((Date.parse(value+'T00:00:00Z')-today)/86400000); }
+function updateCreateWindow(){const value=document.getElementById('new-date').value;const days=daysUntil(value);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}const create=document.getElementById('create');create.disabled=days!==null&&days>28;hint.textContent=days!==null&&days>28?'PayPal 授权 29 天有效，请在出团前 28 天内发链接。':days!==null&&days>7?'当前只能发 PayPal；出团 7 天内可加 Square。':'';}
+document.getElementById('new-date').addEventListener('change',updateCreateWindow);
 async function load(){
   const res = await fetch('/api/admin/authorizations', {headers: headers()});
   const data = await res.json();
@@ -1495,7 +1538,7 @@ function render(row){
     '<div>Date: '+esc(row.activity_date)+'</div>'+
     '<div>Created: '+esc(row.created_at||'-')+'</div>'+
     '<div>Provider: '+esc(row.provider||'paypal')+'</div>'+ '<div>Authorization: '+esc(row.paypal_authorization_id||row.square_payment_id||'-')+'</div>'+
-    '<div>Expires: '+esc(row.authorization_expiration_time||'-')+'</div>'+
+    '<div>收款方式 / 授权到期: '+esc(row.payment_method_label||row.provider||'paypal')+' / <span class="'+(row.square_expired?'expired':'')+'">'+esc(row.authorization_expiration_time||'-')+'</span></div>'+
     '<div>Days left: '+(row.days_until_expiration ?? '-')+' '+(row.reminder ? '<span class="warn">'+row.reminder+'</span>' : '')+'</div>'+
     honorPeriodLine+
     '</div>'+

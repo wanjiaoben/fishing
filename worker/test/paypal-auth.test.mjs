@@ -60,6 +60,13 @@ function env(overrides = {}) {
   };
 }
 
+function daysFromToday(days) {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
 test("production keeps both customer short-link routes", () => {
   const toml = fs.readFileSync(new URL("../../wrangler.production.toml", import.meta.url), "utf8");
   for (const domain of WORKER_ROUTE_DOMAINS) {
@@ -246,6 +253,7 @@ test("admin list displays AUTHORIZED – NOT CHARGED and reminder fields", async
     activity_date: "2026-08-24",
     amount: 66000,
     currency: "JPY",
+    provider: "square",
     authorization_status: "AUTHORIZED",
     authorization_expiration_time: "2026-08-21T00:00:00Z",
     honor_period_ends_at: "2099-01-01T00:00:00Z"
@@ -258,11 +266,21 @@ test("admin list displays AUTHORIZED – NOT CHARGED and reminder fields", async
   assert.equal(data.authorizations[0].status_label, "AUTHORIZED – NOT CHARGED");
   assert.equal(data.authorizations[0].reminder, "AUTHORIZATION_EXPIRING_SOON");
   assert.equal(data.authorizations[0].in_honor_period, true);
+  assert.equal(data.authorizations[0].payment_method_label, "SQUARE");
+  assert.equal(data.authorizations[0].square_expired, true);
 });
 
 test("admin renderer omits Honor period for Square rows", async () => {
   const text = await (await adminPage()).text();
   assert.match(text, /row\.provider === 'square' \? ''/);
+});
+
+test("admin renderer explains PayPal and Square date windows", async () => {
+  const text = await (await adminPage()).text();
+  assert.match(text, /PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。/);
+  assert.match(text, /create\.disabled=days!==null&&days>28/);
+  assert.match(text, /收款方式 \/ 授权到期/);
+  assert.match(text, /square_expired\?'expired'/);
 });
 
 test("admin custom order endpoint is admin-only and fixes currency to JPY", async (t) => {
@@ -292,6 +310,24 @@ test("admin custom order endpoint is admin-only and fixes currency to JPY", asyn
   const payload = JSON.parse(captured.find(c => c.url.endsWith("/v2/checkout/orders")).init.body);
   assert.equal(payload.purchase_units[0].amount.currency_code, "JPY");
   assert.equal(payload.purchase_units[0].amount.value, "100");
+});
+
+test("admin custom order refuses links more than 28 days before trip", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/orders", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ activity: "Future Charter", activity_date: daysFromToday(29), amount: 100, currency: "JPY" })
+  }), env());
+  const data = await response.json();
+  assert.equal(response.status, 400);
+  assert.equal(data.error, "TRIP_DATE_TOO_FAR_FOR_PAYPAL_AUTH_LINK");
+  assert.match(data.message, /29 days/);
+  assert.equal(captured.length, 0, "PayPal must not be called when the server-side date gate fails");
 });
 
 test("admin custom order accepts snorkel brand and customer page renders brand return link", async (t) => {
@@ -480,12 +516,43 @@ test("Square create-payment uses delayed full authorization and short-code idemp
   assert.ok(e.DB.calls.some(entry => entry.sql.includes("payment_audit_log") && entry.values.includes("CUSTOMER_AUTH_EMAIL")));
 });
 
+test("Square create-payment is server-blocked when trip is more than seven days away", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byOrder: {
+    id: "auth-square-future",
+    paypal_order_id: "ORDER-SQ-FUTURE",
+    short_code: "FUTURE",
+    activity: "Private Fishing Charter",
+    activity_date: daysFromToday(8),
+    amount: 66000,
+    currency: "JPY",
+    authorization_status: "ORDER_CREATED",
+    policy_version: "fishing-paypal-auth-v2026-08-20",
+    brand: "fishing"
+  } } });
+  const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-SQ-FUTURE", source_id: "cnon:test", accepted_policy: true, policy_version: "fishing-paypal-auth-v2026-08-20" })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 409);
+  assert.equal(data.error, "SQUARE_UNAVAILABLE_FOR_TRIP_DATE");
+  assert.equal(captured.length, 0, "Square API must not be called outside the seven-day window");
+});
+
 test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {
   const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-SQ"), env({ rows: { byOrder: {
-    paypal_order_id: "ORDER-SQ", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
+    paypal_order_id: "ORDER-SQ", short_code: "ABC123", brand: "fishing", activity: "Charter", activity_date: daysFromToday(5), amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
   } }, env: { SQUARE_SANDBOX_APPLICATION_ID: "sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA", SQUARE_SANDBOX_LOCATION_ID: "L10P89476GMB8" } }));
   const text = await page.text();
+  assert.match(text, /PayPal authorization/);
   assert.match(text, /Pay by card \(Square\)/);
+  assert.match(text, /class="payment-options"/);
   assert.match(text, /sandbox\.web\.squarecdn\.com/);
   assert.match(text, /sandbox-sq0idb-FqL-OnkbPoO8bQVmQpB1bA/);
   assert.match(text, /L10P89476GMB8/);
@@ -517,13 +584,18 @@ test("Square customer section is independent of PayPal rendering and admin marks
 });
 
 test("customer page hides Square when the trip is more than seven days away", async () => {
-  const future = new Date(Date.now() + (8 * 86400000)).toISOString().slice(0, 10);
+  const future = daysFromToday(8);
   const page = await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-FUTURE"), env({ rows: { byOrder: {
     paypal_order_id: "ORDER-FUTURE", short_code: "FUTURE", brand: "fishing", activity: "Charter", activity_date: future, amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
   } } }));
   const text = await page.text();
   assert.match(text, /Pay securely/);
+  assert.match(text, /PayPal authorization/);
+  assert.match(text, /payment-options paypal-only/);
+  assert.match(text, /PayPal authorization is valid for 29 days/);
   assert.doesNotMatch(text, /Pay by card \(Square\)/);
+  assert.doesNotMatch(text, /square-card-container/);
+  assert.doesNotMatch(text, /id="square-pay"/);
   assert.match(text, /squareAvailable/);
 });
 
