@@ -94,7 +94,8 @@ test("customer page states authorization is not an immediate charge", async () =
   const response = customerPage(env());
   const text = await response.text();
   assert.match(text, /Your card will be authorized for JPY 66,000, but you will not be charged at this time\./);
-  assert.match(text, /I understand and agree to the authorization and cancellation policy\./);
+  assert.match(text, /I agree to the hold and to the booking details sent to me by email \(dates, meeting point, participants and cancellation terms\)\./);
+  assert.doesNotMatch(text, /<label[^>]*>(?:(?!<\/label>)[\s\S])*<a\s/i);
   assert.match(text, /translate="no"/);
   assert.match(text, /name="google" content="notranslate"/);
   assert.match(text, /enable-funding=card/);
@@ -396,7 +397,8 @@ test("admin custom order accepts snorkel brand and customer page renders brand r
   const text = await page.text();
   assert.match(text, /Snorkel Nice Okinawa/);
   assert.match(text, /https:\/\/snorkel\.nice\.okinawa\//);
-  assert.match(text, /I understand and agree to the authorization and cancellation policy/);
+  assert.match(text, /I agree to the hold and to the booking details sent to me by email \(dates, meeting point, participants and cancellation terms\)\./);
+  assert.doesNotMatch(text, /<label[^>]*class="agree"[^>]*>(?:(?!<\/label>)[\s\S])*<a\s/i);
 
   const legacy = await handleRequest(new Request("https://fishing.nice.okinawa/payment/authorize?order=ORDER-SNORKEL"), env({ rows: { byOrder: {
     paypal_order_id: "ORDER-SNORKEL", brand: "snorkel", activity: "Snorkel Test", activity_date: "2026-08-24", amount: 100, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20"
