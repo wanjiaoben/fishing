@@ -98,6 +98,44 @@ function isPayPalLinkAllowedForTripDate(activityDate, now = new Date()) {
   return days !== null && days <= 28;
 }
 
+function normalizeActivityEndTime(value) {
+  const time = String(value || "18:00").trim();
+  return /^(12:00|18:00)$/.test(time) ? time : "18:00";
+}
+
+function activityEndAtIso(activityDate, endTime = "18:00") {
+  const date = String(activityDate || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const [hour, minute] = normalizeActivityEndTime(endTime).split(":").map(Number);
+  return new Date(Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)) - 1, Number(date.slice(8, 10)), hour - 9, minute, 0)).toISOString();
+}
+
+function activityEndTimeFromIso(activityEndAt) {
+  const parsed = Date.parse(activityEndAt || "");
+  if (!Number.isFinite(parsed)) return "18:00";
+  const jst = new Date(parsed + (9 * 60 * 60 * 1000));
+  const hour = String(jst.getUTCHours()).padStart(2, "0");
+  const minute = String(jst.getUTCMinutes()).padStart(2, "0");
+  const time = `${hour}:${minute}`;
+  return /^(12:00|18:00)$/.test(time) ? time : "18:00";
+}
+
+function authorizationExpiryHealth(expirationTime, activityDate, activityEndAt) {
+  const value = String(expirationTime || "").trim();
+  if (!value || value === "UNKNOWN") return { status: "UNKNOWN", message: "Provider did not return an authorization expiry." };
+  const expiresAt = Date.parse(value);
+  const endAt = Date.parse(activityEndAt || activityEndAtIso(activityDate));
+  if (!Number.isFinite(expiresAt) || !Number.isFinite(endAt)) return { status: "UNKNOWN", message: "Expiry or activity end time is not parseable." };
+  if (expiresAt <= endAt) return { status: "RED", message: "授权可能在活动结束前失效，勿作预约担保" };
+  if (expiresAt < endAt + (6 * 60 * 60 * 1000)) return { status: "YELLOW", message: "Authorization expires after the activity, but with less than 6 hours of margin." };
+  return { status: "GREEN", message: "Authorization covers the activity end plus 6 hours." };
+}
+
+function displayExpirationDate(expirationTime) {
+  const parsed = Date.parse(expirationTime || "");
+  return Number.isFinite(parsed) ? new Date(parsed).toISOString().slice(0, 10) : "UNKNOWN";
+}
+
 function json(data, init = {}) {
   return new Response(JSON.stringify(data, null, 2), {
     ...init,
@@ -391,15 +429,16 @@ async function createOrder(request, env) {
 
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
-     (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
+     (id, paypal_order_id, brand, activity, activity_date, activity_end_at, amount, currency, authorization_status, paypal_status,
       paypal_create_response, policy_version, agreed_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     authId,
     paypalOrder.id,
     "fishing",
     c.product,
     c.activityDate,
+    activityEndAtIso(c.activityDate),
     c.amount,
     c.currency,
     "ORDER_CREATED",
@@ -456,6 +495,8 @@ async function createAdminOrder(request, env) {
   const brand = normalizeBrand(body.brand);
   const guestName = String(body.guest_name || "").trim().slice(0, 200);
   const guestEmail = String(body.guest_email || "").trim().toLowerCase().slice(0, 320);
+  const activityEndTime = normalizeActivityEndTime(body.activity_end_time);
+  const activityEndAt = activityEndAtIso(activityDate, activityEndTime);
   if (!activity || !/^\d{4}-\d{2}-\d{2}$/.test(activityDate) || !Number.isInteger(amount) || amount <= 0 || currency !== "JPY" || (guestEmail && !/^\S+@\S+\.\S+$/.test(guestEmail))) {
     return json({ ok: false, error: "INVALID_ORDER_FIELDS", required: ["activity", "activity_date", "amount", "currency=JPY", "guest_name?", "guest_email?"] }, { status: 400 });
   }
@@ -476,10 +517,10 @@ async function createAdminOrder(request, env) {
   });
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
-     (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
+     (id, paypal_order_id, brand, activity, activity_date, activity_end_at, amount, currency, authorization_status, paypal_status,
       paypal_create_response, policy_version, guest_name, guest_email, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(localId, paypalOrder.id, brand, activity, activityDate, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(localId, paypalOrder.id, brand, activity, activityDate, activityEndAt, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
     JSON.stringify(paypalOrder), c.policyVersion, guestName || null, guestEmail || null, createdAt, createdAt).run();
   const shortCode = makeShortCode();
   await env.DB.prepare(`UPDATE paypal_authorizations SET short_code = ? WHERE id = ?`).bind(shortCode, localId).run();
@@ -526,15 +567,16 @@ async function createOrderWithSandboxTestCard(request, env) {
 
   await env.DB.prepare(
     `INSERT INTO paypal_authorizations
-     (id, paypal_order_id, brand, activity, activity_date, amount, currency, authorization_status, paypal_status,
+     (id, paypal_order_id, brand, activity, activity_date, activity_end_at, amount, currency, authorization_status, paypal_status,
       paypal_create_response, policy_version, agreed_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     authId,
     paypalOrder.id,
     "fishing",
     c.product,
     c.activityDate,
+    activityEndAtIso(c.activityDate),
     c.amount,
     c.currency,
     "ORDER_CREATED",
@@ -666,12 +708,13 @@ async function createSquarePayment(request, env, ctx) {
     return json({ ok: false, error: "SQUARE_AUTHORIZATION_NOT_APPROVED", square_status: payment.status || null }, { status: 502 });
   }
   const authCreateTime = payment.created_at || createdAt;
-  const expiration = payment.delayed_until || addDaysIso(authCreateTime, 7);
+  const expiration = payment.delayed_until || "UNKNOWN";
+  const delayAction = payment.delay_action || "UNKNOWN";
   const honorPeriod = addDaysIso(authCreateTime, 3);
   await env.DB.prepare(
     `UPDATE paypal_authorizations SET provider = 'square', square_payment_id = ?, authorization_status = ?, paypal_status = ?,
-      authorization_create_time = ?, authorization_expiration_time = ?, honor_period_ends_at = ?, updated_at = ? WHERE id = ?`
-  ).bind(payment.id, "AUTHORIZED", payment.status, authCreateTime, expiration, honorPeriod, nowIso(), row.id).run();
+      authorization_create_time = ?, authorization_expiration_time = ?, square_delay_action = ?, honor_period_ends_at = ?, updated_at = ? WHERE id = ?`
+  ).bind(payment.id, "AUTHORIZED", payment.status, authCreateTime, expiration, delayAction, honorPeriod, nowIso(), row.id).run();
   await audit(env, {
     authorization_id: row.id, action: "SQUARE_AUTHORIZE_PAYMENT", actor: "customer", amount: row.amount, currency: row.currency,
     idempotency_key: shortCode, request_payload: { amount_money: { amount: Number(row.amount), currency: row.currency }, autocomplete: false },
@@ -759,7 +802,7 @@ async function storeAuthorizedOrder(env, row, orderId, paypalAuth, ctx) {
     }, { status: 502 });
   }
   const authCreateTime = authorization.create_time || nowIso();
-  const expiration = authorization.expiration_time || addDaysIso(authCreateTime, 29);
+  const expiration = authorization.expiration_time || "UNKNOWN";
   const honorPeriod = addDaysIso(authCreateTime, 3);
 
   await env.DB.prepare(
@@ -819,7 +862,7 @@ async function listAuthorizations(request, env) {
     return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
   }
   const rows = await env.DB.prepare(
-    `SELECT id, paypal_order_id, paypal_authorization_id, provider, square_payment_id, short_code, brand, activity, activity_date, amount, currency,
+    `SELECT id, paypal_order_id, paypal_authorization_id, provider, square_payment_id, square_delay_action, short_code, brand, activity, activity_date, activity_end_at, amount, currency,
             guest_name, guest_email,
             authorization_status, paypal_status, authorization_create_time, authorization_expiration_time,
             honor_period_ends_at, created_at, updated_at
@@ -831,17 +874,22 @@ async function listAuthorizations(request, env) {
   const data = (rows.results || []).map(r => {
     const expiresAt = r.authorization_expiration_time ? new Date(r.authorization_expiration_time).getTime() : null;
     const honorEnds = r.honor_period_ends_at ? new Date(r.honor_period_ends_at).getTime() : null;
+    const activityEndAt = r.activity_end_at || activityEndAtIso(r.activity_date);
+    const expiryHealth = authorizationExpiryHealth(r.authorization_expiration_time, r.activity_date, activityEndAt);
     return {
       ...r,
+      activity_end_at: activityEndAt,
+      activity_end_time: activityEndTimeFromIso(activityEndAt),
       authorize_url: `${config(env).workerOrigin || "https://activity.nice.okinawa"}/payment/authorize?order=${encodeURIComponent(r.paypal_order_id)}`,
       short_url: r.short_code ? `${config(env).workerOrigin || "https://activity.nice.okinawa"}/p/${encodeURIComponent(r.short_code)}` : null,
       status_label: r.authorization_status === "AUTHORIZED" ? "AUTHORIZED – NOT CHARGED" : r.authorization_status,
-      days_until_expiration: expiresAt ? Math.ceil((expiresAt - now) / 86400000) : null,
+      days_until_expiration: Number.isFinite(expiresAt) ? Math.ceil((expiresAt - now) / 86400000) : null,
       payment_method_label: (r.provider || "paypal").toUpperCase(),
-      authorization_expired: expiresAt ? expiresAt < now : false,
-      square_expired: (r.provider || "paypal") === "square" && expiresAt ? expiresAt < now : false,
+      authorization_expired: Number.isFinite(expiresAt) ? expiresAt < now : false,
+      expiry_health: expiryHealth.status,
+      expiry_health_message: expiryHealth.message,
       in_honor_period: honorEnds ? now <= honorEnds : false,
-      reminder: expiresAt && expiresAt - now <= (3 * 86400000) ? "AUTHORIZATION_EXPIRING_SOON" : null
+      reminder: Number.isFinite(expiresAt) && expiresAt - now <= (3 * 86400000) ? "AUTHORIZATION_EXPIRING_SOON" : null
     };
   });
   return json({ ok: true, authorizations: data });
@@ -902,7 +950,7 @@ async function sendCustomerAuthorizationEmail(env, row) {
   }
   if (await previouslySucceeded(env, "CUSTOMER_AUTH_EMAIL", idempotencyKey)) return;
   const amount = row.currency + " " + Number(row.amount || 0).toLocaleString("en-US");
-  const expiration = row.authorization_expiration_time ? new Date(row.authorization_expiration_time).toISOString().slice(0, 10) : "within 7 days";
+  const expiration = displayExpirationDate(row.authorization_expiration_time);
   const subject = "Authorization received · " + row.activity + " · " + row.activity_date;
   const text = [
     "Your card authorization has been received.",
@@ -1013,7 +1061,8 @@ async function editTripDate(request, env, authId) {
     return json({ ok: false, error: "TRIP_DATE_NOT_EDITABLE", current_status: row.authorization_status }, { status: 409 });
   }
   const previousDate = row.activity_date;
-  await env.DB.prepare(`UPDATE paypal_authorizations SET activity_date = ?, updated_at = ? WHERE id = ?`).bind(activityDate, nowIso(), row.id).run();
+  const activityEndAt = activityEndAtIso(activityDate, activityEndTimeFromIso(row.activity_end_at));
+  await env.DB.prepare(`UPDATE paypal_authorizations SET activity_date = ?, activity_end_at = ?, updated_at = ? WHERE id = ?`).bind(activityDate, activityEndAt, nowIso(), row.id).run();
   await audit(env, {
     authorization_id: row.id,
     paypal_order_id: row.paypal_order_id,
@@ -1021,10 +1070,81 @@ async function editTripDate(request, env, authId) {
     actor: adminActor(request),
     idempotency_key: body.idempotency_key,
     request_payload: { confirm: true, from: previousDate, to: activityDate },
-    response_payload: { activity_date: activityDate },
+    response_payload: { activity_date: activityDate, activity_end_at: activityEndAt },
     result_status: "SUCCESS"
   });
-  return json({ ok: true, activity_date: activityDate, previous_activity_date: previousDate });
+  return json({ ok: true, activity_date: activityDate, activity_end_at: activityEndAt, previous_activity_date: previousDate });
+}
+
+async function editActivityEnd(request, env, authId) {
+  if (!requireAdmin(request, env)) return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const body = await readJson(request);
+  const activityEndTime = normalizeActivityEndTime(body.activity_end_time);
+  if (!body.confirm || !body.idempotency_key) return json({ ok: false, error: "CONFIRMATION_REQUIRED" }, { status: 400 });
+  const existing = await previouslySucceeded(env, "EDIT_ACTIVITY_END", body.idempotency_key);
+  if (existing) return json({ ok: true, idempotent: true });
+  const row = await getAuthorizationById(env, authId);
+  if (!row) return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
+  if (!["ORDER_CREATED", "AUTHORIZED"].includes(row.authorization_status)) {
+    return json({ ok: false, error: "ACTIVITY_END_NOT_EDITABLE", current_status: row.authorization_status }, { status: 409 });
+  }
+  const nextActivityEndAt = activityEndAtIso(row.activity_date, activityEndTime);
+  const previousActivityEndAt = row.activity_end_at || activityEndAtIso(row.activity_date);
+  await env.DB.prepare(`UPDATE paypal_authorizations SET activity_end_at = ?, updated_at = ? WHERE id = ?`).bind(nextActivityEndAt, nowIso(), row.id).run();
+  await audit(env, {
+    authorization_id: row.id,
+    paypal_order_id: row.paypal_order_id,
+    action: "EDIT_ACTIVITY_END",
+    actor: adminActor(request),
+    idempotency_key: body.idempotency_key,
+    request_payload: { confirm: true, from: previousActivityEndAt, to: nextActivityEndAt, activity_end_time: activityEndTime },
+    response_payload: { activity_end_at: nextActivityEndAt },
+    result_status: "SUCCESS"
+  });
+  return json({ ok: true, activity_end_at: nextActivityEndAt, previous_activity_end_at: previousActivityEndAt });
+}
+
+async function refreshProviderExpiry(request, env, authId) {
+  if (!requireAdmin(request, env)) return json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const body = await readJson(request);
+  if (!body.confirm || !body.idempotency_key) return json({ ok: false, error: "CONFIRMATION_REQUIRED" }, { status: 400 });
+  const existing = await previouslySucceeded(env, "REFRESH_PROVIDER_EXPIRY", body.idempotency_key);
+  if (existing) return json({ ok: true, idempotent: true });
+  const row = await getAuthorizationById(env, authId);
+  if (!row) return json({ ok: false, error: "AUTHORIZATION_NOT_FOUND" }, { status: 404 });
+  if (row.authorization_status !== "AUTHORIZED") return json({ ok: false, error: "AUTHORIZATION_NOT_ACTIVE", current_status: row.authorization_status }, { status: 409 });
+  let response;
+  let nextExpiration = "UNKNOWN";
+  let nextCreateTime = row.authorization_create_time || null;
+  let nextDelayAction = row.square_delay_action || null;
+  if ((row.provider || "paypal") === "square") {
+    if (!row.square_payment_id) return json({ ok: false, error: "SQUARE_PAYMENT_ID_MISSING" }, { status: 409 });
+    response = await squareFetch(env, `/v2/payments/${encodeURIComponent(row.square_payment_id)}`, { method: "GET" });
+    const payment = response.payment || {};
+    nextExpiration = payment.delayed_until || "UNKNOWN";
+    nextCreateTime = payment.created_at || nextCreateTime;
+    nextDelayAction = payment.delay_action || "UNKNOWN";
+  } else {
+    if (!row.paypal_authorization_id) return json({ ok: false, error: "PAYPAL_AUTHORIZATION_ID_MISSING" }, { status: 409 });
+    response = await paypalFetch(env, `/v2/payments/authorizations/${encodeURIComponent(row.paypal_authorization_id)}`, { method: "GET" });
+    nextExpiration = response.expiration_time || "UNKNOWN";
+    nextCreateTime = response.create_time || nextCreateTime;
+    nextDelayAction = null;
+  }
+  await env.DB.prepare(
+    `UPDATE paypal_authorizations SET authorization_create_time = ?, authorization_expiration_time = ?, square_delay_action = ?, updated_at = ? WHERE id = ?`
+  ).bind(nextCreateTime, nextExpiration, nextDelayAction, nowIso(), row.id).run();
+  await audit(env, {
+    authorization_id: row.id,
+    paypal_authorization_id: row.paypal_authorization_id,
+    action: "REFRESH_PROVIDER_EXPIRY",
+    actor: adminActor(request),
+    idempotency_key: body.idempotency_key,
+    request_payload: { provider: row.provider || "paypal" },
+    response_payload: { authorization_expiration_time: nextExpiration, square_delay_action: nextDelayAction },
+    result_status: "SUCCESS"
+  });
+  return json({ ok: true, provider: row.provider || "paypal", authorization_expiration_time: nextExpiration, square_delay_action: nextDelayAction });
 }
 
 async function voidAuthorization(request, env, authId) {
@@ -1216,9 +1336,15 @@ async function handleWebhook(request, env) {
         "PAYMENT.CAPTURE.REFUNDED": "CAPTURE_REFUNDED",
         "CHECKOUT.ORDER.APPROVED": "ORDER_APPROVED"
       };
-      await env.DB.prepare(
-        `UPDATE paypal_authorizations SET authorization_status = ?, paypal_status = ?, updated_at = ? WHERE id = ?`
-      ).bind(statusMap[eventType] || row.authorization_status, resource.status || eventType, nowIso(), row.id).run();
+      if (eventType === "PAYMENT.AUTHORIZATION.CREATED") {
+        await env.DB.prepare(
+          `UPDATE paypal_authorizations SET provider = 'paypal', paypal_authorization_id = ?, authorization_status = ?, paypal_status = ?, authorization_create_time = ?, authorization_expiration_time = ?, updated_at = ? WHERE id = ?`
+        ).bind(paypalAuthorizationId || row.paypal_authorization_id, statusMap[eventType], resource.status || eventType, resource.create_time || row.authorization_create_time || null, resource.expiration_time || "UNKNOWN", nowIso(), row.id).run();
+      } else {
+        await env.DB.prepare(
+          `UPDATE paypal_authorizations SET authorization_status = ?, paypal_status = ?, updated_at = ? WHERE id = ?`
+        ).bind(statusMap[eventType] || row.authorization_status, resource.status || eventType, nowIso(), row.id).run();
+      }
       await insertEvent(env, {
         authorization_id: row.id,
         paypal_order_id: row.paypal_order_id,
@@ -1480,6 +1606,11 @@ function adminPage() {
     .status{color:#00b4c8;font-weight:800}
     .warn{color:#e4c06a}
     .expired{color:#ff9f9f;font-weight:900}
+    .expiry-green{color:#75e6a4;font-weight:900}
+    .expiry-yellow{color:#e4c06a;font-weight:900}
+    .expiry-red{color:#ff9f9f;font-weight:900}
+    .expiry-unknown{color:#cbd5e1;font-weight:900}
+    .check-panel{border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:12px;margin:12px 0;background:rgba(0,0,0,.18)}
     .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     .terminal{opacity:.62;filter:grayscale(.7)}
     .group-title{margin:28px 0 8px;color:#00b4c8}
@@ -1496,7 +1627,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p class="warn">PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。</p><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p class="warn">PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。</p><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>End time JST <select id="new-end-time"><option value="18:00">18:00 default</option><option value="12:00">12:00 morning tour</option></select></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><div id="create-check" class="check-panel">选择出团日期后显示 PayPal / Square 可用窗口。</div><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -1508,12 +1639,14 @@ document.getElementById('create').onclick = createOrder;
 function headers(){ return {authorization:'Bearer '+tokenInput.value, 'content-type':'application/json'}; }
 async function createOrder(){
   if(document.getElementById('create').disabled){ document.getElementById('new-result').textContent='PayPal 授权 29 天有效，请在出团前 28 天内发链接。'; return; }
-  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
+  const res=await fetch('/api/admin/orders',{method:'POST',headers:headers(),body:JSON.stringify({brand:document.getElementById('new-brand').value,activity:document.getElementById('new-activity').value,activity_date:document.getElementById('new-date').value,activity_end_time:document.getElementById('new-end-time').value,amount:Number(document.getElementById('new-amount').value),guest_name:document.getElementById('new-guest-name').value,guest_email:document.getElementById('new-guest-email').value,currency:'JPY',idempotency_key:'admin-'+crypto.randomUUID()})});
   const data=await res.json(); document.getElementById('new-result').innerHTML=data.ok ? '<div><a href="'+data.short_url+'">'+data.short_url+'</a> <button onclick="copyLink(\\''+data.short_url+'\\')">Copy link</button></div><div><small>Legacy link: '+data.authorize_url+'</small></div>'+(data.square_link_warning?'<p class="warn">当前链接只显示 PayPal；出团 7 天内页面会加 Square。</p>':'') : (data.message||data.error||'Failed');
 }
 function daysUntil(value){ if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value||'')) return null; const now=new Date(); const today=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()); return Math.ceil((Date.parse(value+'T00:00:00Z')-today)/86400000); }
-function updateCreateWindow(){const value=document.getElementById('new-date').value;const days=daysUntil(value);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}const create=document.getElementById('create');create.disabled=days!==null&&days>28;hint.textContent=days!==null&&days>28?'PayPal 授权 29 天有效，请在出团前 28 天内发链接。':days!==null&&days>7?'当前只能发 PayPal；出团 7 天内可加 Square。':'';}
+function addDays(value,days){const d=new Date(value+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10);}
+function updateCreateWindow(){const value=document.getElementById('new-date').value;const days=daysUntil(value);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}const create=document.getElementById('create');const panel=document.getElementById('create-check');const paypalEligible=days!==null&&days<=28;const squareEligible=days!==null&&days<=7;create.disabled=days!==null&&days>28;hint.textContent=days!==null&&days>28?'PayPal 授权 29 天有效，请在出团前 28 天内发链接。':days!==null&&days>7?'当前只能发 PayPal；出团 7 天内可加 Square。':'';panel.innerHTML=days===null?'选择出团日期后显示 PayPal / Square 可用窗口。':'<b>CHECK</b><br>PayPal Eligible: '+(paypalEligible?'YES':'NO')+' · 可用起始日 '+esc(addDays(value,-28))+' · 授权 29 天<br>Square Eligible: '+(squareEligible?'YES':'NO')+' · 可用起始日 '+esc(addDays(value,-7))+' · 授权按 provider delayed_until<br>推荐方式: '+(squareEligible?'PayPal 优先；7 天内也可加 Square':'PayPal only');}
 document.getElementById('new-date').addEventListener('change',updateCreateWindow);
+document.getElementById('new-end-time').addEventListener('change',updateCreateWindow);
 async function load(){
   const res = await fetch('/api/admin/authorizations', {headers: headers()});
   const data = await res.json();
@@ -1529,16 +1662,22 @@ function esc(value){ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;
 function render(row){
   const terminal=!['AUTHORIZED','ORDER_CREATED'].includes(row.authorization_status);
   const editDateButton = terminal ? '' : '<button onclick="editDate(\\''+row.id+'\\',\\''+esc(row.activity_date)+'\\')">Edit trip date</button>';
+  const editEndButton = terminal ? '' : '<button onclick="editActivityEnd(\\''+row.id+'\\',\\''+esc(row.activity_end_time||'18:00')+'\\')">Edit end time</button>';
+  const refreshExpiryButton = row.authorization_status==='AUTHORIZED' ? '<button onclick="refreshProviderExpiry(\\''+row.id+'\\')">Refresh provider expiry</button>' : '';
   const honorPeriodLine = row.provider === 'square' ? '' : '<div>Honor period: '+(row.in_honor_period ? 'within first 3 days' : 'outside 3-day honor period')+'</div>';
-  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? editDateButton+'<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? editDateButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : editDateButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
+  const expiryClass = 'expiry-'+String(row.expiry_health||'unknown').toLowerCase();
+  const expiryWarning = row.expiry_health==='RED' ? '<div class="expiry-red">授权可能在活动结束前失效，勿作预约担保</div>' : '';
+  const actions=terminal ? '' : (row.authorization_status==='ORDER_CREATED' ? editDateButton+editEndButton+'<button onclick="cancelAuth(\\''+row.id+'\\')">Cancel order</button>' : (row.provider==='square' ? editDateButton+editEndButton+refreshExpiryButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><span>Square: full capture only</span><button onclick="captureAuth(\\''+row.id+'\\',\\'square\\', '+Number(row.amount)+')">Capture Authorization</button>' : editDateButton+editEndButton+refreshExpiryButton+'<button onclick="releaseAuth(\\''+row.id+'\\')">Release Authorization</button><input id="cap-'+row.id+'" inputmode="numeric" placeholder="Capture amount JPY"><button onclick="captureAuth(\\''+row.id+'\\',\\'paypal\\')">Capture Authorization</button>'));
   return '<div class="row '+(terminal?'terminal':'')+'"><h2>'+esc(row.activity)+' <small>· '+esc(row.brand)+' · '+esc(row.guest_name||'Guest name not provided')+'</small></h2>'+
     '<div class="meta">'+
     '<div>Status: <span class="status">'+esc(row.status_label)+'</span></div>'+
     '<div>Amount: '+esc(row.currency)+' '+Number(row.amount).toLocaleString('en-US')+'</div>'+
     '<div>Date: '+esc(row.activity_date)+'</div>'+
+    '<div>Activity end: '+esc(row.activity_end_at||'-')+' ('+esc(row.activity_end_time||'18:00')+' JST)</div>'+
     '<div>Created: '+esc(row.created_at||'-')+'</div>'+
     '<div>Provider: '+esc(row.provider||'paypal')+'</div>'+ '<div>Authorization: '+esc(row.paypal_authorization_id||row.square_payment_id||'-')+'</div>'+
-    '<div>收款方式 / 授权到期: '+esc(row.payment_method_label||row.provider||'paypal')+' / <span class="'+(row.square_expired?'expired':'')+'">'+esc(row.authorization_expiration_time||'-')+'</span></div>'+
+    '<div>收款方式 / 授权到期: '+esc(row.payment_method_label||row.provider||'paypal')+' / <span class="'+expiryClass+'">'+esc(row.authorization_expiration_time||'-')+' · '+esc(row.expiry_health||'UNKNOWN')+'</span></div>'+expiryWarning+
+    (row.provider==='square'?'<div>Square delay_action: '+esc(row.square_delay_action||'-')+'</div>':'')+
     '<div>Days left: '+(row.days_until_expiration ?? '-')+' '+(row.reminder ? '<span class="warn">'+row.reminder+'</span>' : '')+'</div>'+
     honorPeriodLine+
     '</div>'+
@@ -1562,6 +1701,8 @@ document.addEventListener('toggle',function(event){
 },true);
 async function cancelAuth(id){ if(!confirm('Cancel this ORDER_CREATED order? No PayPal call will be made.')) return; const key='cancel-'+id+'-'+crypto.randomUUID(); const res=await fetch('/api/admin/authorizations/'+id+'/cancel',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})}); alert(JSON.stringify(await res.json(),null,2)); load(); }
 async function editDate(id,current){ const value=prompt('Trip date (YYYY-MM-DD)',current); if(!value||value===current||!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return; const key='date-'+id+'-'+value; const res=await fetch('/api/admin/authorizations/'+id+'/date',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,activity_date:value,idempotency_key:key})}); const data=await res.json(); alert(res.ok&&data.ok?'Trip date updated to '+value:(data.error||'Date update failed')); load(); }
+async function editActivityEnd(id,current){ const value=prompt('Activity end time JST: 12:00 for morning tour, 18:00 default',current||'18:00'); if(!/^(12:00|18:00)$/.test(value||'')) return; const key='end-'+id+'-'+value; const res=await fetch('/api/admin/authorizations/'+id+'/activity-end',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,activity_end_time:value,idempotency_key:key})}); const data=await res.json(); alert(res.ok&&data.ok?'Activity end updated to '+value+' JST':(data.error||'End time update failed')); load(); }
+async function refreshProviderExpiry(id){ if(!confirm('Refresh provider expiry only? This does not capture, release, or change status.')) return; const key='provider-expiry-'+id+'-'+crypto.randomUUID(); const res=await fetch('/api/admin/authorizations/'+id+'/provider-expiry',{method:'POST',headers:headers(),body:JSON.stringify({confirm:true,idempotency_key:key})}); const data=await res.json(); alert(res.ok&&data.ok?'Provider expiry refreshed: '+(data.authorization_expiration_time||'UNKNOWN'):(data.error||'Refresh failed')); load(); }
 async function releaseAuth(id){
   if(operationLocks.has('void-'+id)) return;
   if(!confirm('Release this authorization? This voids the authorization and does not charge the customer.')) return;
@@ -1670,6 +1811,10 @@ async function handleRequest(request, env, ctx) {
     if (cancelMatch && request.method === "POST") return await cancelAuthorization(request, env, cancelMatch[1]);
     const dateMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/date$/);
     if (dateMatch && request.method === "POST") return await editTripDate(request, env, dateMatch[1]);
+    const activityEndMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/activity-end$/);
+    if (activityEndMatch && request.method === "POST") return await editActivityEnd(request, env, activityEndMatch[1]);
+    const refreshExpiryMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/provider-expiry$/);
+    if (refreshExpiryMatch && request.method === "POST") return await refreshProviderExpiry(request, env, refreshExpiryMatch[1]);
     const captureMatch = url.pathname.match(/^\/api\/admin\/authorizations\/([^/]+)\/capture$/);
     if (captureMatch && request.method === "POST") return await captureAuthorization(request, env, captureMatch[1]);
     return json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
