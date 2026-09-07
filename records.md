@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-08-22
+- **最后更新**：2026-09-07
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-09-07 | Codex | BOOKING-0907-03 增加 provider 真值授权到期、activity_end_at、后台红黄绿风险提示、CHECK 面板与 provider expiry refresh 施工 PR；不改扣款/释放/void 语义，待 Wan 合并 |
 | 2026-08-22 | Codex | FISH-0822-02 新增客户端错误 D1 落库（30 天清理）、后台订单客户端事件折叠区与诊断字段测试；生产 ¥100 PayPal 单待 Wan 提供/操作 admin token，未伪造订单或支付结果 |
 | 2026-08-21 | Codex | FISH-0821-04 将 PayPal 客人页路由扩展至 activity.nice.okinawa，新增订单 brand（fishing/snorkel）与品牌化客人页，保留 fishing 旧链接；待 Wan 完成 ¥100 snorkel 真浏览器授权与 Release 验收 |
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 生产 Square 卡表单真浏览器复验可渲染；补 Square 前端 stage 错误上报、`?debug=1` 明文诊断、短码诊断字段与 Square 字体 CSP 白名单；待 PR/Wan-Verified 发布 |
@@ -57,6 +58,8 @@
 
 | 优先级 | 任务 | 备注 |
 |--------|------|------|
+| 高 | 活动当天早检 | BOOKING-0907-03 后续项：可并入 Daily Brief 红项，检查 AUTHORIZED 单授权到期是否覆盖活动结束后 6 小时 |
+| 中 | 按 activity_end_at 精确到小时开放窗口 | BOOKING-0907-03 后续项：当前生成链接仍按 trip_date 天级窗口；后续可按 activity_end_at 精确到小时 |
 | 高 | 每次任务结束更新本文件 | 写入已完成、进行中、待办、技术备忘或操作日志 |
 | 中 | 检查页面是否展示旅行保险与协调说明 | 规则已写入，页面文案需后续确认 |
 | 低 |  |  |

@@ -137,7 +137,7 @@ test("create-order uses PayPal Orders v2 AUTHORIZE and fixed server-side JPY 660
   assert.equal(orderCall.init.headers["PayPal-Request-Id"], "order-test");
 });
 
-test("authorize-order returns AUTHORIZED – NOT CHARGED and stores expiration fallback", async (t) => {
+test("authorize-order returns AUTHORIZED – NOT CHARGED and stores UNKNOWN when provider omits expiration", async (t) => {
   t.mock.method(globalThis, "fetch", async (url) => {
     if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
     if (String(url).includes("/v2/checkout/orders/ORDER-1/authorize")) {
@@ -161,8 +161,30 @@ test("authorize-order returns AUTHORIZED – NOT CHARGED and stores expiration f
   assert.equal(data.status, "AUTHORIZED");
   assert.equal(data.charged, false);
   assert.equal(data.message, "AUTHORIZED – NOT CHARGED");
-  assert.equal(data.authorization_expiration_time, "2026-09-18T00:00:00.000Z");
+  assert.equal(data.authorization_expiration_time, "UNKNOWN");
   assert.equal(data.honor_period_ends_at, "2026-08-23T00:00:00.000Z");
+});
+
+test("authorize-order stores PayPal provider expiration_time when present", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
+    if (String(url).includes("/v2/checkout/orders/ORDER-EXP/authorize")) {
+      return Response.json({
+        status: "COMPLETED",
+        purchase_units: [{ payments: { authorizations: [{ id: "AUTH-EXP", status: "CREATED", create_time: "2026-08-20T00:00:00Z", expiration_time: "2026-09-18T00:00:00Z" }] } }]
+      });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byOrder: { id: "auth_exp", paypal_order_id: "ORDER-EXP", amount: 66000, currency: "JPY", authorization_status: "ORDER_CREATED" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/paypal/authorize-order", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-EXP" })
+  }), e);
+  const data = await response.json();
+  assert.equal(data.authorization_expiration_time, "2026-09-18T00:00:00Z");
+  assert.ok(e.DB.calls.some(call => call.sql.includes("authorization_expiration_time") && call.values.includes("2026-09-18T00:00:00Z")));
 });
 
 test("sandbox test-card authorize endpoint is admin-only and sends payment_source card", async (t) => {
@@ -267,7 +289,25 @@ test("admin list displays AUTHORIZED – NOT CHARGED and reminder fields", async
   assert.equal(data.authorizations[0].reminder, "AUTHORIZATION_EXPIRING_SOON");
   assert.equal(data.authorizations[0].in_honor_period, true);
   assert.equal(data.authorizations[0].payment_method_label, "SQUARE");
-  assert.equal(data.authorizations[0].square_expired, true);
+  assert.equal(data.authorizations[0].expiry_health, "RED");
+  assert.match(data.authorizations[0].expiry_health_message, /活动结束前失效/);
+});
+
+test("admin list classifies authorization expiry as green yellow red against activity_end_at", async () => {
+  const e = env({ rows: { all: [
+    { id: "red", paypal_order_id: "ORDER-R", provider: "paypal", activity: "Red", activity_date: "2026-08-24", activity_end_at: "2026-08-24T09:00:00.000Z", amount: 100, currency: "JPY", authorization_status: "AUTHORIZED", authorization_expiration_time: "2026-08-24T09:00:00.000Z" },
+    { id: "yellow", paypal_order_id: "ORDER-Y", provider: "paypal", activity: "Yellow", activity_date: "2026-08-24", activity_end_at: "2026-08-24T09:00:00.000Z", amount: 100, currency: "JPY", authorization_status: "AUTHORIZED", authorization_expiration_time: "2026-08-24T12:00:00.000Z" },
+    { id: "green", paypal_order_id: "ORDER-G", provider: "paypal", activity: "Green", activity_date: "2026-08-24", activity_end_at: "2026-08-24T09:00:00.000Z", amount: 100, currency: "JPY", authorization_status: "AUTHORIZED", authorization_expiration_time: "2026-08-24T15:00:00.000Z" },
+    { id: "unknown", paypal_order_id: "ORDER-U", provider: "paypal", activity: "Unknown", activity_date: "2026-08-24", activity_end_at: "2026-08-24T09:00:00.000Z", amount: 100, currency: "JPY", authorization_status: "AUTHORIZED", authorization_expiration_time: "UNKNOWN" }
+  ] } });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations", {
+    headers: { authorization: "Bearer admin-token" }
+  }), e);
+  const rows = (await response.json()).authorizations;
+  assert.equal(rows.find(row => row.id === "red").expiry_health, "RED");
+  assert.equal(rows.find(row => row.id === "yellow").expiry_health, "YELLOW");
+  assert.equal(rows.find(row => row.id === "green").expiry_health, "GREEN");
+  assert.equal(rows.find(row => row.id === "unknown").expiry_health, "UNKNOWN");
 });
 
 test("admin renderer omits Honor period for Square rows", async () => {
@@ -280,7 +320,10 @@ test("admin renderer explains PayPal and Square date windows", async () => {
   assert.match(text, /PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。/);
   assert.match(text, /create\.disabled=days!==null&&days>28/);
   assert.match(text, /收款方式 \/ 授权到期/);
-  assert.match(text, /square_expired\?'expired'/);
+  assert.match(text, /expiry-green/);
+  assert.match(text, /Refresh provider expiry/);
+  assert.match(text, /PayPal Eligible/);
+  assert.match(text, /Square Eligible/);
 });
 
 test("admin custom order endpoint is admin-only and fixes currency to JPY", async (t) => {
@@ -310,6 +353,7 @@ test("admin custom order endpoint is admin-only and fixes currency to JPY", asyn
   const payload = JSON.parse(captured.find(c => c.url.endsWith("/v2/checkout/orders")).init.body);
   assert.equal(payload.purchase_units[0].amount.currency_code, "JPY");
   assert.equal(payload.purchase_units[0].amount.value, "100");
+  assert.ok(e.DB.calls.some(call => call.sql.includes("activity_end_at") && call.values.includes("2026-08-24T09:00:00.000Z")), "default activity_end_at is 18:00 JST");
 });
 
 test("admin custom order refuses links more than 28 days before trip", async (t) => {
@@ -379,13 +423,14 @@ test("ORDER_CREATED can be cancelled without calling PayPal, AUTHORIZED cannot",
 });
 
 test("admin can edit trip date only for active authorizations and writes audit", async () => {
-  const e = env({ rows: { byId: { id: "auth-date", paypal_order_id: "ORDER-DATE", activity_date: "2026-08-23", amount: 66000, currency: "JPY", authorization_status: "AUTHORIZED" } } });
+  const e = env({ rows: { byId: { id: "auth-date", paypal_order_id: "ORDER-DATE", activity_date: "2026-08-23", activity_end_at: "2026-08-23T03:00:00.000Z", amount: 66000, currency: "JPY", authorization_status: "AUTHORIZED" } } });
   const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-date/date", {
     method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token", "x-admin-user": "Wan" },
     body: JSON.stringify({ confirm: true, activity_date: "2026-08-24", idempotency_key: "date-auth-date" })
   }), e);
   assert.equal(response.status, 200);
   assert.equal((await response.json()).activity_date, "2026-08-24");
+  assert.ok(e.DB.calls.some(call => call.sql.includes("activity_end_at") && call.values.includes("2026-08-24T03:00:00.000Z")), "trip date edit keeps 12:00 JST morning end time");
   assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log")));
   const terminal = env({ rows: { byId: { id: "auth-terminal", activity_date: "2026-08-23", authorization_status: "CANCELLED" } } });
   const blocked = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-terminal/date", {
@@ -393,6 +438,22 @@ test("admin can edit trip date only for active authorizations and writes audit",
     body: JSON.stringify({ confirm: true, activity_date: "2026-08-24", idempotency_key: "date-auth-terminal" })
   }), terminal);
   assert.equal(blocked.status, 409);
+});
+
+test("admin can edit activity end time without changing authorization status", async () => {
+  const e = env({ rows: { byId: { id: "auth-end", paypal_order_id: "ORDER-END", activity_date: "2026-08-24", activity_end_at: "2026-08-24T09:00:00.000Z", authorization_status: "AUTHORIZED" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-end/activity-end", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer admin-token", "x-admin-user": "Wan" },
+    body: JSON.stringify({ confirm: true, activity_end_time: "12:00", idempotency_key: "end-auth-end" })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(data.activity_end_at, "2026-08-24T03:00:00.000Z");
+  const update = e.DB.calls.find(call => call.sql.includes("UPDATE paypal_authorizations SET activity_end_at"));
+  assert.ok(update);
+  assert.doesNotMatch(update.sql, /authorization_status/);
+  assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log") && call.values.includes("EDIT_ACTIVITY_END")));
 });
 
 test("admin order list exposes guest fields, created time and activity-domain link", async () => {
@@ -487,7 +548,7 @@ test("Square create-payment uses delayed full authorization and short-code idemp
   t.mock.method(globalThis, "fetch", async (url, init = {}) => {
     captured.push({ url: String(url), init });
     if (String(url).includes("connect.squareupsandbox.com/v2/payments")) {
-      return Response.json({ payment: { id: "SQ-PAY-1", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-24T00:00:00Z" } });
+      return Response.json({ payment: { id: "SQ-PAY-1", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-24T00:00:00Z", delay_action: "CANCEL" } });
     }
     if (String(url).includes("api.resend.com/emails")) return Response.json({ id: "email-test" });
     throw new Error(`unexpected fetch ${url}`);
@@ -508,6 +569,7 @@ test("Square create-payment uses delayed full authorization and short-code idemp
   assert.equal(payload.amount_money.amount, 66000);
   assert.equal(payload.idempotency_key, "ABC123");
   assert.equal(call.init.headers["idempotency-key"], "ABC123");
+  assert.ok(e.DB.calls.some(entry => entry.sql.includes("square_delay_action") && entry.values.includes("CANCEL")));
   await Promise.all(waits);
   const customerMail = captured.find(entry => String(entry.url).includes("api.resend.com/emails") && JSON.parse(entry.init.body).to[0] === "sandbox@example.test");
   assert.ok(customerMail);
@@ -543,6 +605,112 @@ test("Square create-payment is server-blocked when trip is more than seven days 
   assert.equal(response.status, 409);
   assert.equal(data.error, "SQUARE_UNAVAILABLE_FOR_TRIP_DATE");
   assert.equal(captured.length, 0, "Square API must not be called outside the seven-day window");
+});
+
+test("admin provider expiry refresh reads provider API and updates metadata only", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
+    if (String(url).includes("/v2/payments/authorizations/AUTH-REFRESH")) {
+      return Response.json({ id: "AUTH-REFRESH", status: "CREATED", create_time: "2026-08-20T00:00:00Z", expiration_time: "2026-09-18T00:00:00Z" });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byId: { id: "auth-refresh", paypal_order_id: "ORDER-REFRESH", provider: "paypal", paypal_authorization_id: "AUTH-REFRESH", authorization_status: "AUTHORIZED", authorization_expiration_time: "UNKNOWN" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-refresh/provider-expiry", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer admin-token", "x-admin-user": "Wan" },
+    body: JSON.stringify({ confirm: true, idempotency_key: "refresh-auth-refresh" })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(data.authorization_expiration_time, "2026-09-18T00:00:00Z");
+  assert.ok(captured.some(call => call.url.includes("/v2/payments/authorizations/AUTH-REFRESH")));
+  const update = e.DB.calls.find(call => call.sql.includes("UPDATE paypal_authorizations SET authorization_create_time"));
+  assert.ok(update);
+  assert.doesNotMatch(update.sql, /authorization_status/);
+  assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log") && call.values.includes("REFRESH_PROVIDER_EXPIRY")));
+});
+
+test("admin Square provider expiry refresh stores delayed_until and delay_action true values", async (t) => {
+  const captured = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    captured.push({ url: String(url), init });
+    if (String(url).includes("connect.squareupsandbox.com/v2/payments/SQ-REFRESH")) {
+      return Response.json({ payment: { id: "SQ-REFRESH", status: "APPROVED", created_at: "2026-08-21T00:00:00Z", delayed_until: "2026-08-28T00:00:00Z", delay_action: "CANCEL" } });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byId: { id: "auth-square-refresh", paypal_order_id: "ORDER-SQ-REFRESH", provider: "square", square_payment_id: "SQ-REFRESH", authorization_status: "AUTHORIZED", authorization_expiration_time: "UNKNOWN" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/admin/authorizations/auth-square-refresh/provider-expiry", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ confirm: true, idempotency_key: "refresh-square" })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(data.authorization_expiration_time, "2026-08-28T00:00:00Z");
+  assert.equal(data.square_delay_action, "CANCEL");
+  assert.ok(captured.some(call => call.url.includes("/v2/payments/SQ-REFRESH") && call.init.method === "GET"));
+});
+
+test("Square create-payment stores UNKNOWN when provider omits delayed_until and delay_action", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    if (String(url).includes("connect.squareupsandbox.com/v2/payments")) {
+      return Response.json({ payment: { id: "SQ-UNKNOWN", status: "APPROVED", created_at: "2026-08-21T00:00:00Z" } });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byOrder: {
+    id: "auth-square-unknown",
+    paypal_order_id: "ORDER-SQ-UNKNOWN",
+    short_code: "UNKNWN",
+    activity: "Private Fishing Charter",
+    activity_date: daysFromToday(3),
+    amount: 66000,
+    currency: "JPY",
+    authorization_status: "ORDER_CREATED",
+    policy_version: "fishing-paypal-auth-v2026-08-20",
+    brand: "fishing"
+  } } });
+  const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-SQ-UNKNOWN", source_id: "cnon:test", accepted_policy: true, policy_version: "fishing-paypal-auth-v2026-08-20" })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(data.authorization_expiration_time, "UNKNOWN");
+  assert.ok(e.DB.calls.some(entry => entry.sql.includes("square_delay_action") && entry.values.includes("UNKNOWN")));
+});
+
+test("PayPal authorization webhook stores provider expiration_time when present", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "token" });
+    if (String(url).endsWith("/v1/notifications/verify-webhook-signature")) return Response.json({ verification_status: "SUCCESS" });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env({ rows: { byId: { id: "auth-webhook", paypal_order_id: "ORDER-WH", paypal_authorization_id: "AUTH-WH", provider: "paypal", authorization_status: "ORDER_CREATED" } } });
+  const response = await handleRequest(new Request("https://worker.test/api/paypal/webhook", {
+    method: "POST",
+    headers: { "content-type": "application/json", "paypal-transmission-id": "tx-1" },
+    body: JSON.stringify({
+      id: "WH-1",
+      event_type: "PAYMENT.AUTHORIZATION.CREATED",
+      resource: {
+        id: "AUTH-WH",
+        status: "CREATED",
+        create_time: "2026-08-20T00:00:00Z",
+        expiration_time: "2026-09-18T00:00:00Z",
+        supplementary_data: { related_ids: { order_id: "ORDER-WH" } }
+      }
+    })
+  }), e);
+  const data = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(data.processed_status, "PROCESSED");
+  assert.ok(e.DB.calls.some(call => call.sql.includes("provider = 'paypal'") && call.values.includes("2026-09-18T00:00:00Z")));
 });
 
 test("Square customer section is independent of PayPal rendering and admin marks full capture only", async () => {
