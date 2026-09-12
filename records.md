@@ -85,6 +85,8 @@
 
 ## 📝 操作日志
 
+| 2026-09-12 | Codex | FISHING-COPY-0912-01：修正首页页脚跨站链接；保留 golf.nice.okinawa，移除不存在的 diving/whale 链接 | ✅ 仅修改 `index.html` 页脚；未部署、未发信、未下单 |
+
 | 日期 | 执行者 | 操作 | 结果 |
 |------|--------|------|------|
 | 2026-08-20 | Codex | FISH-0820-05：合并 #31；新建生产 D1 并应用五表 migration；补生产 wrangler 配置、任意订单 API/客户专属授权页、后台新建单 UI、生产 tag 发布 workflow；未注入 Live secrets、未部署 | ✅ 前置施工完成，待 FISH-0820-06 |
