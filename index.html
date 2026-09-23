@@ -1823,6 +1823,7 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
           { "@id": "https://fishing.nice.okinawa/#offer-gt-fishing" },
           { "@id": "https://fishing.nice.okinawa/#offer-overnight-expedition" },
           { "@id": "https://fishing.nice.okinawa/#offer-other-methods" },
+          { "@id": "https://fishing.nice.okinawa/#offer-night-fishing" },
           { "@id": "https://fishing.nice.okinawa/#offer-remote-island-charter" }
         ]
       }
@@ -1947,6 +1948,26 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
         "price": 82000,
         "priceCurrency": "JPY",
         "description": "¥82,000 private half-day + snorkeling combination, all-inclusive."
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://fishing.nice.okinawa/#service-night-fishing",
+      "name": "Night Fishing Charter",
+      "description": "Seasonal 4-hour private night fishing charter from Chatan American Village, generally available from around June to November. Up to 6 guests; rental equipment included; bait fishing for snapper and grouper.",
+      "provider": { "@id": "https://fishing.nice.okinawa/#business" },
+      "areaServed": "Chatan American Village",
+      "offers": { "@id": "https://fishing.nice.okinawa/#offer-night-fishing" }
+    },
+    {
+      "@type": "Offer",
+      "@id": "https://fishing.nice.okinawa/#offer-night-fishing",
+      "itemOffered": { "@id": "https://fishing.nice.okinawa/#service-night-fishing" },
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "minPrice": 70000,
+        "priceCurrency": "JPY",
+        "description": "From ¥70,000 per boat."
       }
     },
     {
@@ -2087,6 +2108,22 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When is night fishing available in Okinawa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is night fishing suitable for beginners?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
       }
     }
   ]
@@ -2528,6 +2565,15 @@ const SERVICE_B_PLANS = [
     rows:[
       { label:{ en:'Package', zh:'套餐', ja:'パッケージ', ko:'패키지', th:'แพ็กเกจ' }, val:{ en:'Fishing + snorkeling, all-inclusive', zh:'钓鱼+浮潜，全包', ja:'釣り＋シュノーケリング、オールインクルーシブ', ko:'낚시 + 스노클링, 올인클루시브', th:'ตกปลา + ดำน้ำตื้น รวมทุกอย่าง' } },
     ],
+  },
+  {
+    num:'06', featured:false,
+    name:{ en:'Night Fishing Charter' },
+    desc:{ en:'Night fishing is a seasonal option, generally available from around June to November. Fishing is usually less productive in winter, so we normally don\'t recommend it during the colder months.<br><br>The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM. Departure time varies with the season — in summer, for example, it may be around 7:00 PM.<br><br>The charter can accommodate up to 6 guests. Rental equipment is included.<br><br>The main fishing style is bait fishing, targeting species such as snapper and grouper.<br><br>Please note that seasickness can be more common at night, so we generally don\'t recommend night fishing for complete beginners.<br><br>The exact departure time and fishing plan will depend on the season, weather and sea conditions.' },
+    port:{ en:'Chatan American Village' },
+    price:'From ¥70,000 / boat',
+    price_note:{ en:'' },
+    rows:[],
   },
   {
     num:'🏝️', featured:false, island:true,
@@ -3470,6 +3516,14 @@ const FAQS = [
   {
     q_en: "How early should I book a fishing charter?",
     a_en: "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: <a href=\"https://activity.nice.okinawa/en/when-to-book/\">When to book — the earlier, the better</a>."
+  },
+  {
+    q_en: "When is night fishing available in Okinawa?",
+    a_en: "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+  },
+  {
+    q_en: "Is night fishing suitable for beginners?",
+    a_en: "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
   }
 ];
 
