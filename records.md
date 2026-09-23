@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-09-23 | Codex | FISH-0923-15 六语套餐价格改版施工：Plan 01/02/03/05 半日 ¥70,000、全日 ¥130,000，装备 ¥10,000/人另计；Plan 04 过夜 ¥140,000–¥470,000，装备按行程询价；Plan 06 夜钓补充含装备；同步首页、FAQ、JSON-LD、llms.txt、英文套餐页与现价 FAQ，待 PR/Pages 发布 |
 | 2026-09-23 | Codex | FISH-0923-13 新增 Night Fishing Charter Plan 06、两条 FAQ、FAQPage JSON-LD 夜钓问答、OfferCatalog Service/Offer 与 llms.txt 夜钓事实段；未改既有 plan、月历、取消政策、/fishing-seasons/ 或 sitemap；PR #79 已 squash 合并 e7b04e475ddd31ac61d58648003050a905d176a3，Pages 部署成功，回滚点 912b229d9dce97cc45e08623dff2a907a394bc46 |
 | 2026-09-07 | Codex | BOOKING-0907-03 增加 provider 真值授权到期、activity_end_at、后台红黄绿风险提示、CHECK 面板与 provider expiry refresh 施工 PR；不改扣款/释放/void 语义，待 Wan 合并 |
 | 2026-08-22 | Codex | FISH-0822-02 新增客户端错误 D1 落库（30 天清理）、后台订单客户端事件折叠区与诊断字段测试；生产 ¥100 PayPal 单待 Wan 提供/操作 admin token，未伪造订单或支付结果 |

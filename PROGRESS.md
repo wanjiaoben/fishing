@@ -13,3 +13,4 @@ M0731-18 fishing 真提交验收补强：固定 `site=fishing` 与 `sourceSite=f
 FISH-0821-HOTFIX-04 生产 Square 卡表单真实 Chromium 复验可渲染；补前端 stage 错误上报、`?debug=1` 明文诊断与 Square 字体 CSP 白名单，待 PR/Wan-Verified 发布。
 FISH-0821-HOTFIX-04 追加：补生产两域 `/api/square/*` 路由；Square 提交失败显示 HTTP 状态码+服务端 message，并上报 `authorize-submit`。
 FISH-0923-13：夜钓套餐、FAQ、llms.txt 事实段与 JSON-LD Offer 已上线（PR #79，生产 SHA e7b04e4，Pages 部署成功）。
+FISH-0923-15：六语套餐价格改版施工完成，待 schema/响应式校验、PR 与 Pages 发布。
