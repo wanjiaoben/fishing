@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-09-07
+- **最后更新**：2026-09-23
 - **负责人**：Wan
 
 ---
@@ -16,6 +16,7 @@
 
 | 日期 | 执行者 | 内容 |
 |------|--------|------|
+| 2026-09-23 | Codex | FISH-0923-13 新增 Night Fishing Charter Plan 06、两条 FAQ、FAQPage JSON-LD 夜钓问答、OfferCatalog Service/Offer 与 llms.txt 夜钓事实段；未改既有 plan、月历、取消政策、/fishing-seasons/ 或 sitemap，待 PR/Pages 发布 |
 | 2026-09-07 | Codex | BOOKING-0907-03 增加 provider 真值授权到期、activity_end_at、后台红黄绿风险提示、CHECK 面板与 provider expiry refresh 施工 PR；不改扣款/释放/void 语义，待 Wan 合并 |
 | 2026-08-22 | Codex | FISH-0822-02 新增客户端错误 D1 落库（30 天清理）、后台订单客户端事件折叠区与诊断字段测试；生产 ¥100 PayPal 单待 Wan 提供/操作 admin token，未伪造订单或支付结果 |
 | 2026-08-21 | Codex | FISH-0821-04 将 PayPal 客人页路由扩展至 activity.nice.okinawa，新增订单 brand（fishing/snorkel）与品牌化客人页，保留 fishing 旧链接；待 Wan 完成 ¥100 snorkel 真浏览器授权与 Release 验收 |
