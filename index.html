@@ -1620,7 +1620,7 @@ section { padding:5.5rem 0; }
 .faq-icon { width:22px; height:22px; border-radius:50%; border:1px solid var(--glass-b); display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; transition:all .3s; color:var(--teal); }
 .faq-item.open .faq-icon { background:var(--teal); color:var(--deep); transform:rotate(45deg); }
 .faq-a { max-height:0; overflow:hidden; transition:max-height .35s ease; }
-.faq-item.open .faq-a { max-height:200px; }
+.faq-item.open .faq-a { max-height:1200px; }
 .faq-a-inner { padding:0 1.4rem 1.1rem; font-size:.85rem; color:rgba(255,255,255,.55); line-height:1.75; border-top:1px solid var(--glass-b); padding-top:.9rem; }
 
 /* ── CONTACT ── */
@@ -1998,136 +1998,1068 @@ footer { background:#030810; border-top:1px solid var(--glass-b); padding:2.5rem
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "@id": "https://fishing.nice.okinawa/#faq",
-  "mainEntity": [
+  "@graph": [
     {
-      "@type": "Question",
-      "name": "Is this a private charter — no shared boats?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The private charters are your group only — no strangers. We also offer shared boat experience tours for beginners departing from Kadena port."
-      }
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faq",
+      "inLanguage": "en",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "How do I book?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Tell us your preferred date, group size, children's ages, accommodation area, fishing experience, and whether you want a half-day or full-day trip. After checking boat availability, we will explain the plan, total amount, meeting point and booking steps in a confirmation email."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Can I join without fishing experience?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Most experience tours welcome beginners. Private charters and shared boats have different arrangements; specialist methods such as GT casting require relevant experience. Tell us when booking so we can help confirm a suitable plan."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Is equipment included in the price?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Inclusions vary by plan. Boat fees, equipment rental and optional extras will be listed separately when booking. Tell us in advance if you bring your own equipment; the final amount is as stated in the confirmation email."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Where do we meet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "The port and meeting time depend on the plan. Your confirmation email will provide the exact location, map pin and arrival time. Check for updates the evening before; contact us immediately if you cannot find the meeting point or may be late on the day."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "How do I pay? Has a preauthorization already charged me?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Private-boat sea fishing uses a preauthorization to hold your booking, with cash as the main payment method on the activity day. Confirm other payment methods in advance. A preauthorization temporarily holds available funds; it is not an actual payment. Payment methods for other sea-fishing products are confirmed for the specific plan."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "What if the weather is bad or I want to cancel?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "The captain decides whether to sail based on weather and sea conditions. We usually contact you again the evening before to confirm. Contact us early for a personal cancellation or date change; cancellation fees and refund arrangements follow the terms of the relevant plan confirmed when booking. Guest cancellations: no cancellation fee 15 days or more before the activity date; 50% 14–7 days before; 80% 6–2 days before; 100% for cancellation the day before, on the activity date, or a no-show. Weather-related sailing cancellations are handled separately and are not subject to guest cancellation fees."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Should I bring food and drinks? What happens to the catch?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Bring your own food and drinks and protect yourself from the sun. Whether the catch can be kept, prepared on site or made into sashimi must be confirmed with the captain based on the species and conditions that day. Sashimi on board is not guaranteed on every trip."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Is this a private charter — no shared boats?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "The private charters are your group only — no strangers. We also offer shared boat experience tours for beginners departing from Kadena port."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Can children join?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Yes! Let us know their ages when booking. Life jackets are provided for everyone. The shared boat experience is especially great for kids."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "How do I prevent seasickness?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Take motion sickness tablets 1–2 hours before, stay hydrated, eat light, and keep your eyes on the horizon. We can recommend what to grab locally."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "What languages do you support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "How many people can join a private fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples are ¥70,000 for a half-day or ¥130,000 for a full-day, depending on the selected package."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "How does the shared fishing boat work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "The shared fishing boat Okinawa experience departs from Kadena Fishing Port, runs about 2 hours and can take up to 35 people. It is built for first-timers and families; contact us for current shared-boat pricing."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "What free options can I request?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Free on request: a styrofoam cooler box with ice and basic utensils so you can take your catch home (yours to keep); depending on the day's catch, the captain may prepare fresh sashimi on board — free, just ask; and child life jackets and snorkel gear on combo trips. None of the above options carry an extra charge from us."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "How early should I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "When is night fishing available in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "en",
+          "name": "Is night fishing suitable for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "en",
+            "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+          }
+        }
+      ]
     },
     {
-      "@type": "Question",
-      "name": "Do I need prior fishing experience?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "For most plans, no experience needed. GT fishing is the exception — it requires heavy tackle and long-distance casting experience. Chat with us first if unsure."
-      }
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faq-zh-Hans",
+      "inLanguage": "zh-Hans",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "怎么预约？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "请告诉我们希望日期、人数、儿童年龄、住宿区域、钓鱼经验，以及想参加半日还是全天行程。我们核对船期后，会通过确认邮件说明方案、总额、集合地点和预约手续。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "没有钓鱼经验，可以参加吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "多数体验方案欢迎初学者。私人包船和拼船的安排不同；GT抛投等专业钓法需要相应经验，请预约时说明，我们会协助确认适合的方案。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "价格包含装备吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "不同方案的包含项目不同。预约时会分别列明船费、装备租赁及其他选购项目；自带装备请提前告知，最终金额以确认邮件为准。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "在哪里集合？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "港口和集合时间随方案而定。确认邮件会提供准确地点、地图定位和到场时间。前一晚请留意最新消息；当天找不到集合点或可能迟到，请立即联系。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "怎么付款？预授权是已经扣款了吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "私人船海钓采用预授权保留预约，活动当天以现金付款为主；其他支付方式请提前确认。预授权只是暂时冻结额度，不是实际付款。其他海钓商品按具体方案确认付款方式。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "天气不好或想取消，怎么办？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "是否出航由船长根据天气和海况判断，我们通常会在前一晚再次联系确认。个人取消或改期请尽早联系；具体取消费用和退款安排，按预约时确认的对应方案条款执行。 个人取消：活动日 15 天前及更早取消不收取消费；活动日前 14–7 天 50%；6–2 天 80%；前一天、当天取消或未到场 100%。天气停航单独处理，不套用个人取消收费。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "要自己带吃喝吗？钓到的鱼怎么安排？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "请自备食物和饮料，并做好防晒。渔获能否保留、现场处理或制作刺身，需按鱼种和当天条件与船长确认，不保证每次都有船上刺身。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "是完全包船吗？不会和陌生人拼船？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "专业包船行程均为整船包，只有你们的团队。我们也提供嘉手纳渔港出发的拼船体验团。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "孩子可以参加吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "可以！预约时告知年龄，所有人提供救生衣。拼船体验特别适合带孩子参加。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "如何预防晕船？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "出发前1-2小时服用晕船药，保持补水，吃清淡食物，眼望地平线。我们可以推荐当地的晕船药（成人推荐大白兔）。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "提供哪些语言服务？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "我们支持中文、英语和日语。船长是日本人，有基本英语和部分中文能力，我们负责所有沟通。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "包船最多可以几个人参加？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "包船只接待你们一组，最多 12 人。2–3 人参加时，包船价按整船价格由同行人数分摊；现有私人包船示例为半日 ¥70,000 或全天 ¥130,000，具体取决于所选方案。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "拼船海钓体验是怎么安排的？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "Okinawa 拼船海钓体验从嘉手纳渔港出发，约 2 小时，最多 35 人。适合初学者和家庭；当前拼船价格请直接咨询。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "可以申请哪些免费选项？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "可免费申请：带冰块和基本餐具的冰桶，方便您带走渔获；船上刺身（看渔获）；以及儿童救生衣和组合行程的浮潜装备。以上选项均不会向您收取额外费用。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "How early should I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "When is night fishing available in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hans",
+          "name": "Is night fishing suitable for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hans",
+            "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+          }
+        }
+      ]
     },
     {
-      "@type": "Question",
-      "name": "Is fishing gear included?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Gear is rented per person and priced by fishing style — around ¥10,000 per person as a guide. Bring your own if you prefer. We'll confirm the exact amount in your confirmation email, and it is included in the card hold we place before your trip."
-      }
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faq-zh-Hant",
+      "inLanguage": "zh-Hant",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "怎麼預約？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "請告訴我們希望日期、人數、兒童年齡、住宿區域、釣魚經驗，以及想參加半日還是全天行程。我們核對船期後，會透過確認郵件說明方案、總額、集合地點和預約手續。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "沒有釣魚經驗，可以參加嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "多數體驗方案歡迎初學者。私人包船和拼船的安排不同；GT拋投等專業釣法需要相應經驗，請預約時說明，我們會協助確認適合的方案。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "價格包含裝備嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "不同方案的包含項目不同。預約時會分別列明船費、裝備租借及其他選購項目；自帶裝備請提前告知，最終金額以確認郵件為準。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "在哪裡集合？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "港口和集合時間隨方案而定。確認郵件會提供準確地點、地圖定位和到場時間。前一晚請留意最新消息；當天找不到集合點或可能遲到，請立即聯絡。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "怎麼付款？預授權是已經扣款了嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "私人船海釣採用預授權保留預約，活動當天以現金付款為主；其他支付方式請提前確認。預授權只是暫時凍結額度，不是實際付款。其他海釣商品按具體方案確認付款方式。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "天氣不好或想取消，怎麼辦？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "是否出航由船長根據天氣和海況判斷，我們通常會在前一晚再次聯絡確認。個人取消或改期請儘早聯絡；具體取消費用和退款安排，按預約時確認的對應方案條款執行。 個人取消：活動日 15 天前及更早取消不收取消費；活動日前 14–7 天 50%；6–2 天 80%；前一天、當天取消或未到場 100%。天氣停航單獨處理，不套用個人取消收費。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "要自己帶吃喝嗎？釣到的魚怎麼安排？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "請自備食物和飲料，並做好防曬。漁獲能否保留、現場處理或製作刺身，需按魚種和當天條件與船長確認，不保證每次都有船上刺身。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "是完全包船嗎？不會和陌生人拼船？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "專業包船行程均為整船包，只有您們的團隊。我們也提供嘉手納漁港出發的拼船體驗團。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "小孩可以參加嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "可以！預約時告知年齡，所有人提供救生衣。拼船體驗特別適合帶小孩參加。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "如何預防暈船？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "出發前1-2小時服用暈船藥，保持補水，吃清淡食物，眼望地平線。我們可以推薦當地的暈船藥。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "提供哪些語言服務？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "我們支援中文、英語和日語。船長是日本人，有基本英語和部分中文能力，我們負責所有溝通。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "包船最多可以幾個人參加？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "包船只接待您們一組，最多 12 人。2–3 人參加時，包船價按整船價格由同行人數分攤；現有私人包船示例為半日 ¥70,000 或全天 ¥130,000，具體取決於所選方案。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "拼船海釣體驗是怎麼安排的？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "Okinawa 拼船海釣體驗從嘉手納漁港出發，約 2 小時，最多 35 人。適合初學者和家庭；目前拼船價格請直接詢問。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "可以申請哪些免費選項？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "可免費申請：帶冰塊和基本餐具的冰桶，方便您帶走漁獲；船上刺身（視當日漁獲而定）；以及兒童救生衣和組合行程的浮潛裝備。以上選項均不會向您收取額外費用。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "How early should I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "When is night fishing available in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "zh-Hant",
+          "name": "Is night fishing suitable for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "zh-Hant",
+            "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+          }
+        }
+      ]
     },
     {
-      "@type": "Question",
-      "name": "What if the weather is bad?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Safety first. If the captain calls it unsafe, the trip is cancelled and you get a full refund — including the coordination fee."
-      }
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faq-ja",
+      "inLanguage": "ja",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "予約方法は？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "希望日、人数、お子様の年齢、宿泊エリア、釣り経験、半日または終日の希望をお知らせください。船の空きを確認後、プラン、総額、集合場所、予約手続きを確認メールでご案内します。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "釣りの経験がなくても参加できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "多くの体験プランは初心者を歓迎します。貸切船と乗合船では手配が異なります。GTキャスティングなど専門的な釣法には相応の経験が必要ですので、予約時にお知らせください。適したプランの確認をお手伝いします。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "料金に道具は含まれますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "含まれる項目はプランによって異なります。予約時に船代、道具のレンタル、その他のオプションをそれぞれ明記します。道具を持参する場合は事前にお知らせください。最終金額は確認メールの記載が基準です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "集合場所はどこですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "港と集合時間はプランによって異なります。確認メールで正確な場所、地図の位置、到着時間をご案内します。前夜は最新の連絡をご確認ください。当日、集合場所が見つからない場合や遅れそうな場合はすぐにご連絡ください。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "支払方法は？事前承認で既に引き落とされていますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "貸切船の海釣りは事前承認で予約を確保し、活動当日は主に現金でお支払いいただきます。他の支払方法は事前にご確認ください。事前承認は利用可能枠を一時的に確保するもので、実際の支払いではありません。その他の海釣り商品の支払方法は各プランに応じて確認します。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "悪天候やキャンセルの場合は？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "天候と海況に基づき船長が出航の可否を判断します。通常、前夜に改めてご連絡して確認します。お客様都合のキャンセルや日程変更は早めにご連絡ください。具体的なキャンセル料や返金は、予約時に確認した該当プランの規定に従います。 お客様都合のキャンセル：活動日の15日前以前はキャンセル料なし、14〜7日前は50%、6〜2日前は80%、前日・当日のキャンセルまたは無断不参加は100%です。天候による欠航は別途対応し、お客様都合のキャンセル料は適用しません。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "飲食物は持参しますか？釣った魚はどうなりますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "食べ物と飲み物をご持参いただき、日焼け対策もお願いします。魚の持ち帰り、現地での処理、刺身の提供は、魚種と当日の条件に応じて船長にご確認ください。毎回船上で刺身が提供されるとは限りません。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "完全チャーター（貸切）ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "プライベートチャーターはグループ専用です。嘉手納漁港からの乗合体験ツアーもご用意しています。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "子どもは参加できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "はい！ご予約時に年齢をお知らせください。ライフジャケットは全員分ご用意します。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "船酔いを防ぐには？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "言語サポートはどうなりますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "英語・中文・日本語に対応。船長は日本語メインですが、英語・中文も少々対応可能。コミュニケーションはすべて当方がサポートします。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "貸切チャーターは何名まで参加できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "貸切チャーターはグループ専用で、最大12名まで参加できます。2〜3名の場合は船単位の料金を人数で割る形です。現在の貸切例は半日¥70,000、または終日¥130,000です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "乗合の釣り体験はどのような内容ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "沖縄の乗合釣り体験は嘉手納漁港発、約2時間、最大35名までです。初心者や家族向けです。現在の乗合料金はお問い合わせください。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "無料でお願いできるオプションは何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "無料でご用意できます：発泡スチロールのクーラーボックス（氷・簡単な食器付き、お持ち帰り可）、船上での刺身（魚次第）、お子様用ライフジャケットとコンボ行程のシュノーケル用品。上記のオプションに追加料金はかかりません。"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "How early should I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "When is night fishing available in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ja",
+          "name": "Is night fishing suitable for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ja",
+            "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+          }
+        }
+      ]
     },
     {
-      "@type": "Question",
-      "name": "Can children join?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes! Let us know their ages when booking. Life jackets are provided for everyone. The shared boat experience is especially great for kids."
-      }
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faq-ko",
+      "inLanguage": "ko",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "어떻게 예약하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "희망 날짜, 인원, 어린이 나이, 숙박 지역, 낚시 경험, 반일 또는 종일 일정 중 원하는 것을 알려 주세요. 선박 일정을 확인한 뒤 확인 이메일로 상품, 총액, 집합 장소 및 예약 절차를 안내합니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "낚시 경험이 없어도 참여할 수 있나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "대부분의 체험 상품은 초보자를 환영합니다. 단독 대절선과 합승선은 운영 방식이 다르며 GT 캐스팅 같은 전문 낚시에는 해당 경험이 필요합니다. 예약할 때 알려 주시면 적합한 상품을 확인하도록 도와드립니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "가격에 장비가 포함되나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "포함 항목은 상품마다 다릅니다. 예약할 때 선박 요금, 장비 대여 및 기타 선택 항목을 각각 명시합니다. 개인 장비를 가져오면 미리 알려 주세요. 최종 금액은 확인 이메일을 기준으로 합니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "어디에서 모이나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "항구와 집합 시간은 상품에 따라 다릅니다. 확인 이메일에 정확한 장소, 지도 위치 및 도착 시간을 안내합니다. 전날 밤 최신 안내를 확인하고, 당일 집합 장소를 찾지 못하거나 늦을 것 같으면 즉시 연락해 주세요."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "어떻게 결제하나요? 사전 승인은 이미 결제된 건가요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "단독 대절선 바다낚시는 사전 승인으로 예약을 확보하며 활동 당일 현금 결제가 기본입니다. 다른 결제 방법은 미리 확인해 주세요. 사전 승인은 한도를 일시적으로 확보하는 것이며 실제 결제가 아닙니다. 다른 바다낚시 상품은 해당 상품에 따라 결제 방법을 확인합니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "날씨가 나쁘거나 취소하고 싶으면 어떻게 하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "출항 여부는 날씨와 바다 상태에 따라 선장이 판단하며 보통 전날 밤 다시 연락하여 확인합니다. 개인 사정에 따른 취소나 날짜 변경은 일찍 연락해 주세요. 구체적인 취소 수수료와 환불은 예약 시 확인한 해당 상품 약관에 따릅니다. 고객 사정에 따른 취소: 활동일 15일 전 및 그 이전에는 취소 수수료 없음, 14–7일 전 50%, 6–2일 전 80%, 전날·당일 취소 또는 불참은 100%입니다. 날씨로 인한 결항은 별도로 처리하며 고객 취소 수수료를 적용하지 않습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "음식과 음료를 가져와야 하나요? 잡은 물고기는 어떻게 하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "음식과 음료를 직접 준비하고 자외선 차단을 해 주세요. 잡은 물고기를 가져가거나 현장에서 손질하거나 회로 먹을 수 있는지는 어종과 당일 상황에 따라 선장과 확인해야 합니다. 매번 선상에서 회를 제공하는 것은 보장되지 않습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "전세 차터인가요 — 합승은 없나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "전세 차터는 귀하의 그룹만 이용합니다 — 낯선 사람 없음. 가데나 항구에서 출발하는 초보자용 합승 체험 투어도 제공합니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "어린이도 참여할 수 있나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "네! 예약 시 나이를 알려주세요. 구명조끼는 모든 분께 제공됩니다. 합승 체험은 아이들에게 특히 좋습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "뱃멀미를 어떻게 예방하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "출발 1~2시간 전 멀미약 복용, 수분 보충, 가벼운 식사, 수평선을 바라보세요. 현지에서 구할 수 있는 것을 추천해 드릴 수 있습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "어떤 언어를 지원하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "영어, 중국어, 일본어를 지원합니다. 선장은 일본인이지만 기본 영어와 일부 중국어가 가능합니다. 모든 소통은 저희가 대신합니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "전세 낚시 차터는 몇 명까지 참여할 수 있나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "전세 차터는 귀하의 그룹만 이용하며 최대 12명까지 가능합니다. 2~3명은 선박 전체 요금을 그룹 인원으로 나누는 방식이며, 현재 전세 예시는 반일 ¥70,000 또는 종일 ¥130,000입니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "합승 낚시 보트는 어떻게 운영되나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "오키나와 합승 낚시 보트 체험은 가데나 어항에서 출발하며 약 2시간, 최대 35명까지 가능합니다. 초보자와 가족에게 적합하며 현재 합승 보트 요금은 문의해 주세요."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "어떤 무료 옵션을 요청할 수 있나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "무료 요청 가능: 얼음과 기본 식기가 있는 쿨러 박스, 선상 사시미(어획에 따라 가능), 어린이 구명조끼와 콤보 일정의 스노클 장비입니다. 위 옵션에는 추가 요금이 없습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "How early should I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "When is night fishing available in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "ko",
+          "name": "Is night fishing suitable for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "ko",
+            "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+          }
+        }
+      ]
     },
     {
-      "@type": "Question",
-      "name": "How do I prevent seasickness?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Take motion sickness tablets 1–2 hours before, stay hydrated, eat light, and keep your eyes on the horizon. We can recommend what to grab locally."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What languages do you support?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How many people can join a private fishing charter?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples are ¥70,000 for a half-day or ¥130,000 for a full-day, depending on the selected package."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the shared fishing boat work?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The shared fishing boat Okinawa experience departs from Kadena Fishing Port, runs about 2 hours and can take up to 35 people. It is built for first-timers and families; contact us for current shared-boat pricing."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Where do we meet for the fishing trip?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Meeting points depend on the plan: Chatan American Village Port or Chatan Hamagawa Port on the west coast, Uruma Awase Port on the east coast, and Kadena Fishing Port for the shared boat experience. We confirm the exact port before booking."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What's included in the price?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Our price includes a private boat charter with a licensed local captain; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day. Tackle and bait are rented separately per person."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What's not included in the price?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Tackle and bait rental — approx. ¥10,000 per person, depending on the fishing style. Settled on the day; the amount is included in your card hold. Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What free options can I request?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Free on request: a styrofoam cooler box with ice and basic utensils so you can take your catch home (yours to keep); depending on the day's catch, the captain may prepare fresh sashimi on board — free, just ask; and child life jackets and snorkel gear on combo trips. None of the above options carry an extra charge from us."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How early should I book a fishing charter?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "When is night fishing available in Okinawa?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is night fishing suitable for beginners?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
-      }
+      "@type": "FAQPage",
+      "@id": "https://fishing.nice.okinawa/#faq-th",
+      "inLanguage": "th",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "จองอย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "กรุณาแจ้งวันที่ต้องการ จำนวนคน อายุเด็ก พื้นที่ที่พัก ประสบการณ์ตกปลา และต้องการทริปครึ่งวันหรือเต็มวัน หลังตรวจสอบตารางเรือ เราจะส่งอีเมลยืนยันระบุแผน ยอดรวม จุดนัดพบ และขั้นตอนการจอง"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "ไม่มีประสบการณ์ตกปลา เข้าร่วมได้ไหม?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "ทริปทดลองส่วนใหญ่ยินดีรับผู้เริ่มต้น การจัดเรือเหมาส่วนตัวกับเรือร่วมต่างกัน วิธีตกปลาเฉพาะทาง เช่น การตีเหยื่อ GT ต้องมีประสบการณ์ที่เกี่ยวข้อง กรุณาแจ้งเมื่อจอง เราจะช่วยตรวจสอบแผนที่เหมาะสม"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "ราคารวมอุปกรณ์ไหม?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "สิ่งที่รวมแตกต่างกันตามแผน เมื่อจองจะระบุค่าเรือ ค่าเช่าอุปกรณ์ และตัวเลือกอื่นแยกกัน หากนำอุปกรณ์มาเองกรุณาแจ้งล่วงหน้า ยอดสุดท้ายให้ยึดตามอีเมลยืนยัน"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "นัดพบที่ไหน?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "ท่าเรือและเวลานัดพบขึ้นอยู่กับแผน อีเมลยืนยันจะระบุสถานที่ที่แน่นอน หมุดแผนที่ และเวลาที่ต้องมาถึง กรุณาตรวจสอบข้อความล่าสุดในคืนก่อนกิจกรรม หากหาจุดนัดพบไม่เจอหรืออาจมาสายในวันกิจกรรม ให้ติดต่อทันที"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "ชำระอย่างไร? การกันวงเงินล่วงหน้าคือหักเงินแล้วหรือไม่?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "การตกปลาทะเลด้วยเรือเหมาส่วนตัวใช้การกันวงเงินล่วงหน้าเพื่อรักษาการจอง และในวันกิจกรรมชำระเป็นเงินสดเป็นหลัก วิธีชำระอื่นกรุณายืนยันล่วงหน้า การกันวงเงินเป็นเพียงการสำรองวงเงินชั่วคราว ไม่ใช่การชำระเงินจริง ผลิตภัณฑ์ตกปลาทะเลอื่นให้ยืนยันวิธีชำระตามแผนที่เลือก"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "ถ้าอากาศไม่ดีหรือต้องการยกเลิก ทำอย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "กัปตันตัดสินใจออกเรือตามสภาพอากาศและทะเล โดยปกติเราจะติดต่ออีกครั้งในคืนก่อนกิจกรรมเพื่อยืนยัน หากต้องการยกเลิกหรือเปลี่ยนวันด้วยเหตุส่วนตัว กรุณาติดต่อโดยเร็ว ค่าธรรมเนียมยกเลิกและการคืนเงินให้เป็นไปตามข้อกำหนดของแผนที่ยืนยันเมื่อจอง การยกเลิกโดยผู้เข้าร่วม: ยกเลิกก่อนวันกิจกรรม 15 วันขึ้นไปไม่มีค่าธรรมเนียม; ก่อน 14–7 วัน 50%; ก่อน 6–2 วัน 80%; ยกเลิกหนึ่งวันก่อน วันกิจกรรม หรือไม่มาตามนัด 100% การงดออกเรือเนื่องจากสภาพอากาศจะจัดการแยกต่างหาก และไม่ใช้ค่าธรรมเนียมการยกเลิกโดยผู้เข้าร่วม"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "ต้องนำอาหารและเครื่องดื่มเองไหม? ปลาที่จับได้จัดการอย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "กรุณานำอาหารและเครื่องดื่มมาเองและป้องกันแสงแดด การนำปลากลับ การทำความสะอาดปลา ณ จุดนั้น หรือทำซาชิมิ ต้องยืนยันกับกัปตันตามชนิดปลาและสภาพในวันนั้น ไม่รับประกันว่าจะมีซาชิมิบนเรือทุกครั้ง"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "นี่คือการเช่าเหมาลำส่วนตัวใช่ไหม — ไม่มีเรือร่วม?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "การเช่าเหมาลำส่วนตัวเป็นของกลุ่มคุณเท่านั้น — ไม่มีคนแปลกหน้า เรายังมีทัวร์เรือร่วมสำหรับผู้เริ่มต้นออกจากท่าเรือ Kadena"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "เด็กๆ เข้าร่วมได้ไหม?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "ได้! แจ้งอายุตอนจองด้วย เสื้อชูชีพมีให้ทุกคน การตกปลาแบบเรือร่วมเหมาะกับเด็กเป็นพิเศษ"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "จะป้องกันอาการเมาเรือได้อย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "รับประทานยาแก้เมาเรือ 1-2 ชั่วโมงก่อน ดื่มน้ำให้เพียงพอ ทานอาหารเบาๆ และมองที่ขอบฟ้า เราแนะนำยาที่หาได้ในท้องถิ่นได้"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "รองรับภาษาอะไรบ้าง?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "เรารองรับภาษาอังกฤษ จีนกลาง และญี่ปุ่น กัปตันเป็นคนญี่ปุ่นแต่มีภาษาอังกฤษพื้นฐานและจีนบ้าง เราจัดการการสื่อสารทั้งหมดให้คุณ"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "เรือเช่าเหมาลำส่วนตัวเข้าร่วมได้กี่คน?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "เรือเช่าเหมาลำเป็นของกลุ่มคุณเท่านั้น รองรับได้สูงสุด 12 คน สำหรับ 2–3 คน ค่าเช่าเหมาลำเป็นราคารวมทั้งลำแล้วแบ่งกันในกลุ่ม ตัวอย่างปัจจุบันคือครึ่งวัน ¥70,000 หรือเต็มวัน ¥130,000 ขึ้นอยู่กับแพ็กเกจที่เลือก"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "เรือตกปลาร่วมทำงานอย่างไร?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "ประสบการณ์เรือตกปลาร่วม Okinawa ออกจากท่าเรือประมง Kadena ใช้เวลาประมาณ 2 ชั่วโมง รองรับได้สูงสุด 35 คน เหมาะสำหรับผู้เริ่มต้นและครอบครัว โปรดติดต่อเราเพื่อสอบถามราคาเรือร่วมปัจจุบัน"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "ขอตัวเลือกฟรีอะไรได้บ้าง?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "ขอฟรีได้: กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ ซาชิมิบนเรือ (ขึ้นอยู่กับปลาที่จับได้) และเสื้อชูชีพเด็กกับอุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา"
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "How early should I book a fishing charter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: When to book — the earlier, the better."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "When is night fishing available in Okinawa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+          }
+        },
+        {
+          "@type": "Question",
+          "inLanguage": "th",
+          "name": "Is night fishing suitable for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "inLanguage": "th",
+            "text": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+          }
+        }
+      ]
     }
   ]
 }
@@ -2615,7 +3547,7 @@ const PRO_GENERAL = {
   },
   cancellation: {
     label: { en:'Cancellation', zh:'取消政策', 'zh-TW':'取消政策', ja:'キャンセル', ko:'취소 정책', th:'นโยบายการยกเลิก' },
-    body: { en:'2+ weeks before: charter fee refunded (minus fee), coordination non-refundable. Typhoon/sea conditions (captain decision): full refund including coordination fee.', zh:'2周前以上：退还船费（扣手续费），协调费不退。台风/海况（船长判断）：全额退款含协调费。', 'zh-TW':'2週前以上：退還船費（扣手續費），協調費不退。颱風／海況（船長判斷）：全額退款含協調費。', ja:'2週間前以上：手数料差引の上船費返金、コーディネート料は返金不可。台風・海況（船長判断）：コーディネート料含む全額返金。', ko:'2주 전 이상: 차터 요금 환불 (수수료 제외), 코디네이션비 불환. 태풍/해상 상태(선장 결정): 코디네이션비 포함 전액 환불.', th:'2+ สัปดาห์ล่วงหน้า: คืนค่าเช่าเหมาลำ (หักค่าธรรมเนียม) ค่าประสานงานไม่คืน พายุไต้ฝุ่น/สภาพทะเล (การตัดสินใจกัปตัน): คืนเงินเต็มจำนวนรวมค่าประสานงาน' }
+    body: {"zh": "个人取消：活动日 15 天前及更早取消不收取消费；活动日前 14–7 天 50%；6–2 天 80%；前一天、当天取消或未到场 100%。天气停航单独处理，不套用个人取消收费。", "zh-TW": "個人取消：活動日 15 天前及更早取消不收取消費；活動日前 14–7 天 50%；6–2 天 80%；前一天、當天取消或未到場 100%。天氣停航單獨處理，不套用個人取消收費。", "en": "Guest cancellations: no cancellation fee 15 days or more before the activity date; 50% 14–7 days before; 80% 6–2 days before; 100% for cancellation the day before, on the activity date, or a no-show. Weather-related sailing cancellations are handled separately and are not subject to guest cancellation fees.", "ja": "お客様都合のキャンセル：活動日の15日前以前はキャンセル料なし、14〜7日前は50%、6〜2日前は80%、前日・当日のキャンセルまたは無断不参加は100%です。天候による欠航は別途対応し、お客様都合のキャンセル料は適用しません。", "ko": "고객 사정에 따른 취소: 활동일 15일 전 및 그 이전에는 취소 수수료 없음, 14–7일 전 50%, 6–2일 전 80%, 전날·당일 취소 또는 불참은 100%입니다. 날씨로 인한 결항은 별도로 처리하며 고객 취소 수수료를 적용하지 않습니다.", "th": "การยกเลิกโดยผู้เข้าร่วม: ยกเลิกก่อนวันกิจกรรม 15 วันขึ้นไปไม่มีค่าธรรมเนียม; ก่อน 14–7 วัน 50%; ก่อน 6–2 วัน 80%; ยกเลิกหนึ่งวันก่อน วันกิจกรรม หรือไม่มาตามนัด 100% การงดออกเรือเนื่องจากสภาพอากาศจะจัดการแยกต่างหาก และไม่ใช้ค่าธรรมเนียมการยกเลิกโดยผู้เข้าร่วม"}
   },
   disclaimer: {
     en: '⚠️ We provide booking coordination and translation only. All operational responsibility is with the captain and vessel.',
@@ -3335,198 +4267,212 @@ function switchGuideTab(panel, btn) {
 // ── FAQ ───────────────────────────────────────────────────
 const FAQS = [
   {
-    q_en: "Is this a private charter — no shared boats?",
-    q_zh: "是完全包船吗？不会和陌生人拼船？",
-    'q_zh-TW': "是完全包船嗎？不會和陌生人拼船？",
-    q_ja: "完全チャーター（貸切）ですか？",
-    q_ko: "전세 차터인가요 — 합승은 없나요?",
-    q_th: "นี่คือการเช่าเหมาลำส่วนตัวใช่ไหม — ไม่มีเรือร่วม?",
-    a_en: "The private charters are your group only — no strangers. We also offer shared boat experience tours for beginners departing from Kadena port.",
-    a_zh: "专业包船行程均为整船包，只有你们的团队。我们也提供嘉手纳渔港出发的拼船体验团。",
-    'a_zh-TW': "專業包船行程均為整船包，只有您們的團隊。我們也提供嘉手納漁港出發的拼船體驗團。",
-    a_ja: "プライベートチャーターはグループ専用です。嘉手納漁港からの乗合体験ツアーもご用意しています。",
-    a_ko: "전세 차터는 귀하의 그룹만 이용합니다 — 낯선 사람 없음. 가데나 항구에서 출발하는 초보자용 합승 체험 투어도 제공합니다.",
-    a_th: "การเช่าเหมาลำส่วนตัวเป็นของกลุ่มคุณเท่านั้น — ไม่มีคนแปลกหน้า เรายังมีทัวร์เรือร่วมสำหรับผู้เริ่มต้นออกจากท่าเรือ Kadena"
+    "q_zh": "怎么预约？",
+    "a_zh": "请告诉我们希望日期、人数、儿童年龄、住宿区域、钓鱼经验，以及想参加半日还是全天行程。我们核对船期后，会通过确认邮件说明方案、总额、集合地点和预约手续。",
+    "q_zh-TW": "怎麼預約？",
+    "a_zh-TW": "請告訴我們希望日期、人數、兒童年齡、住宿區域、釣魚經驗，以及想參加半日還是全天行程。我們核對船期後，會透過確認郵件說明方案、總額、集合地點和預約手續。",
+    "q_en": "How do I book?",
+    "a_en": "Tell us your preferred date, group size, children's ages, accommodation area, fishing experience, and whether you want a half-day or full-day trip. After checking boat availability, we will explain the plan, total amount, meeting point and booking steps in a confirmation email.",
+    "q_ja": "予約方法は？",
+    "a_ja": "希望日、人数、お子様の年齢、宿泊エリア、釣り経験、半日または終日の希望をお知らせください。船の空きを確認後、プラン、総額、集合場所、予約手続きを確認メールでご案内します。",
+    "q_ko": "어떻게 예약하나요?",
+    "a_ko": "희망 날짜, 인원, 어린이 나이, 숙박 지역, 낚시 경험, 반일 또는 종일 일정 중 원하는 것을 알려 주세요. 선박 일정을 확인한 뒤 확인 이메일로 상품, 총액, 집합 장소 및 예약 절차를 안내합니다.",
+    "q_th": "จองอย่างไร?",
+    "a_th": "กรุณาแจ้งวันที่ต้องการ จำนวนคน อายุเด็ก พื้นที่ที่พัก ประสบการณ์ตกปลา และต้องการทริปครึ่งวันหรือเต็มวัน หลังตรวจสอบตารางเรือ เราจะส่งอีเมลยืนยันระบุแผน ยอดรวม จุดนัดพบ และขั้นตอนการจอง"
   },
   {
-    q_en: "Do I need prior fishing experience?",
-    q_zh: "需要有钓鱼经验吗？",
-    'q_zh-TW': "需要有釣魚經驗嗎？",
-    q_ja: "釣りの経験がなくても大丈夫ですか？",
-    q_ko: "사전 낚시 경험이 필요한가요?",
-    q_th: "ต้องมีประสบการณ์ตกปลามาก่อนไหม?",
-    a_en: "For most plans, no experience needed. GT fishing is the exception — it requires heavy tackle and long-distance casting experience. Chat with us first if unsure.",
-    a_zh: "大多数方案无需钓鱼经验。GT钓鱼是例外——需要重型装备和远距离抛投经验，不确定请先联系我们。",
-    'a_zh-TW': "大多數方案無需釣魚經驗。GT釣魚是例外——需要重型裝備和遠距離拋投經驗，不確定請先聯絡我們。",
-    a_ja: "ほとんどのプランは未経験でも大丈夫。GTフィッシングは例外で、重いタックルと遠投の経験が必要です。",
-    a_ko: "대부분의 플랜은 경험이 필요 없습니다. GT 낚시는 예외 — 무거운 장비와 원거리 캐스팅 경험이 필요합니다. 불확실하면 먼저 문의해 주세요.",
-    a_th: "สำหรับแผนส่วนใหญ่ ไม่ต้องมีประสบการณ์ การตกปลา GT เป็นข้อยกเว้น — ต้องใช้อุปกรณ์หนักและประสบการณ์การโยนระยะไกล"
+    "q_zh": "没有钓鱼经验，可以参加吗？",
+    "a_zh": "多数体验方案欢迎初学者。私人包船和拼船的安排不同；GT抛投等专业钓法需要相应经验，请预约时说明，我们会协助确认适合的方案。",
+    "q_zh-TW": "沒有釣魚經驗，可以參加嗎？",
+    "a_zh-TW": "多數體驗方案歡迎初學者。私人包船和拼船的安排不同；GT拋投等專業釣法需要相應經驗，請預約時說明，我們會協助確認適合的方案。",
+    "q_en": "Can I join without fishing experience?",
+    "a_en": "Most experience tours welcome beginners. Private charters and shared boats have different arrangements; specialist methods such as GT casting require relevant experience. Tell us when booking so we can help confirm a suitable plan.",
+    "q_ja": "釣りの経験がなくても参加できますか？",
+    "a_ja": "多くの体験プランは初心者を歓迎します。貸切船と乗合船では手配が異なります。GTキャスティングなど専門的な釣法には相応の経験が必要ですので、予約時にお知らせください。適したプランの確認をお手伝いします。",
+    "q_ko": "낚시 경험이 없어도 참여할 수 있나요?",
+    "a_ko": "대부분의 체험 상품은 초보자를 환영합니다. 단독 대절선과 합승선은 운영 방식이 다르며 GT 캐스팅 같은 전문 낚시에는 해당 경험이 필요합니다. 예약할 때 알려 주시면 적합한 상품을 확인하도록 도와드립니다.",
+    "q_th": "ไม่มีประสบการณ์ตกปลา เข้าร่วมได้ไหม?",
+    "a_th": "ทริปทดลองส่วนใหญ่ยินดีรับผู้เริ่มต้น การจัดเรือเหมาส่วนตัวกับเรือร่วมต่างกัน วิธีตกปลาเฉพาะทาง เช่น การตีเหยื่อ GT ต้องมีประสบการณ์ที่เกี่ยวข้อง กรุณาแจ้งเมื่อจอง เราจะช่วยตรวจสอบแผนที่เหมาะสม"
   },
   {
-    q_en: "Is fishing gear included?",
-    q_zh: "需要自带钓鱼装备吗？",
-    'q_zh-TW': "需要自帶釣魚裝備嗎？",
-    q_ja: "釣り道具は持参する必要がありますか？",
-    q_ko: "낚시 장비를 가져와야 하나요?",
-    q_th: "ต้องนำอุปกรณ์ตกปลามาเองไหม?",
-    a_en: "Gear is rented per person and priced by fishing style — around ¥10,000 per person as a guide. Bring your own if you prefer. We'll confirm the exact amount in your confirmation email, and it is included in the card hold we place before your trip.",
-    a_zh: "不需要，全套装备提供或可租赁。如想自带，提前告知即可。",
-    'a_zh-TW': "不需要，全套裝備提供或可租借。如想自帶，提前告知即可。",
-    a_ja: "釣具・エサのレンタルは別途（釣り方により1名あたり約10,000円目安）。当日精算、カードの与信枠（ホールド）には含まれます。",
-    a_ko: "아니요 — 모든 장비가 제공되거나 대여 가능합니다. 원하시면 직접 가져오셔도 됩니다. 미리 알려주세요.",
-    a_th: "ไม่ — อุปกรณ์ทั้งหมดจัดเตรียมให้หรือเช่าได้ นำมาเองได้หากต้องการ แค่แจ้งล่วงหน้า"
+    "q_zh": "价格包含装备吗？",
+    "a_zh": "不同方案的包含项目不同。预约时会分别列明船费、装备租赁及其他选购项目；自带装备请提前告知，最终金额以确认邮件为准。",
+    "q_zh-TW": "價格包含裝備嗎？",
+    "a_zh-TW": "不同方案的包含項目不同。預約時會分別列明船費、裝備租借及其他選購項目；自帶裝備請提前告知，最終金額以確認郵件為準。",
+    "q_en": "Is equipment included in the price?",
+    "a_en": "Inclusions vary by plan. Boat fees, equipment rental and optional extras will be listed separately when booking. Tell us in advance if you bring your own equipment; the final amount is as stated in the confirmation email.",
+    "q_ja": "料金に道具は含まれますか？",
+    "a_ja": "含まれる項目はプランによって異なります。予約時に船代、道具のレンタル、その他のオプションをそれぞれ明記します。道具を持参する場合は事前にお知らせください。最終金額は確認メールの記載が基準です。",
+    "q_ko": "가격에 장비가 포함되나요?",
+    "a_ko": "포함 항목은 상품마다 다릅니다. 예약할 때 선박 요금, 장비 대여 및 기타 선택 항목을 각각 명시합니다. 개인 장비를 가져오면 미리 알려 주세요. 최종 금액은 확인 이메일을 기준으로 합니다.",
+    "q_th": "ราคารวมอุปกรณ์ไหม?",
+    "a_th": "สิ่งที่รวมแตกต่างกันตามแผน เมื่อจองจะระบุค่าเรือ ค่าเช่าอุปกรณ์ และตัวเลือกอื่นแยกกัน หากนำอุปกรณ์มาเองกรุณาแจ้งล่วงหน้า ยอดสุดท้ายให้ยึดตามอีเมลยืนยัน"
   },
   {
-    q_en: "What if the weather is bad?",
-    q_zh: "天气不好怎么办？",
-    'q_zh-TW': "天氣不好怎麼辦？",
-    q_ja: "天候が悪い場合はどうなりますか？",
-    q_ko: "날씨가 나쁘면 어떻게 되나요?",
-    q_th: "ถ้าอากาศไม่ดีจะเป็นอย่างไร?",
-    a_en: "Safety first. If the captain calls it unsafe, the trip is cancelled and you get a full refund — including the coordination fee.",
-    a_zh: "安全第一。船长判断海况不安全则取消行程，全额退款，含协调费。",
-    'a_zh-TW': "安全第一。船長判斷海況不安全則取消行程，全額退款，含協調費。",
-    a_ja: "安全最優先。船長が危険と判断した場合は中止・全額返金（コーディネート料含む）。",
-    a_ko: "안전 최우선. 선장이 위험하다고 판단하면 여행이 취소되고 전액 환불됩니다 — 코디네이션 비용 포함.",
-    a_th: "ความปลอดภัยเป็นอันดับแรก หากกัปตันตัดสินว่าไม่ปลอดภัย ทริปจะถูกยกเลิกและคืนเงินเต็มจำนวน รวมค่าประสานงาน"
+    "q_zh": "在哪里集合？",
+    "a_zh": "港口和集合时间随方案而定。确认邮件会提供准确地点、地图定位和到场时间。前一晚请留意最新消息；当天找不到集合点或可能迟到，请立即联系。",
+    "q_zh-TW": "在哪裡集合？",
+    "a_zh-TW": "港口和集合時間隨方案而定。確認郵件會提供準確地點、地圖定位和到場時間。前一晚請留意最新消息；當天找不到集合點或可能遲到，請立即聯絡。",
+    "q_en": "Where do we meet?",
+    "a_en": "The port and meeting time depend on the plan. Your confirmation email will provide the exact location, map pin and arrival time. Check for updates the evening before; contact us immediately if you cannot find the meeting point or may be late on the day.",
+    "q_ja": "集合場所はどこですか？",
+    "a_ja": "港と集合時間はプランによって異なります。確認メールで正確な場所、地図の位置、到着時間をご案内します。前夜は最新の連絡をご確認ください。当日、集合場所が見つからない場合や遅れそうな場合はすぐにご連絡ください。",
+    "q_ko": "어디에서 모이나요?",
+    "a_ko": "항구와 집합 시간은 상품에 따라 다릅니다. 확인 이메일에 정확한 장소, 지도 위치 및 도착 시간을 안내합니다. 전날 밤 최신 안내를 확인하고, 당일 집합 장소를 찾지 못하거나 늦을 것 같으면 즉시 연락해 주세요.",
+    "q_th": "นัดพบที่ไหน?",
+    "a_th": "ท่าเรือและเวลานัดพบขึ้นอยู่กับแผน อีเมลยืนยันจะระบุสถานที่ที่แน่นอน หมุดแผนที่ และเวลาที่ต้องมาถึง กรุณาตรวจสอบข้อความล่าสุดในคืนก่อนกิจกรรม หากหาจุดนัดพบไม่เจอหรืออาจมาสายในวันกิจกรรม ให้ติดต่อทันที"
   },
   {
-    q_en: "Can children join?",
-    q_zh: "孩子可以参加吗？",
-    'q_zh-TW': "小孩可以參加嗎？",
-    q_ja: "子どもは参加できますか？",
-    q_ko: "어린이도 참여할 수 있나요?",
-    q_th: "เด็กๆ เข้าร่วมได้ไหม?",
-    a_en: "Yes! Let us know their ages when booking. Life jackets are provided for everyone. The shared boat experience is especially great for kids.",
-    a_zh: "可以！预约时告知年龄，所有人提供救生衣。拼船体验特别适合带孩子参加。",
-    'a_zh-TW': "可以！預約時告知年齡，所有人提供救生衣。拼船體驗特別適合帶小孩參加。",
-    a_ja: "はい！ご予約時に年齢をお知らせください。ライフジャケットは全員分ご用意します。",
-    a_ko: "네! 예약 시 나이를 알려주세요. 구명조끼는 모든 분께 제공됩니다. 합승 체험은 아이들에게 특히 좋습니다.",
-    a_th: "ได้! แจ้งอายุตอนจองด้วย เสื้อชูชีพมีให้ทุกคน การตกปลาแบบเรือร่วมเหมาะกับเด็กเป็นพิเศษ"
+    "q_zh": "怎么付款？预授权是已经扣款了吗？",
+    "a_zh": "私人船海钓采用预授权保留预约，活动当天以现金付款为主；其他支付方式请提前确认。预授权只是暂时冻结额度，不是实际付款。其他海钓商品按具体方案确认付款方式。",
+    "q_zh-TW": "怎麼付款？預授權是已經扣款了嗎？",
+    "a_zh-TW": "私人船海釣採用預授權保留預約，活動當天以現金付款為主；其他支付方式請提前確認。預授權只是暫時凍結額度，不是實際付款。其他海釣商品按具體方案確認付款方式。",
+    "q_en": "How do I pay? Has a preauthorization already charged me?",
+    "a_en": "Private-boat sea fishing uses a preauthorization to hold your booking, with cash as the main payment method on the activity day. Confirm other payment methods in advance. A preauthorization temporarily holds available funds; it is not an actual payment. Payment methods for other sea-fishing products are confirmed for the specific plan.",
+    "q_ja": "支払方法は？事前承認で既に引き落とされていますか？",
+    "a_ja": "貸切船の海釣りは事前承認で予約を確保し、活動当日は主に現金でお支払いいただきます。他の支払方法は事前にご確認ください。事前承認は利用可能枠を一時的に確保するもので、実際の支払いではありません。その他の海釣り商品の支払方法は各プランに応じて確認します。",
+    "q_ko": "어떻게 결제하나요? 사전 승인은 이미 결제된 건가요?",
+    "a_ko": "단독 대절선 바다낚시는 사전 승인으로 예약을 확보하며 활동 당일 현금 결제가 기본입니다. 다른 결제 방법은 미리 확인해 주세요. 사전 승인은 한도를 일시적으로 확보하는 것이며 실제 결제가 아닙니다. 다른 바다낚시 상품은 해당 상품에 따라 결제 방법을 확인합니다.",
+    "q_th": "ชำระอย่างไร? การกันวงเงินล่วงหน้าคือหักเงินแล้วหรือไม่?",
+    "a_th": "การตกปลาทะเลด้วยเรือเหมาส่วนตัวใช้การกันวงเงินล่วงหน้าเพื่อรักษาการจอง และในวันกิจกรรมชำระเป็นเงินสดเป็นหลัก วิธีชำระอื่นกรุณายืนยันล่วงหน้า การกันวงเงินเป็นเพียงการสำรองวงเงินชั่วคราว ไม่ใช่การชำระเงินจริง ผลิตภัณฑ์ตกปลาทะเลอื่นให้ยืนยันวิธีชำระตามแผนที่เลือก"
   },
   {
-    q_en: "How do I prevent seasickness?",
-    q_zh: "如何预防晕船？",
-    'q_zh-TW': "如何預防暈船？",
-    q_ja: "船酔いを防ぐには？",
-    q_ko: "뱃멀미를 어떻게 예방하나요?",
-    q_th: "จะป้องกันอาการเมาเรือได้อย่างไร?",
-    a_en: "Take motion sickness tablets 1–2 hours before, stay hydrated, eat light, and keep your eyes on the horizon. We can recommend what to grab locally.",
-    a_zh: "出发前1-2小时服用晕船药，保持补水，吃清淡食物，眼望地平线。我们可以推荐当地的晕船药（成人推荐大白兔）。",
-    'a_zh-TW': "出發前1-2小時服用暈船藥，保持補水，吃清淡食物，眼望地平線。我們可以推薦當地的暈船藥。",
-    a_ja: "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。",
-    a_ko: "출발 1~2시간 전 멀미약 복용, 수분 보충, 가벼운 식사, 수평선을 바라보세요. 현지에서 구할 수 있는 것을 추천해 드릴 수 있습니다.",
-    a_th: "รับประทานยาแก้เมาเรือ 1-2 ชั่วโมงก่อน ดื่มน้ำให้เพียงพอ ทานอาหารเบาๆ และมองที่ขอบฟ้า เราแนะนำยาที่หาได้ในท้องถิ่นได้"
+    "q_zh": "天气不好或想取消，怎么办？",
+    "a_zh": "是否出航由船长根据天气和海况判断，我们通常会在前一晚再次联系确认。个人取消或改期请尽早联系；具体取消费用和退款安排，按预约时确认的对应方案条款执行。 个人取消：活动日 15 天前及更早取消不收取消费；活动日前 14–7 天 50%；6–2 天 80%；前一天、当天取消或未到场 100%。天气停航单独处理，不套用个人取消收费。",
+    "q_zh-TW": "天氣不好或想取消，怎麼辦？",
+    "a_zh-TW": "是否出航由船長根據天氣和海況判斷，我們通常會在前一晚再次聯絡確認。個人取消或改期請儘早聯絡；具體取消費用和退款安排，按預約時確認的對應方案條款執行。 個人取消：活動日 15 天前及更早取消不收取消費；活動日前 14–7 天 50%；6–2 天 80%；前一天、當天取消或未到場 100%。天氣停航單獨處理，不套用個人取消收費。",
+    "q_en": "What if the weather is bad or I want to cancel?",
+    "a_en": "The captain decides whether to sail based on weather and sea conditions. We usually contact you again the evening before to confirm. Contact us early for a personal cancellation or date change; cancellation fees and refund arrangements follow the terms of the relevant plan confirmed when booking. Guest cancellations: no cancellation fee 15 days or more before the activity date; 50% 14–7 days before; 80% 6–2 days before; 100% for cancellation the day before, on the activity date, or a no-show. Weather-related sailing cancellations are handled separately and are not subject to guest cancellation fees.",
+    "q_ja": "悪天候やキャンセルの場合は？",
+    "a_ja": "天候と海況に基づき船長が出航の可否を判断します。通常、前夜に改めてご連絡して確認します。お客様都合のキャンセルや日程変更は早めにご連絡ください。具体的なキャンセル料や返金は、予約時に確認した該当プランの規定に従います。 お客様都合のキャンセル：活動日の15日前以前はキャンセル料なし、14〜7日前は50%、6〜2日前は80%、前日・当日のキャンセルまたは無断不参加は100%です。天候による欠航は別途対応し、お客様都合のキャンセル料は適用しません。",
+    "q_ko": "날씨가 나쁘거나 취소하고 싶으면 어떻게 하나요?",
+    "a_ko": "출항 여부는 날씨와 바다 상태에 따라 선장이 판단하며 보통 전날 밤 다시 연락하여 확인합니다. 개인 사정에 따른 취소나 날짜 변경은 일찍 연락해 주세요. 구체적인 취소 수수료와 환불은 예약 시 확인한 해당 상품 약관에 따릅니다. 고객 사정에 따른 취소: 활동일 15일 전 및 그 이전에는 취소 수수료 없음, 14–7일 전 50%, 6–2일 전 80%, 전날·당일 취소 또는 불참은 100%입니다. 날씨로 인한 결항은 별도로 처리하며 고객 취소 수수료를 적용하지 않습니다.",
+    "q_th": "ถ้าอากาศไม่ดีหรือต้องการยกเลิก ทำอย่างไร?",
+    "a_th": "กัปตันตัดสินใจออกเรือตามสภาพอากาศและทะเล โดยปกติเราจะติดต่ออีกครั้งในคืนก่อนกิจกรรมเพื่อยืนยัน หากต้องการยกเลิกหรือเปลี่ยนวันด้วยเหตุส่วนตัว กรุณาติดต่อโดยเร็ว ค่าธรรมเนียมยกเลิกและการคืนเงินให้เป็นไปตามข้อกำหนดของแผนที่ยืนยันเมื่อจอง การยกเลิกโดยผู้เข้าร่วม: ยกเลิกก่อนวันกิจกรรม 15 วันขึ้นไปไม่มีค่าธรรมเนียม; ก่อน 14–7 วัน 50%; ก่อน 6–2 วัน 80%; ยกเลิกหนึ่งวันก่อน วันกิจกรรม หรือไม่มาตามนัด 100% การงดออกเรือเนื่องจากสภาพอากาศจะจัดการแยกต่างหาก และไม่ใช้ค่าธรรมเนียมการยกเลิกโดยผู้เข้าร่วม"
   },
   {
-    q_en: "What languages do you support?",
-    q_zh: "提供哪些语言服务？",
-    'q_zh-TW': "提供哪些語言服務？",
-    q_ja: "言語サポートはどうなりますか？",
-    q_ko: "어떤 언어를 지원하나요?",
-    q_th: "รองรับภาษาอะไรบ้าง?",
-    a_en: "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you.",
-    a_zh: "我们支持中文、英语和日语。船长是日本人，有基本英语和部分中文能力，我们负责所有沟通。",
-    'a_zh-TW': "我們支援中文、英語和日語。船長是日本人，有基本英語和部分中文能力，我們負責所有溝通。",
-    a_ja: "英語・中文・日本語に対応。船長は日本語メインですが、英語・中文も少々対応可能。コミュニケーションはすべて当方がサポートします。",
-    a_ko: "영어, 중국어, 일본어를 지원합니다. 선장은 일본인이지만 기본 영어와 일부 중국어가 가능합니다. 모든 소통은 저희가 대신합니다.",
-    a_th: "เรารองรับภาษาอังกฤษ จีนกลาง และญี่ปุ่น กัปตันเป็นคนญี่ปุ่นแต่มีภาษาอังกฤษพื้นฐานและจีนบ้าง เราจัดการการสื่อสารทั้งหมดให้คุณ"
+    "q_zh": "要自己带吃喝吗？钓到的鱼怎么安排？",
+    "a_zh": "请自备食物和饮料，并做好防晒。渔获能否保留、现场处理或制作刺身，需按鱼种和当天条件与船长确认，不保证每次都有船上刺身。",
+    "q_zh-TW": "要自己帶吃喝嗎？釣到的魚怎麼安排？",
+    "a_zh-TW": "請自備食物和飲料，並做好防曬。漁獲能否保留、現場處理或製作刺身，需按魚種和當天條件與船長確認，不保證每次都有船上刺身。",
+    "q_en": "Should I bring food and drinks? What happens to the catch?",
+    "a_en": "Bring your own food and drinks and protect yourself from the sun. Whether the catch can be kept, prepared on site or made into sashimi must be confirmed with the captain based on the species and conditions that day. Sashimi on board is not guaranteed on every trip.",
+    "q_ja": "飲食物は持参しますか？釣った魚はどうなりますか？",
+    "a_ja": "食べ物と飲み物をご持参いただき、日焼け対策もお願いします。魚の持ち帰り、現地での処理、刺身の提供は、魚種と当日の条件に応じて船長にご確認ください。毎回船上で刺身が提供されるとは限りません。",
+    "q_ko": "음식과 음료를 가져와야 하나요? 잡은 물고기는 어떻게 하나요?",
+    "a_ko": "음식과 음료를 직접 준비하고 자외선 차단을 해 주세요. 잡은 물고기를 가져가거나 현장에서 손질하거나 회로 먹을 수 있는지는 어종과 당일 상황에 따라 선장과 확인해야 합니다. 매번 선상에서 회를 제공하는 것은 보장되지 않습니다.",
+    "q_th": "ต้องนำอาหารและเครื่องดื่มเองไหม? ปลาที่จับได้จัดการอย่างไร?",
+    "a_th": "กรุณานำอาหารและเครื่องดื่มมาเองและป้องกันแสงแดด การนำปลากลับ การทำความสะอาดปลา ณ จุดนั้น หรือทำซาชิมิ ต้องยืนยันกับกัปตันตามชนิดปลาและสภาพในวันนั้น ไม่รับประกันว่าจะมีซาชิมิบนเรือทุกครั้ง"
   },
   {
-    q_en: "How many people can join a private fishing charter?",
-    q_zh: "包船最多可以几个人参加？",
-    'q_zh-TW': "包船最多可以幾個人參加？",
-    q_ja: "貸切チャーターは何名まで参加できますか？",
-    q_ko: "전세 낚시 차터는 몇 명까지 참여할 수 있나요?",
-    q_th: "เรือเช่าเหมาลำส่วนตัวเข้าร่วมได้กี่คน?",
-    a_en: "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples are ¥70,000 for a half-day or ¥130,000 for a full-day, depending on the selected package.",
-    a_zh: "包船只接待你们一组，最多 12 人。2–3 人参加时，包船价按整船价格由同行人数分摊；现有私人包船示例为半日 ¥70,000 或全天 ¥130,000，具体取决于所选方案。",
-    'a_zh-TW': "包船只接待您們一組，最多 12 人。2–3 人參加時，包船價按整船價格由同行人數分攤；現有私人包船示例為半日 ¥70,000 或全天 ¥130,000，具體取決於所選方案。",
-    a_ja: "貸切チャーターはグループ専用で、最大12名まで参加できます。2〜3名の場合は船単位の料金を人数で割る形です。現在の貸切例は半日¥70,000、または終日¥130,000です。",
-    a_ko: "전세 차터는 귀하의 그룹만 이용하며 최대 12명까지 가능합니다. 2~3명은 선박 전체 요금을 그룹 인원으로 나누는 방식이며, 현재 전세 예시는 반일 ¥70,000 또는 종일 ¥130,000입니다.",
-    a_th: "เรือเช่าเหมาลำเป็นของกลุ่มคุณเท่านั้น รองรับได้สูงสุด 12 คน สำหรับ 2–3 คน ค่าเช่าเหมาลำเป็นราคารวมทั้งลำแล้วแบ่งกันในกลุ่ม ตัวอย่างปัจจุบันคือครึ่งวัน ¥70,000 หรือเต็มวัน ¥130,000 ขึ้นอยู่กับแพ็กเกจที่เลือก"
+    "q_en": "Is this a private charter — no shared boats?",
+    "q_zh": "是完全包船吗？不会和陌生人拼船？",
+    "q_zh-TW": "是完全包船嗎？不會和陌生人拼船？",
+    "q_ja": "完全チャーター（貸切）ですか？",
+    "q_ko": "전세 차터인가요 — 합승은 없나요?",
+    "q_th": "นี่คือการเช่าเหมาลำส่วนตัวใช่ไหม — ไม่มีเรือร่วม?",
+    "a_en": "The private charters are your group only — no strangers. We also offer shared boat experience tours for beginners departing from Kadena port.",
+    "a_zh": "专业包船行程均为整船包，只有你们的团队。我们也提供嘉手纳渔港出发的拼船体验团。",
+    "a_zh-TW": "專業包船行程均為整船包，只有您們的團隊。我們也提供嘉手納漁港出發的拼船體驗團。",
+    "a_ja": "プライベートチャーターはグループ専用です。嘉手納漁港からの乗合体験ツアーもご用意しています。",
+    "a_ko": "전세 차터는 귀하의 그룹만 이용합니다 — 낯선 사람 없음. 가데나 항구에서 출발하는 초보자용 합승 체험 투어도 제공합니다.",
+    "a_th": "การเช่าเหมาลำส่วนตัวเป็นของกลุ่มคุณเท่านั้น — ไม่มีคนแปลกหน้า เรายังมีทัวร์เรือร่วมสำหรับผู้เริ่มต้นออกจากท่าเรือ Kadena"
   },
   {
-    q_en: "How does the shared fishing boat work?",
-    q_zh: "拼船海钓体验是怎么安排的？",
-    'q_zh-TW': "拼船海釣體驗是怎麼安排的？",
-    q_ja: "乗合の釣り体験はどのような内容ですか？",
-    q_ko: "합승 낚시 보트는 어떻게 운영되나요?",
-    q_th: "เรือตกปลาร่วมทำงานอย่างไร?",
-    a_en: "The shared fishing boat Okinawa experience departs from Kadena Fishing Port, runs about 2 hours and can take up to 35 people. It is built for first-timers and families; contact us for current shared-boat pricing.",
-    a_zh: "Okinawa 拼船海钓体验从嘉手纳渔港出发，约 2 小时，最多 35 人。适合初学者和家庭；当前拼船价格请直接咨询。",
-    'a_zh-TW': "Okinawa 拼船海釣體驗從嘉手納漁港出發，約 2 小時，最多 35 人。適合初學者和家庭；目前拼船價格請直接詢問。",
-    a_ja: "沖縄の乗合釣り体験は嘉手納漁港発、約2時間、最大35名までです。初心者や家族向けです。現在の乗合料金はお問い合わせください。",
-    a_ko: "오키나와 합승 낚시 보트 체험은 가데나 어항에서 출발하며 약 2시간, 최대 35명까지 가능합니다. 초보자와 가족에게 적합하며 현재 합승 보트 요금은 문의해 주세요.",
-    a_th: "ประสบการณ์เรือตกปลาร่วม Okinawa ออกจากท่าเรือประมง Kadena ใช้เวลาประมาณ 2 ชั่วโมง รองรับได้สูงสุด 35 คน เหมาะสำหรับผู้เริ่มต้นและครอบครัว โปรดติดต่อเราเพื่อสอบถามราคาเรือร่วมปัจจุบัน"
+    "q_en": "Can children join?",
+    "q_zh": "孩子可以参加吗？",
+    "q_zh-TW": "小孩可以參加嗎？",
+    "q_ja": "子どもは参加できますか？",
+    "q_ko": "어린이도 참여할 수 있나요?",
+    "q_th": "เด็กๆ เข้าร่วมได้ไหม?",
+    "a_en": "Yes! Let us know their ages when booking. Life jackets are provided for everyone. The shared boat experience is especially great for kids.",
+    "a_zh": "可以！预约时告知年龄，所有人提供救生衣。拼船体验特别适合带孩子参加。",
+    "a_zh-TW": "可以！預約時告知年齡，所有人提供救生衣。拼船體驗特別適合帶小孩參加。",
+    "a_ja": "はい！ご予約時に年齢をお知らせください。ライフジャケットは全員分ご用意します。",
+    "a_ko": "네! 예약 시 나이를 알려주세요. 구명조끼는 모든 분께 제공됩니다. 합승 체험은 아이들에게 특히 좋습니다.",
+    "a_th": "ได้! แจ้งอายุตอนจองด้วย เสื้อชูชีพมีให้ทุกคน การตกปลาแบบเรือร่วมเหมาะกับเด็กเป็นพิเศษ"
   },
   {
-    q_en: "Where do we meet for the fishing trip?",
-    q_zh: "海钓行程在哪里集合？",
-    'q_zh-TW': "海釣行程在哪裡集合？",
-    q_ja: "釣りツアーの集合場所はどこですか？",
-    q_ko: "낚시 여행은 어디에서 만나나요?",
-    q_th: "เราจะนัดพบกันที่ไหนสำหรับทริปตกปลา?",
-    a_en: "Meeting points depend on the plan: Chatan American Village Port or Chatan Hamagawa Port on the west coast, Uruma Awase Port on the east coast, and Kadena Fishing Port for the shared boat experience. We confirm the exact port before booking.",
-    a_zh: "集合点按方案而定：西海岸为北谷美国村港或北谷滨川港，东海岸为 Uruma Awase 港，拼船体验为嘉手纳渔港。预约前会确认准确港口。",
-    'a_zh-TW': "集合點按方案而定：西海岸為北谷美國村港或北谷濱川港，東海岸為 Uruma Awase 港，拼船體驗為嘉手納漁港。預約前會確認準確港口。",
-    a_ja: "集合場所はプランにより異なります。西海岸は北谷アメリカンビレッジ港または北谷浜川港、東海岸はうるま泡瀬港、乗合体験は嘉手納漁港です。予約前に正確な港を確認します。",
-    a_ko: "집합 장소는 플랜에 따라 다릅니다. 서해안은 차탄 아메리칸 빌리지 항구 또는 차탄 하마가와 항구, 동해안은 우루마 아와세 항구, 합승 보트 체험은 가데나 어항입니다. 예약 전 정확한 항구를 확인합니다.",
-    a_th: "จุดนัดพบขึ้นอยู่กับแผน: ท่าเรือ Chatan American Village หรือ Chatan Hamagawa ทางฝั่งตะวันตก, ท่าเรือ Uruma Awase ทางฝั่งตะวันออก และท่าเรือประมง Kadena สำหรับประสบการณ์เรือร่วม เราจะยืนยันท่าเรือที่แน่นอนก่อนจอง"
+    "q_en": "How do I prevent seasickness?",
+    "q_zh": "如何预防晕船？",
+    "q_zh-TW": "如何預防暈船？",
+    "q_ja": "船酔いを防ぐには？",
+    "q_ko": "뱃멀미를 어떻게 예방하나요?",
+    "q_th": "จะป้องกันอาการเมาเรือได้อย่างไร?",
+    "a_en": "Take motion sickness tablets 1–2 hours before, stay hydrated, eat light, and keep your eyes on the horizon. We can recommend what to grab locally.",
+    "a_zh": "出发前1-2小时服用晕船药，保持补水，吃清淡食物，眼望地平线。我们可以推荐当地的晕船药（成人推荐大白兔）。",
+    "a_zh-TW": "出發前1-2小時服用暈船藥，保持補水，吃清淡食物，眼望地平線。我們可以推薦當地的暈船藥。",
+    "a_ja": "出発1〜2時間前に酔い止めを服用し、水分補給、軽食、水平線を見ることをお勧めします。",
+    "a_ko": "출발 1~2시간 전 멀미약 복용, 수분 보충, 가벼운 식사, 수평선을 바라보세요. 현지에서 구할 수 있는 것을 추천해 드릴 수 있습니다.",
+    "a_th": "รับประทานยาแก้เมาเรือ 1-2 ชั่วโมงก่อน ดื่มน้ำให้เพียงพอ ทานอาหารเบาๆ และมองที่ขอบฟ้า เราแนะนำยาที่หาได้ในท้องถิ่นได้"
   },
   {
-    q_en: "What's included in the price?",
-    q_zh: "价格包含哪些内容？",
-    'q_zh-TW': "價格包含哪些內容？",
-    q_ja: "料金には何が含まれますか？",
-    q_ko: "가격에는 무엇이 포함되나요?",
-    q_th: "ราคานี้รวมอะไรบ้าง?",
-    a_en: "Our price includes a private boat charter with a licensed local captain; life jackets and safety equipment; and English booking support and WhatsApp coordination before and on the day. Tackle and bait are rented separately per person.",
-    a_zh: "我们的价格包括持证当地船长的包船服务、救生衣及安全设备，以及出发前和当天的英语预约支持与 WhatsApp 协调。渔具和鱼饵需按人另行租赁。",
-    'a_zh-TW': "我們的價格包括持證當地船長的包船服務、救生衣及安全設備，以及出發前和當天的英語預約支援與 WhatsApp 協調。釣具和魚餌需按人另行租借。",
-    a_ja: "料金には資格を持つ地元船長による貸切ボート、ライフジャケットと安全装備、出発前と当日の英語予約サポート・WhatsApp対応が含まれます。釣具・エサのレンタルは別途です。",
-    a_ko: "가격에는 자격을 갖춘 현지 선장과의 전세 보트, 낚싯대·릴·태클·미끼, 구명조끼와 안전 장비, 출항 전 및 당일 영어 예약 지원과 WhatsApp 조율이 포함됩니다.",
-    a_th: "ราคานี้รวมเรือเช่าเหมาลำพร้อมกัปตันท้องถิ่นที่มีใบอนุญาต คันเบ็ด รอก อุปกรณ์และเหยื่อ เสื้อชูชีพและอุปกรณ์ความปลอดภัย รวมถึงการจองภาษาอังกฤษและประสานงาน WhatsApp ก่อนและในวันเดินทาง"
+    "q_en": "What languages do you support?",
+    "q_zh": "提供哪些语言服务？",
+    "q_zh-TW": "提供哪些語言服務？",
+    "q_ja": "言語サポートはどうなりますか？",
+    "q_ko": "어떤 언어를 지원하나요?",
+    "q_th": "รองรับภาษาอะไรบ้าง?",
+    "a_en": "We support English, Mandarin Chinese and Japanese. The captain is Japanese but has basic English and some Mandarin. We handle all communication for you.",
+    "a_zh": "我们支持中文、英语和日语。船长是日本人，有基本英语和部分中文能力，我们负责所有沟通。",
+    "a_zh-TW": "我們支援中文、英語和日語。船長是日本人，有基本英語和部分中文能力，我們負責所有溝通。",
+    "a_ja": "英語・中文・日本語に対応。船長は日本語メインですが、英語・中文も少々対応可能。コミュニケーションはすべて当方がサポートします。",
+    "a_ko": "영어, 중국어, 일본어를 지원합니다. 선장은 일본인이지만 기본 영어와 일부 중국어가 가능합니다. 모든 소통은 저희가 대신합니다.",
+    "a_th": "เรารองรับภาษาอังกฤษ จีนกลาง และญี่ปุ่น กัปตันเป็นคนญี่ปุ่นแต่มีภาษาอังกฤษพื้นฐานและจีนบ้าง เราจัดการการสื่อสารทั้งหมดให้คุณ"
   },
   {
-    q_en: "What's not included in the price?",
-    q_zh: "ราคาไม่รวมอะไรบ้าง？",
-    'q_zh-TW': "費用不包含哪些內容？",
-    q_ja: "料金に含まれないものは何ですか？",
-    q_ko: "가격에 포함되지 않는 것은 무엇인가요?",
-    q_th: "ไม่รวมอะไรในราคาบ้าง?",
-    a_en: "Tackle and bait rental — approx. ¥10,000 per person, depending on the fishing style. Settled on the day; the amount is included in your card hold. Food and drinks are not included — please bring your own. We keep it this way because of allergies and personal preferences.",
-    a_zh: "价格不包含食物和饮料——请自备。考虑到过敏和个人偏好，我们保持这种安排。",
-    'a_zh-TW': "費用不包含食物和飲料——請自備。考慮到過敏和個人偏好，我們維持這樣的安排。",
-    a_ja: "釣具・エサのレンタルは別途（釣り方により1名あたり約10,000円目安）。当日精算、カードの与信枠（ホールド）には含まれます。食べ物・飲み物は含まれません。各自でご持参ください。アレルギーや好みに配慮し、この形にしています。",
-    a_ko: "음식과 음료는 포함되지 않습니다 — 직접 준비해 주세요. 알레르기와 개인 취향을 고려한 방식입니다.",
-    a_th: "ราคาไม่รวมอาหารและเครื่องดื่ม — โปรดนำมาเอง เราจัดแบบนี้เพื่อคำนึงถึงอาการแพ้และความชอบส่วนบุคคล"
+    "q_en": "How many people can join a private fishing charter?",
+    "q_zh": "包船最多可以几个人参加？",
+    "q_zh-TW": "包船最多可以幾個人參加？",
+    "q_ja": "貸切チャーターは何名まで参加できますか？",
+    "q_ko": "전세 낚시 차터는 몇 명까지 참여할 수 있나요?",
+    "q_th": "เรือเช่าเหมาลำส่วนตัวเข้าร่วมได้กี่คน?",
+    "a_en": "Private charters are for your group only and can take up to 12 people. For 2–3 people, the charter price is the boat price split by your group; current private charter examples are ¥70,000 for a half-day or ¥130,000 for a full-day, depending on the selected package.",
+    "a_zh": "包船只接待你们一组，最多 12 人。2–3 人参加时，包船价按整船价格由同行人数分摊；现有私人包船示例为半日 ¥70,000 或全天 ¥130,000，具体取决于所选方案。",
+    "a_zh-TW": "包船只接待您們一組，最多 12 人。2–3 人參加時，包船價按整船價格由同行人數分攤；現有私人包船示例為半日 ¥70,000 或全天 ¥130,000，具體取決於所選方案。",
+    "a_ja": "貸切チャーターはグループ専用で、最大12名まで参加できます。2〜3名の場合は船単位の料金を人数で割る形です。現在の貸切例は半日¥70,000、または終日¥130,000です。",
+    "a_ko": "전세 차터는 귀하의 그룹만 이용하며 최대 12명까지 가능합니다. 2~3명은 선박 전체 요금을 그룹 인원으로 나누는 방식이며, 현재 전세 예시는 반일 ¥70,000 또는 종일 ¥130,000입니다.",
+    "a_th": "เรือเช่าเหมาลำเป็นของกลุ่มคุณเท่านั้น รองรับได้สูงสุด 12 คน สำหรับ 2–3 คน ค่าเช่าเหมาลำเป็นราคารวมทั้งลำแล้วแบ่งกันในกลุ่ม ตัวอย่างปัจจุบันคือครึ่งวัน ¥70,000 หรือเต็มวัน ¥130,000 ขึ้นอยู่กับแพ็กเกจที่เลือก"
   },
   {
-    q_en: "What free options can I request?",
-    q_zh: "可以申请哪些免费选项？",
-    'q_zh-TW': "可以申請哪些免費選項？",
-    q_ja: "無料でお願いできるオプションは何ですか？",
-    q_ko: "어떤 무료 옵션을 요청할 수 있나요?",
-    q_th: "ขอตัวเลือกฟรีอะไรได้บ้าง?",
-    a_en: "Free on request: a styrofoam cooler box with ice and basic utensils so you can take your catch home (yours to keep); depending on the day's catch, the captain may prepare fresh sashimi on board — free, just ask; and child life jackets and snorkel gear on combo trips. None of the above options carry an extra charge from us.",
-    a_zh: "可免费申请：带冰块和基本餐具的冰桶，方便您带走渔获；船上刺身（看渔获）；以及儿童救生衣和组合行程的浮潜装备。以上选项均不会向您收取额外费用。",
-    'a_zh-TW': "可免費申請：帶冰塊和基本餐具的冰桶，方便您帶走漁獲；船上刺身（視當日漁獲而定）；以及兒童救生衣和組合行程的浮潛裝備。以上選項均不會向您收取額外費用。",
-    a_ja: "無料でご用意できます：発泡スチロールのクーラーボックス（氷・簡単な食器付き、お持ち帰り可）、船上での刺身（魚次第）、お子様用ライフジャケットとコンボ行程のシュノーケル用品。上記のオプションに追加料金はかかりません。",
-    a_ko: "무료 요청 가능: 얼음과 기본 식기가 있는 쿨러 박스, 선상 사시미(어획에 따라 가능), 어린이 구명조끼와 콤보 일정의 스노클 장비입니다. 위 옵션에는 추가 요금이 없습니다.",
-    a_th: "ขอฟรีได้: กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ ซาชิมิบนเรือ (ขึ้นอยู่กับปลาที่จับได้) และเสื้อชูชีพเด็กกับอุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา"
+    "q_en": "How does the shared fishing boat work?",
+    "q_zh": "拼船海钓体验是怎么安排的？",
+    "q_zh-TW": "拼船海釣體驗是怎麼安排的？",
+    "q_ja": "乗合の釣り体験はどのような内容ですか？",
+    "q_ko": "합승 낚시 보트는 어떻게 운영되나요?",
+    "q_th": "เรือตกปลาร่วมทำงานอย่างไร?",
+    "a_en": "The shared fishing boat Okinawa experience departs from Kadena Fishing Port, runs about 2 hours and can take up to 35 people. It is built for first-timers and families; contact us for current shared-boat pricing.",
+    "a_zh": "Okinawa 拼船海钓体验从嘉手纳渔港出发，约 2 小时，最多 35 人。适合初学者和家庭；当前拼船价格请直接咨询。",
+    "a_zh-TW": "Okinawa 拼船海釣體驗從嘉手納漁港出發，約 2 小時，最多 35 人。適合初學者和家庭；目前拼船價格請直接詢問。",
+    "a_ja": "沖縄の乗合釣り体験は嘉手納漁港発、約2時間、最大35名までです。初心者や家族向けです。現在の乗合料金はお問い合わせください。",
+    "a_ko": "오키나와 합승 낚시 보트 체험은 가데나 어항에서 출발하며 약 2시간, 최대 35명까지 가능합니다. 초보자와 가족에게 적합하며 현재 합승 보트 요금은 문의해 주세요.",
+    "a_th": "ประสบการณ์เรือตกปลาร่วม Okinawa ออกจากท่าเรือประมง Kadena ใช้เวลาประมาณ 2 ชั่วโมง รองรับได้สูงสุด 35 คน เหมาะสำหรับผู้เริ่มต้นและครอบครัว โปรดติดต่อเราเพื่อสอบถามราคาเรือร่วมปัจจุบัน"
   },
   {
-    q_en: "How early should I book a fishing charter?",
-    a_en: "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: <a href=\"https://activity.nice.okinawa/en/when-to-book/\">When to book — the earlier, the better</a>."
+    "q_en": "What free options can I request?",
+    "q_zh": "可以申请哪些免费选项？",
+    "q_zh-TW": "可以申請哪些免費選項？",
+    "q_ja": "無料でお願いできるオプションは何ですか？",
+    "q_ko": "어떤 무료 옵션을 요청할 수 있나요?",
+    "q_th": "ขอตัวเลือกฟรีอะไรได้บ้าง?",
+    "a_en": "Free on request: a styrofoam cooler box with ice and basic utensils so you can take your catch home (yours to keep); depending on the day's catch, the captain may prepare fresh sashimi on board — free, just ask; and child life jackets and snorkel gear on combo trips. None of the above options carry an extra charge from us.",
+    "a_zh": "可免费申请：带冰块和基本餐具的冰桶，方便您带走渔获；船上刺身（看渔获）；以及儿童救生衣和组合行程的浮潜装备。以上选项均不会向您收取额外费用。",
+    "a_zh-TW": "可免費申請：帶冰塊和基本餐具的冰桶，方便您帶走漁獲；船上刺身（視當日漁獲而定）；以及兒童救生衣和組合行程的浮潛裝備。以上選項均不會向您收取額外費用。",
+    "a_ja": "無料でご用意できます：発泡スチロールのクーラーボックス（氷・簡単な食器付き、お持ち帰り可）、船上での刺身（魚次第）、お子様用ライフジャケットとコンボ行程のシュノーケル用品。上記のオプションに追加料金はかかりません。",
+    "a_ko": "무료 요청 가능: 얼음과 기본 식기가 있는 쿨러 박스, 선상 사시미(어획에 따라 가능), 어린이 구명조끼와 콤보 일정의 스노클 장비입니다. 위 옵션에는 추가 요금이 없습니다.",
+    "a_th": "ขอฟรีได้: กล่องเก็บความเย็นพร้อมน้ำแข็งและอุปกรณ์พื้นฐานเพื่อนำปลาที่จับได้กลับ ซาชิมิบนเรือ (ขึ้นอยู่กับปลาที่จับได้) และเสื้อชูชีพเด็กกับอุปกรณ์ดำน้ำตื้นสำหรับทริปคอมโบ ตัวเลือกข้างต้นไม่มีค่าใช้จ่ายเพิ่มเติมจากเรา"
   },
   {
-    q_en: "When is night fishing available in Okinawa?",
-    a_en: "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+    "q_en": "How early should I book a fishing charter?",
+    "a_en": "Ideally 2–4 weeks ahead for a private charter; 3–5 days is sometimes possible if a captain is free. Peak weeks (Golden Week, Obon, late July–August) sell out early. Read more: <a href=\"https://activity.nice.okinawa/en/when-to-book/\">When to book — the earlier, the better</a>."
   },
   {
-    q_en: "Is night fishing suitable for beginners?",
-    a_en: "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
+    "q_en": "When is night fishing available in Okinawa?",
+    "a_en": "Night fishing is seasonal, generally from around June to November. Fishing is usually less productive in winter, so we normally don't recommend it during the colder months. The trip is a 4-hour private charter departing from Chatan, usually leaving around 6:00 PM and returning around 10:00 PM, with departure moving to around 7:00 PM in summer."
+  },
+  {
+    "q_en": "Is night fishing suitable for beginners?",
+    "a_en": "Seasickness can be more common at night, so we generally don't recommend night fishing for complete beginners. The charter takes up to 6 guests, rental equipment is included, and the main style is bait fishing targeting species such as snapper and grouper."
   }
 ];
 
