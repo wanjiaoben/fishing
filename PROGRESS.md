@@ -16,3 +16,5 @@ FISH-0923-13：夜钓套餐、FAQ、llms.txt 事实段与 JSON-LD Offer 已上�
 FISH-0923-15：六语套餐价格改版施工完成，已上线：PR #81，生产 SHA 371b6b4aafbf5f07c3556e5e438d31e6a14e4a29，Pages 部署成功；回滚点 e7b04e475ddd31ac61d58648003050a905d176a3。
 
 M1017-01 B内容：新增已验收船只介绍静态页 `/chatanboat/`，待 PR/MERGE_GATE 与 Pages 发布；核心业务零修改。
+
+M1017-02 C包装：船页收紧区块留白，主图去拱门改正方形；其余照片尺寸和内容不变。

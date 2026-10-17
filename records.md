@@ -163,3 +163,10 @@
 - 新增 `chatanboat/index.html` 和 `chatanboat/assets/`，照片沿用已审核 WebP、无 EXIF；不公开船名、船长姓名或详细集合地址。
 - 对三项零影响：diff 不含学习系统、支付/预授权页面、Worker、路由、配置或部署工作流。
 - 回滚：revert 本次内容提交，仅删除新增静态目录并还原记录。生产基线 `f8554967ecf17dad00cafb3462aef9cafb9ea89a`。
+
+## M1017-02 C包装：船页紧凑排版
+
+- 按 Wan 明确要求收紧 `/chatanboat/` 各区块纵向留白、标题与正文间距；主图去拱门改为直角正方形，其余照片尺寸、栅格列宽、图片文件和正文不改。
+- 仅修改 chatanboat/index.html 与任务记录；对学习、支付、预授权三项零影响（无相关文件 diff）。
+- 自测：正文/脚本不变、8 张图片哈希不变、非主图尺寸规则不变；MERGE_GATE 由 PR 核验。
+- 回滚：revert 本次 PR；基线 3bba7a0420e04d912592e9caf330a5774131eb53。
