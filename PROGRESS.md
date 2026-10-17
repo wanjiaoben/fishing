@@ -14,3 +14,5 @@ FISH-0821-HOTFIX-04 生产 Square 卡表单真实 Chromium 复验可渲染；补
 FISH-0821-HOTFIX-04 追加：补生产两域 `/api/square/*` 路由；Square 提交失败显示 HTTP 状态码+服务端 message，并上报 `authorize-submit`。
 FISH-0923-13：夜钓套餐、FAQ、llms.txt 事实段与 JSON-LD Offer 已上线（PR #79，生产 SHA e7b04e4，Pages 部署成功）。
 FISH-0923-15：六语套餐价格改版施工完成，已上线：PR #81，生产 SHA 371b6b4aafbf5f07c3556e5e438d31e6a14e4a29，Pages 部署成功；回滚点 e7b04e475ddd31ac61d58648003050a905d176a3。
+
+M1017-01 B内容：新增已验收船只介绍静态页 `/chatanboat/`，待 PR/MERGE_GATE 与 Pages 发布；核心业务零修改。

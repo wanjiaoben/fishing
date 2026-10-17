@@ -7,7 +7,7 @@
 ## 📍 当前状态
 
 - **阶段**：维护中
-- **最后更新**：2026-10-10
+- **最后更新**：2026-10-17
 - **负责人**：Wan
 
 ---
@@ -48,6 +48,9 @@
 ---
 
 ## 🔄 进行中
+
+- M1017-01 B内容：将 Wan 已验收的英文船只介绍页原样接入 `/chatanboat/`；原版 logo、2026 年已获同意的客人照片、禁止外传声明；独立静态目录，等待 PR 检查及 Pages 发布。页面沿用已批准英文版本，多语补齐另记后续内容任务。
+
 
 - M1010-FAQ B内容：已批准 FAQ 本地补丁已完成，六语言与 FAQPage 同步；内容一致性、JS/JSON 语法与本地宪法检查通过；现有测试 fishing 41 / snorkel 8 通过。此前 GitHub 分支创建因集成权限 403 受阻；2026-10-10 用户完成官方 Connector 安装后，已核实安装仅覆盖 fishing/snorkel，分支创建成功。本 PR 复用既有已验证补丁，合并及实际 Pages 上线以 PR/checks 与生产页面证据为准。中文及最终三项修订依据本次明确授权，未修改历史订单。
 
@@ -154,3 +157,9 @@
 | 2026-08-21 | Codex | FISH-0821-HOTFIX-04 追加：确认 Square 前端提交 URL 为 `/api/square/create-payment`，生产路由漏 `/api/square/*`；已补两域路由与提交失败专用错误文案/`authorize-submit` 上报 | ✅ 本地测试通过，待 PR/Wan-Verified 发布 |
 | 2026-08-21 | Codex | FISH-0821-12：授权成功后以 waitUntil 异步发送客人确认邮件，失败写 audit/日志并通知 info@；CLAUDE.md 同步 wan-rules v1.15；未发送真实邮件、未部署生产 | ⏳ |
 | 2026-08-22 | Codex | FISH-0822-02：客户端错误事件写入 `client_error_events`，按 30 天清理；后台按订单加载客户端事件；本地 27 项测试与脚本语法检查通过，待 PR/生产发布 | ⏳ |
+
+## M1017-01 操作日志
+
+- 新增 `chatanboat/index.html` 和 `chatanboat/assets/`，照片沿用已审核 WebP、无 EXIF；不公开船名、船长姓名或详细集合地址。
+- 对三项零影响：diff 不含学习系统、支付/预授权页面、Worker、路由、配置或部署工作流。
+- 回滚：revert 本次内容提交，仅删除新增静态目录并还原记录。生产基线 `f8554967ecf17dad00cafb3462aef9cafb9ea89a`。
