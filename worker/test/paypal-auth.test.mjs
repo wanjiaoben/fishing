@@ -103,6 +103,7 @@ test("interpretation short and legacy URLs show approved terms and preserve paym
       const page = await response.text();
       assert.equal(response.status, 200);
       assert.match(page, /Accompanying Interpretation/);
+      assert.match(page, /<h1>Accompanying Interpretation — Card Pre-Authorization<\/h1>/);
       assert.match(page, /This is a temporary card hold\. No payment will be charged at this stage\./);
       assert.match(page, /within one month of the scheduled service date/);
       assert.match(page, /weather or other circumstances beyond reasonable control/);
