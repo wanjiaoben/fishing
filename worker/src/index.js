@@ -970,7 +970,9 @@ async function sendCustomerAuthorizationEmail(env, row) {
     "",
     "This authorization is not the final booking confirmation. We will check the details and send a confirmation email. Please also reply to this email or message us on WhatsApp to let us know you completed this step.",
     "",
-    "Cancellation policy: " + authorizationPolicyUrl(row),
+    brandConfig(row.brand).key === "translation"
+      ? "Cancellation terms: Please refer to your confirmation email."
+      : "Cancellation policy: " + authorizationPolicyUrl(row),
     "WhatsApp: +81 70-8952-3968",
     "Email: info@nice.okinawa"
   ].join("\n");

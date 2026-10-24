@@ -581,6 +581,62 @@ test("authorization notification is audited and does not block payment when Rese
   assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log") && call.values.includes("NOTIFY_AUTHORIZED")));
 });
 
+test("empty authorization route probes reject before database, provider or email access", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => { throw new Error("empty probe reached external service"); });
+  const e = env({ env: { DB: { prepare() { throw new Error("empty probe reached database"); } } } });
+  for (const [path, error] of [
+    ["/api/paypal/authorize-order", "ORDER_ID_REQUIRED"],
+    ["/api/square/create-payment", "ORDER_ID_AND_SOURCE_ID_REQUIRED"]
+  ]) {
+    const response = await handleRequest(new Request(`https://worker.test${path}`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: "{}"
+    }), e, { waitUntil() { throw new Error("empty probe queued background task"); } });
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { ok: false, error });
+  }
+});
+
+test("interpretation email uses approved cancellation line while older brands keep their links", async (t) => {
+  const messages = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    const target = String(url);
+    if (target.includes("connect.squareupsandbox.com/v2/payments")) {
+      return Response.json({ payment: { id: "SQ-MOCK", status: "APPROVED", created_at: "2026-10-25T00:00:00Z" } });
+    }
+    if (target === "https://api.resend.com/emails") {
+      messages.push(JSON.parse(init.body));
+      return Response.json({ id: "mock-email-id" });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  for (const brand of ["translation", "fishing", "snorkel"]) {
+    messages.length = 0;
+    const row = {
+      id: `auth-email-${brand}`, paypal_order_id: `ORDER-EMAIL-${brand}`, short_code: "MOCK01",
+      brand, activity: "Test service", activity_date: daysFromToday(3), amount: 22000, currency: "JPY",
+      guest_email: "delivered@resend.dev", authorization_status: "ORDER_CREATED",
+      policy_version: "fishing-paypal-auth-v2026-08-20"
+    };
+    const waits = [];
+    const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ order_id: row.paypal_order_id, source_id: "cnon:mock", accepted_policy: true, policy_version: row.policy_version })
+    }), env({ env: { RESEND_API_KEY: "mock-key" }, rows: { byOrder: row } }), { waitUntil(task) { waits.push(task); } });
+    assert.equal(response.status, 200);
+    await Promise.all(waits);
+    const customerMessages = messages.filter(message => message.to?.[0] === "delivered@resend.dev");
+    assert.equal(customerMessages.length, 1);
+    const text = customerMessages[0].text;
+    if (brand === "translation") {
+      assert.match(text, /^Cancellation terms: Please refer to your confirmation email\.$/m);
+      assert.doesNotMatch(text, /fishing\.nice\.okinawa|snorkel\.nice\.okinawa/);
+    } else {
+      const expected = brand === "snorkel" ? "https://snorkel.nice.okinawa/#how-booking-works" : "https://fishing.nice.okinawa/#booking";
+      assert.ok(text.includes(`Cancellation policy: ${expected}`));
+    }
+  }
+});
+
 test("customer authorization email failures (500, timeout, invalid key) do not fail authorization and notify info", async (t) => {
   const scenarios = [
     ["500", () => Response.json({ message: "upstream failure" }, { status: 500 })],
