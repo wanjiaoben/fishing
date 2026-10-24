@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import vm from "node:vm";
 import { handleRequest, customerPage, adminPage } from "../src/index.js";
 import { AUTHORIZE_PAGE_SCRIPT } from "../src/authorize-page.js";
 import { WORKER_ADMIN_PATHS, WORKER_PUBLIC_PATHS, WORKER_ROUTE_DOMAINS } from "../src/routes.js";
@@ -66,6 +67,101 @@ function daysFromToday(days) {
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
+
+test("admin offers accompanying interpretation and persists its brand without capturing", async (t) => {
+  const page = await (await adminPage()).text();
+  assert.match(page, /<option value="translation">翻译同行 \/ Accompanying Interpretation<\/option>/);
+  assert.match(page, /Service date（服务日期）/);
+  assert.match(page, /翻译服务预授权金额/);
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    requests.push({ url: String(url), init });
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "test-token" });
+    if (String(url).endsWith("/v2/checkout/orders")) return Response.json({ id: "ORDER-TRANSLATION", status: "CREATED" });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env();
+  const response = await handleRequest(new Request("https://fishing.test/api/admin/orders", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ brand: "translation", activity: "Accompanying Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY" })
+  }), e);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).brand, "translation");
+  const insert = e.DB.calls.find(call => /INSERT INTO paypal_authorizations/.test(call.sql));
+  assert.equal(insert.values[2], "translation");
+  const order = requests.find(call => call.url.endsWith("/v2/checkout/orders"));
+  assert.equal(JSON.parse(order.init.body).intent, "AUTHORIZE");
+  assert.equal(requests.length, 2, "only token and AUTHORIZE order requests are made");
+});
+
+test("interpretation short and legacy URLs show approved terms and preserve payment windows", async () => {
+  for (const days of [3, 14]) {
+    const row = { paypal_order_id: "ORDER-TRANSLATION", short_code: "INT123", brand: "translation", activity: "Accompanying Interpretation", activity_date: daysFromToday(days), amount: 22000, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20" };
+    for (const url of ["https://activity.nice.okinawa/p/INT123", "https://fishing.nice.okinawa/payment/authorize?order=ORDER-TRANSLATION"]) {
+      const e = env({ rows: { byOrder: row, byShortCode: row } });
+      const response = await handleRequest(new Request(url), e);
+      const page = await response.text();
+      assert.equal(response.status, 200);
+      assert.match(page, /Accompanying Interpretation/);
+      assert.match(page, /This is a temporary card hold\. No payment will be charged at this stage\./);
+      assert.match(page, /within one month of the scheduled service date/);
+      assert.match(page, /weather or other circumstances beyond reasonable control/);
+      assert.match(page, /actual service duration and expenses incurred/);
+      assert.match(page, /may differ from the pre-authorized amount/);
+      assert.match(page, /receipt of the cash payment has been confirmed/);
+      assert.match(page, /id="agree"/);
+      assert.match(page, /id="paypal-buttons" class="notranslate"/);
+      assert.equal(page.includes('id="square-card-container"'), days <= 7);
+      assert.doesNotMatch(page, /captain|gear rental|Snorkel gear|sea conditions|Join the trip|release the full hold the same day/i);
+      assert.equal(e.DB.calls.some(call => call.run), false, "rendering never changes an authorization");
+    }
+  }
+});
+
+test("interpretation authorized page keeps cash receipt as release condition", async () => {
+  const row = { paypal_order_id: "ORDER-TRANSLATION", brand: "translation", activity: "Accompanying Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", authorization_status: "AUTHORIZED" };
+  const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TRANSLATION"), env({ rows: { byOrder: row } }))).text();
+  assert.match(page, /receipt of the cash payment has been confirmed/);
+  assert.match(page, /actual service duration and expenses incurred/);
+  assert.doesNotMatch(page, /After the trip|released the same day|id="paypal-buttons"/);
+});
+
+test("live client confirmation uses interpretation settlement terms after PayPal approval", async () => {
+  const row = { paypal_order_id: "ORDER-TRANSLATION", brand: "translation", activity: "Interpretation <test>", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20" };
+  const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TRANSLATION"), env({ rows: { byOrder: row } }))).text();
+  assert.match(page, /authorize-page\.js\?v=interpretation-20261025/);
+  const configText = page.match(/<textarea id="authorize-config" hidden>([\s\S]*?)<\/textarea>/)[1]
+    .replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+  const scripts = [];
+  let approval;
+  const document = {
+    body: { innerHTML: "" },
+    head: { appendChild(script) { scripts.push(script); } },
+    getElementById(id) {
+      if (id === "authorize-config") return { textContent: configText };
+      if (id === "agree") return { checked: true };
+      return null;
+    },
+    querySelector() { return null; },
+    createElement() { return {}; }
+  };
+  vm.runInNewContext(AUTHORIZE_PAGE_SCRIPT, {
+    document, location: { search: "" }, URLSearchParams, console,
+    setTimeout() { return 1; }, clearTimeout() {},
+    paypal: { FUNDING: { PAYPAL: "paypal" }, Buttons(options) { approval = options.onApprove; return { render() {} }; } },
+    fetch: async (url, init) => {
+      assert.equal(url, "/api/paypal/authorize-order");
+      assert.equal(JSON.parse(init.body).order_id, "ORDER-TRANSLATION");
+      return { ok: true, json: async () => ({ ok: true }) };
+    }
+  });
+  scripts[0].onload();
+  await approval({ orderID: "ORDER-TRANSLATION" });
+  assert.match(document.body.innerHTML, /receipt of the cash payment has been confirmed/);
+  assert.match(document.body.innerHTML, /actual service duration and expenses incurred/);
+  assert.match(document.body.innerHTML, /Interpretation &lt;test&gt;/);
+  assert.doesNotMatch(document.body.innerHTML, /After the trip|released the same day/);
+});
 
 test("production keeps both customer short-link routes", () => {
   const toml = fs.readFileSync(new URL("../../wrangler.production.toml", import.meta.url), "utf8");
