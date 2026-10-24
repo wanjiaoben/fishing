@@ -49,14 +49,11 @@
 
 ## 🔄 进行中
 
-- M1025-01 追加授权与回滚点：Wan 本轮明确批准 A（仅翻译订单自动确认邮件将取消条款一行改为 `Cancellation terms: Please refer to your confirmation email.`）及 B（两个生产接口各一次无订单号、无卡信息的 `{}` 请求），并要求 B 先有回滚点。本次不包含新候选的生产发布授权。
-- M1025-01 B 检查前恢复锚：最近一次成功预授权生产 Actions 为 https://github.com/wanjiaoben/fishing/actions/runs/34074785724 ，发布标签 `fishing-paypal-auth-v2026.09.07-booking-0907-06-copy`，tag object `52f455f6832952d517225117f1b9c527c8f58a9a`，源码 `7d43d973ff4677ac1b5c8e487cdebcb1ae22dc26`，部署日志 Worker version `68d097be-367c-4910-a079-40154180b4bf`。此为成功部署记录中的版本，非 Cloudflare 控制面当前版本查询。预检查 `activity.nice.okinawa/__diag` HTTP 200；线上 `/assets/authorize-page.js` HTTP 200，SHA256 `a39155496512bbe7e5b20f78fe2fd0ae1ed4742baf6118fe845d83d84c0e7e8b`，与该稳定源码的脚本字节一致。
-- M1025-01 B 执行边界：仅 sequential 两次空 POST：`/api/paypal/authorize-order` 预期 400/ORDER_ID_REQUIRED、`/api/square/create-payment` 预期 400/ORDER_ID_AND_SOURCE_ID_REQUIRED；不携订单、卡、token 或客人信息，不重试、不跟随重定向。任一结果异常即停止，保留原部署；不自动对真实订单采取逆操作。43项模拟测试通过，其中空请求测试让数据库、provider、后台任务一被调用就失败，两个处理函数都在这些调用前拒绝。B不部署代码或改变数据，没有需要反向执行的订单写入；恢复锚用于必要时恢复 Worker 代码，不代表资金/数据库备份或已演练一键回滚。
-
-- M1025-01 A功能：预授权新增 `translation`（翻译同行 / Accompanying Interpretation）；英文网页采用 Wan 本次批准文案：一个月内取消收费、天气等不可抗力例外、实际时长和费用可能与预授权金额不同、确认现金到账后手动释放。允许文件仅 `worker/src/index.js`、`worker/src/authorize-page.js`、`worker/test/paypal-auth.test.mjs`、`records.md`、`PROGRESS.md`。41 项模拟测试通过，旧 Fishing/Snorkel 两品牌 × 七状态 × 两日期窗口共 28 张 HTML 与基线逐字节相同。仅分支施工，未合并/部署/建真实单/发送邮件/操作授权；未触碰 provider 接口、路由、资金状态机、生产数据库或学习产品。
-- M1025-01 发布待办：授权成功自动邮件的 `authorizationPolicyUrl` 只有 fishing/snorkel 分支，新项目目前会回退到 fishing 取消链接；此为本次发现的既有二分支限制。遵守 Wan 邮件须先审后改的要求，尚未改邮件模板或收发设置；须先批准翻译订单该行替换文本。另待真实公网预览、独立验收、支付页四项检查及绑定候选 SHA 的生产发布批准。浏览器二进制下载返回无效压缩包，未取得真实浏览器截图，不能把模拟测试宣称为线上成功。
-- M1025-01 验收留痕：GitHub MERGE_GATE 已通过；独立复核指出完整英文标题未在真实模板显示，已修正并通过模拟测试。线上无卡空 POST 路由探测被自动审批拒绝，理由为未授权探测生产金融接口且可能有运行副作用；该检查仍未完成，已停止且未绕行。此项需 Wan 明确批准后才能执行，不能写成探测成功。
-- M1025-01 独立代码验收：PR #86 的代码候选 `733101710574c02cb1da0fd0af3e0de2de9c16bc` 经独立会话复核，41/41 模拟测试及28张旧品牌页面逐字节回归通过，完整英文标题确认已修复；另以全 mock 反向证据重现翻译授权成功邮件仍指向 Fishing 取消页，保留为上线阻塞。仅网页范围通过代码层复核，生产与真实浏览器验收未完成。
+- M1025-01 A功能当前状态：PR #86 独立分支新增翻译同行（translation / Accompanying Interpretation）预授权及 Wan 已批准英文网页条款；一个月内取消收费、天气等不可抗力例外、实际时长和费用可能与预授权金额不同、确认现金收款后手动释放。用户本轮明确批准 A（翻译订单自动确认邮件仅替换取消条款一行）与 B（两个生产接口各一次无订单号、无卡信息空请求，先保存回滚点）。A已按批准文案修改为 `Cancellation terms: Please refer to your confirmation email.`，旧两品牌邮件不变；未真实发信。本次不包含新候选的生产发布授权。
+- M1025-01 修改范围：仅 `worker/src/index.js`、`worker/src/authorize-page.js`、`worker/test/paypal-auth.test.mjs`、`records.md`、`PROGRESS.md`。独立复核43/43模拟测试通过、旧两品牌完整邮件与基线相同、28张旧品牌网页逐字节一致。空请求单测在数据库、provider或后台任务被调用时立即失败，两个处理函数均在这些调用之前拒绝。未合并/部署、未真实建单或操作授权，未改provider接口、路由、资金状态机、生产数据或学习产品。
+- M1025-01 B检查前恢复锚：最近成功的预授权生产发布为 https://github.com/wanjiaoben/fishing/actions/runs/34074785724 ，标签 `fishing-paypal-auth-v2026.09.07-booking-0907-06-copy`，tag object `52f455f6832952d517225117f1b9c527c8f58a9a`，源码 `7d43d973ff4677ac1b5c8e487cdebcb1ae22dc26`，日志记录 Worker version `68d097be-367c-4910-a079-40154180b4bf`。此为成功发布记录中的版本，非 Cloudflare 控制面当前版本查询。检查前线上健康与脚本均HTTP200；脚本SHA256 `a39155496512bbe7e5b20f78fe2fd0ae1ed4742baf6118fe845d83d84c0e7e8b`，与该稳定源码完全一致。恢复锚在任何B请求之前随提交 `c0209b36cc1bcecb404844d6e5fc260ebb62c590` 入仓。
+- M1025-01 B实际结果：2026-10-25 08:55 JST（23:55 UTC前日），向 `https://activity.nice.okinawa/api/paypal/authorize-order` 发送恰好一次 `{}`，收到HTTP403、正文 `error code: 1010`；不是预期业务400，按预先约定立即停止，无重试、无绕行、无Square POST。检查后健康接口及脚本仍HTTP200，健康JSON和脚本字节均与检查前一致。B未发布代码或提交任何真实订单信息，无须执行代码回滚；没有数据库或资金恢复操作。此结果不算支付接口验收通过。
+- M1025-01 发布待办：邮件阻塞已通过本轮明确授权修复，独立代码验收通过；此前自动审批拒绝后经用户本轮授权才执行B。仍缺公网Worker preview、真实浏览器按钮/卡表单验收、成功的生产无卡路由探测和绑定具体候选的发布批准。Chromium下载返回无效压缩包，生产POST被拦403/1010；不关闭安全规则、不换方式绕过，不得将本地模拟400当线上成功。保持Draft，禁止合并及生产tag。恢复锚仅供必要时恢复Worker代码，不是资金/数据库备份，也不代表已经演练一键回滚。
 
 - M1017-01 B内容：将 Wan 已验收的英文船只介绍页原样接入 `/chatanboat/`；原版 logo、2026 年已获同意的客人照片、禁止外传声明；独立静态目录，等待 PR 检查及 Pages 发布。页面沿用已批准英文版本，多语补齐另记后续内容任务。
 
