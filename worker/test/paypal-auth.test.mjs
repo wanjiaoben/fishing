@@ -89,7 +89,7 @@ test("admin offers accompanying interpretation and persists its brand without ca
   assert.equal((await response.json()).brand, "translation");
   const insert = e.DB.calls.find(call => /INSERT INTO paypal_authorizations/.test(call.sql));
   assert.equal(insert.values[2], "translation");
-  assert.equal(insert.values[11], "translation-auth-v2026-10-25-v1");
+  assert.equal(insert.values[11], "translation-auth-v2026-10-25-v2");
   const order = requests.find(call => call.url.endsWith("/v2/checkout/orders"));
   assert.equal(JSON.parse(order.init.body).intent, "AUTHORIZE");
   assert.equal(requests.length, 2, "only token and AUTHORIZE order requests are made");
@@ -112,9 +112,8 @@ test("interpretation short and legacy URLs show approved terms and preserve paym
       assert.match(page, /may differ from the pre-authorized amount/);
       assert.match(page, /receipt of the cash payment has been confirmed/);
       assert.match(page, /To the extent permitted by applicable law, you agree not to claim damages of any kind/);
-      assert.match(page, /only after fully understanding and confirming them/);
-      assert.match(page, /By checking the box below and proceeding with payment or card pre-authorization/);
-      assert.match(page, /I have read and agree to the Accompanying Interpretation Service Terms above/);
+      assert.match(page, /Please fully understand and confirm all important amounts, terms and contractual matters before making your own decisions/);
+      assert.match(page, /I have read and agree to these Service Terms/);
       assert.ok(page.indexOf('id="interpretation-service-terms"') < page.indexOf('id="agree"'));
       assert.ok(page.indexOf('id="agree"') < page.indexOf('id="paypal-buttons"'));
       assert.match(page, /id="agree"/);
@@ -140,7 +139,7 @@ test("interpretation consent and exact order policy version are required by both
     for (const consent of [{}, { accepted_policy: false }, { accepted_policy: true, policy_version: "stale-version" }]) {
       const e = env({ rows: { byOrder: {
         id: "auth-terms", paypal_order_id: "ORDER-TERMS", brand: "translation", activity_date: daysFromToday(3),
-        authorization_status: "ORDER_CREATED", policy_version: "translation-auth-v2026-10-25-v1"
+        authorization_status: "ORDER_CREATED", policy_version: "translation-auth-v2026-10-25-v2"
       } } });
       const response = await handleRequest(new Request(`https://worker.test${path}`, {
         method: "POST", headers: { "content-type": "application/json" },
@@ -161,7 +160,7 @@ test("accepted interpretation terms are recorded with their order version", asyn
     });
     throw new Error(`unexpected fetch ${url}`);
   });
-  const version = "translation-auth-v2026-10-25-v1";
+  const version = "translation-auth-v2026-10-25-v2";
   const e = env({ rows: { byOrder: { id: "auth-terms", paypal_order_id: "ORDER-TERMS", brand: "translation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: version } } });
   const waits = [];
   const response = await handleRequest(new Request("https://worker.test/api/paypal/authorize-order", {
@@ -177,7 +176,7 @@ test("accepted interpretation terms are recorded with their order version", asyn
 });
 
 test("PayPal and Square client paths stop until the service terms checkbox is checked", async () => {
-  const row = { paypal_order_id: "ORDER-TERMS", brand: "translation", activity: "Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", policy_version: "translation-auth-v2026-10-25-v1" };
+  const row = { paypal_order_id: "ORDER-TERMS", brand: "translation", activity: "Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", policy_version: "translation-auth-v2026-10-25-v2" };
   const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TERMS"), env({ rows: { byOrder: row } }))).text();
   const configText = page.match(/<textarea id="authorize-config" hidden>([\s\S]*?)<\/textarea>/)[1]
     .replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");

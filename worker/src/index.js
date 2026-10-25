@@ -52,7 +52,7 @@ const BRAND_CONFIG = Object.freeze({
     key: "translation",
     name: "Accompanying Interpretation",
     title: "Accompanying Interpretation — Card Pre-Authorization",
-    policyVersion: "translation-auth-v2026-10-25-v1",
+    policyVersion: "translation-auth-v2026-10-25-v2",
     accent: "#00b4c8",
     background: "#06101d",
     returnUrl: "https://translation.nice.okinawa/"
@@ -1570,10 +1570,10 @@ async function customerPageForOrder(request, env, orderId) {
     ? "Service details, meeting arrangements and fees are set out in your confirmation email."
     : "Every trip is run by a licensed local captain or guide we work with regularly.";
   const serviceTerms = isTranslation
-    ? `<section class="trust-card" id="interpretation-service-terms"><h2>Accompanying Interpretation Service Terms</h2><p>Based on the requirements and information you provide in advance, our company will do its best to arrange the most suitable personnel and actively assist with communication, coordination and confirmation.</p><p>You acknowledge that this service provides language and communication assistance. We do not guarantee that interpretation will be entirely error-free or that any particular outcome will be achieved. To the extent permitted by applicable law, you agree not to claim damages of any kind from our company in connection with this service.</p><p>You are responsible for making your own decisions on all important matters, including amounts, terms and contractual provisions, only after fully understanding and confirming them.</p><p>By checking the box below and proceeding with payment or card pre-authorization, you confirm that you have read and agreed to these Service Terms and the fees and cancellation terms set out in your booking confirmation.</p></section>`
+    ? `<section class="trust-card" id="interpretation-service-terms"><h2>Interpretation Service Terms</h2><p>Based on the details you provide in advance, we will do our best to arrange the most suitable personnel and assist with communication, coordination and confirmation.</p><p>We provide language and communication assistance, without guaranteeing error-free interpretation or specific outcomes. To the extent permitted by applicable law, you agree not to claim damages of any kind from our company for this service.</p><p>Please fully understand and confirm all important amounts, terms and contractual matters before making your own decisions.</p></section>`
     : "";
   const agreementLabel = isTranslation
-    ? "I have read and agree to the Accompanying Interpretation Service Terms above, the card pre-authorization, and the fees and cancellation terms in my booking confirmation."
+    ? "I have read and agree to these Service Terms, the card pre-authorization, and the fees and cancellation terms in my booking confirmation."
     : "I agree to the hold and to the booking details sent to me by email (dates, meeting point, participants and cancellation terms).";
   const status = String(row.authorization_status || "ORDER_CREATED");
   const cfg = { clientId: c.clientId || "", currency: row.currency, policyVersion: row.policy_version,
