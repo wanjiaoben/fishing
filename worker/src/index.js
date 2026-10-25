@@ -47,6 +47,15 @@ const BRAND_CONFIG = Object.freeze({
     accent: "#25c2a0",
     background: "#06201f",
     returnUrl: "https://snorkel.nice.okinawa/"
+  },
+  translation: {
+    key: "translation",
+    name: "Accompanying Interpretation",
+    title: "Accompanying Interpretation — Card Pre-Authorization",
+    policyVersion: "translation-auth-v2026-10-25-v2",
+    accent: "#00b4c8",
+    background: "#06101d",
+    returnUrl: "https://translation.nice.okinawa/"
   }
 });
 
@@ -521,7 +530,7 @@ async function createAdminOrder(request, env) {
       paypal_create_response, policy_version, guest_name, guest_email, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(localId, paypalOrder.id, brand, activity, activityDate, activityEndAt, amount, currency, "ORDER_CREATED", paypalOrder.status || null,
-    JSON.stringify(paypalOrder), c.policyVersion, guestName || null, guestEmail || null, createdAt, createdAt).run();
+    JSON.stringify(paypalOrder), brandConfig(brand).policyVersion || c.policyVersion, guestName || null, guestEmail || null, createdAt, createdAt).run();
   const shortCode = makeShortCode();
   await env.DB.prepare(`UPDATE paypal_authorizations SET short_code = ? WHERE id = ?`).bind(shortCode, localId).run();
   await insertEvent(env, { authorization_id: localId, paypal_order_id: paypalOrder.id, event_type: "ORDER_CREATED", event_status: paypalOrder.status, payload: paypalOrder });
@@ -631,6 +640,9 @@ async function authorizeOrder(request, env, ctx) {
   const row = await getAuthorizationByOrder(env, orderId);
   if (!row) {
     return json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 });
+  }
+  if (row.brand === "translation" && (body.accepted_policy !== true || body.policy_version !== row.policy_version)) {
+    return json({ ok: false, error: "POLICY_AGREEMENT_REQUIRED" }, { status: 400 });
   }
   if (body.accepted_policy === true && body.policy_version === row.policy_version) {
     await env.DB.prepare(
@@ -962,7 +974,9 @@ async function sendCustomerAuthorizationEmail(env, row) {
     "",
     "This authorization is not the final booking confirmation. We will check the details and send a confirmation email. Please also reply to this email or message us on WhatsApp to let us know you completed this step.",
     "",
-    "Cancellation policy: " + authorizationPolicyUrl(row),
+    brandConfig(row.brand).key === "translation"
+      ? "Cancellation terms: Please refer to your confirmation email."
+      : "Cancellation policy: " + authorizationPolicyUrl(row),
     "WhatsApp: +81 70-8952-3968",
     "Email: info@nice.okinawa"
   ].join("\n");
@@ -1524,13 +1538,16 @@ async function customerPageForOrder(request, env, orderId) {
   const c = config(env);
   const brand = brandConfig(row.brand);
   const isSnorkel = brand.key === "snorkel";
+  const isTranslation = brand.key === "translation";
   const shortCode = row.short_code || "";
-  const brandLabel = isSnorkel ? "Snorkel Okinawa" : "Fishing Okinawa";
+  const brandLabel = isTranslation ? brand.name : isSnorkel ? "Snorkel Okinawa" : "Fishing Okinawa";
   const tripNoun = isSnorkel ? "tour" : "trip";
   const cancellationActor = isSnorkel ? "we cancel" : "the captain cancels";
   const amountText = `${row.currency} ${Number(row.amount).toLocaleString("en-US")}`;
   const squareAvailable = isSquareAllowedForTripDate(row.activity_date);
-  const paymentLead = squareAvailable
+  const paymentLead = isTranslation
+    ? "This is a temporary card hold. No payment will be charged at this stage."
+    : squareAvailable
     ? `To confirm your reservation, PayPal or Square will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today.`
     : `To confirm your reservation, PayPal will place a temporary hold of ${escapeHtml(amountText)} on your card. This is not a payment — nothing is collected today. PayPal authorization is valid for 29 days.`;
   const displayActivity = isSnorkel ? String(row.activity || "").replace(/fishing/gi, "marine activity") : row.activity;
@@ -1538,21 +1555,40 @@ async function customerPageForOrder(request, env, orderId) {
   const guestName = String(row.guest_name || "").trim();
   const participants = String(row.headcount || row.participants || "").trim();
   const snorkelGuests = participants ? ` for ${escapeHtml(participants)} guests` : "";
-  const supportNote = isSnorkel
+  const supportNote = isTranslation
+    ? "The final amount will be calculated based on the actual service duration and expenses incurred, and may differ from the pre-authorized amount. Please refer to the fee arrangements in your confirmation email."
+    : isSnorkel
     ? `The hold covers the tour fee${snorkelGuests}. Snorkel gear and life jackets are included.`
     : "The hold covers the charter fee and any gear rental listed in your confirmation email.";
+  const releaseNote = isTranslation
+    ? "We will request payment of the final amount in cash and release the pre-authorization once receipt of the cash payment has been confirmed."
+    : "After the trip, the hold is released the same day (your bank may take a few days to show it).";
+  const nextSteps = isTranslation
+    ? `<li>Cancellation fees apply to cancellations made within one month of the scheduled service date, except where cancellation is due to weather or other circumstances beyond reasonable control. Please refer to your confirmation email for the applicable cancellation terms.</li><li>${escapeHtml(releaseNote)}</li>`
+    : `<li>Join the ${escapeHtml(tripNoun)} as scheduled and we release the full hold the same day. No payment is taken.</li><li>If ${escapeHtml(cancellationActor)} for weather or sea conditions, we release it in full.</li><li>Only a late cancellation or no-show may be charged, up to the hold amount, per our cancellation policy.</li>`;
+  const trustNote = isTranslation
+    ? "Service details, meeting arrangements and fees are set out in your confirmation email."
+    : "Every trip is run by a licensed local captain or guide we work with regularly.";
+  const serviceTerms = isTranslation
+    ? `<section class="trust-card" id="interpretation-service-terms"><h2>Interpretation Service Terms</h2><p>Based on the details you provide in advance, we will do our best to arrange the most suitable personnel and assist with communication, coordination and confirmation.</p><p>We provide language and communication assistance, without guaranteeing error-free interpretation or specific outcomes. To the extent permitted by applicable law, you agree not to claim damages of any kind from our company for this service.</p><p>Please fully understand and confirm all important amounts, terms and contractual matters before making your own decisions.</p></section>`
+    : "";
+  const agreementLabel = isTranslation
+    ? "I have read and agree to these Service Terms, the card pre-authorization, and the fees and cancellation terms in my booking confirmation."
+    : "I agree to the hold and to the booking details sent to me by email (dates, meeting point, participants and cancellation terms).";
   const status = String(row.authorization_status || "ORDER_CREATED");
   const cfg = { clientId: c.clientId || "", currency: row.currency, policyVersion: row.policy_version,
     amount: row.amount, activity: displayActivity, activityDate: row.activity_date, orderId, paypalJsBase: c.jsBase,
     squareApplicationId: c.squareApplicationId || "", squareLocationId: c.squareLocationId || "", squareJsBase: c.squareJsBase,
     shortCode, brand: brand.key, brandName: brand.name, brandTitle: brand.title, brandAccent: brand.accent,
-    brandBackground: brand.background, returnUrl: brand.returnUrl };
+    brandBackground: brand.background, returnUrl: brand.returnUrl,
+    ...(isTranslation ? { releaseNote, settlementNote: supportNote,
+      agreementMessage: "Please read and agree to the Service Terms, card pre-authorization, fees and cancellation terms before continuing." } : {}) };
   const pageCss = `:root{--blue:#0060B4;--sky:#009CD8;--cyan:#00B4C0;--mint:#3CC090;--soft:#F2F8FA;--text:#1F2A37;--muted:#526170;--line:#D8E7EE;--card:#FFFFFF}*{box-sizing:border-box}body{margin:0;background:var(--soft);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.auth-page{max-width:600px;margin:0 auto;padding:22px 16px 28px}.auth-shell{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 18px 44px rgba(31,42,55,.08)}.top{text-align:center;margin-bottom:20px}.logo-text{font-weight:900;letter-spacing:.02em;color:var(--blue);font-size:1.1rem}.brand-sub{margin-top:4px;color:var(--muted);font-size:.88rem}.eyebrow{display:inline-flex;align-items:center;justify-content:center;margin:2px 0 14px;padding:6px 12px;border-radius:999px;background:rgba(60,192,144,.14);color:#13795b;font-size:.76rem;font-weight:900;letter-spacing:.08em}.auth-shell h1{margin:0 0 10px;text-align:center;color:var(--blue);font-size:2rem;line-height:1.12}.lead{margin:0 auto 18px;max-width:520px;text-align:center;color:#344353}.order-card,.trust-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}.order-row{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-top:1px solid #edf4f7}.order-row:first-child{border-top:0}.order-row strong{color:#526170;font-size:.84rem}.order-row span{text-align:right;font-weight:750}.next{margin:22px 0}.next h2,.pay-block h2{margin:0 0 12px;color:var(--text);font-size:1.2rem}.check-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}.check-list li{position:relative;padding-left:30px}.check-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--mint);font-weight:900}.fine-print{margin:12px 0 0;color:var(--muted);font-size:.9rem}.agree{display:flex;gap:10px;align-items:flex-start;margin:18px 0;color:#263443;font-weight:650}.agree input{margin-top:5px}.agree a,.notice-link{color:#00B4C0;text-decoration:underline;text-underline-offset:2px}.agree a:hover,.agree a:active,.notice-link:hover,.notice-link:active{color:#009CD8}.pay-block{margin-top:20px}.payment-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.payment-options.paypal-only{grid-template-columns:1fr}.pay-option,.square{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.or-card{margin:10px 0 14px;text-align:center;color:var(--muted);font-size:.9rem}.square{transition:background .2s,border-color .2s,box-shadow .2s}.square.square-highlight{background:rgba(0,180,192,.08);border-color:rgba(0,180,192,.35);box-shadow:0 0 0 4px rgba(0,180,192,.12)}.square h3{margin:0 0 8px;color:var(--text);font-size:1.05rem}.processor-note{margin:8px 0 12px;color:var(--muted);font-size:.86rem}.status{white-space:pre-wrap;background:#eef7fb;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;color:#264052}button{appearance:none;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:850;padding:13px 16px;min-height:48px}button:disabled{opacity:.5}.square button{margin-top:14px}.trust-card{color:#334155}.trust-card p{margin:8px 0}.footer{text-align:center;color:var(--muted);font-size:.82rem;margin:18px 0 0}.safe-close{color:var(--muted);font-size:.92rem}.booking-ref{font-weight:750}.confirmation-card h1{text-align:left}.status-pill{display:inline-flex;border-radius:999px;background:rgba(0,96,180,.1);color:var(--blue);font-weight:900;padding:7px 12px;font-size:.78rem;letter-spacing:.04em}@media(max-width:620px){.payment-options{grid-template-columns:1fr}}@media(max-width:430px){.auth-page{padding:16px 12px}.auth-shell{padding:20px 16px;border-radius:18px}.auth-shell h1{font-size:1.75rem}.order-row{display:block}.order-row span{display:block;text-align:left;margin-top:2px}}`;
   const shellTop = `<div class="top"><div class="logo-text">Okinawa Private Tour</div><div class="brand-sub">${escapeHtml(brandLabel)}</div></div>`;
   const orderRows = [
     ["Booking reference", shortCode],
     guestName ? ["Guest", guestName] : null,
-    ["Activity", displayActivity],
+    [isTranslation ? "Service" : "Activity", displayActivity],
     ["Date", row.activity_date],
     participants ? ["Participants", participants] : null,
     ["Temporary authorization — no charge today", amountText]
@@ -1564,15 +1600,16 @@ async function customerPageForOrder(request, env, orderId) {
       : status === "CANCELLED"
         ? "This booking authorization was cancelled — nothing was charged."
         : "This authorization is no longer available for payment.";
-  const authorizedBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Hold placed ✓ — we'll be in touch shortly</h1><p>We've placed a temporary hold of ${escapeHtml(amountText)} on your card for ${escapeHtml(displayActivity)} on ${escapeHtml(row.activity_date)}. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We'll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you've completed this step — it helps us move faster.</li><li>Once everything is confirmed, you'll receive our confirmation email. That email is your booking.</li><li>After the trip, the hold is released the same day (your bank may take a few days to show it).</li></ul><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
+  const authorizedBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Hold placed ✓ — we'll be in touch shortly</h1><p>We've placed a temporary hold of ${escapeHtml(amountText)} on your card for ${escapeHtml(displayActivity)} on ${escapeHtml(row.activity_date)}. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We'll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you've completed this step — it helps us move faster.</li><li>Once everything is confirmed, you'll receive our confirmation email. That email is your booking.</li><li>${escapeHtml(releaseNote)}</li>${isTranslation ? `<li>${escapeHtml(supportNote)}</li>` : ""}</ul><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
   const terminalBody = `<main class="auth-page"><section class="auth-shell confirmation-card">${shellTop}<span class="status-pill">${escapeHtml(status || "STATUS UPDATED")}</span><h1>Booking status</h1><p>${escapeHtml(terminalMessage)}</p><p>Activity: ${escapeHtml(displayActivity)} · ${escapeHtml(row.activity_date)}</p><p class="booking-ref">Booking reference ${escapeHtml(shortCode)} · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main>`;
   const statusBody = status === "AUTHORIZED" ? authorizedBody : terminalBody;
-  const squareBlock = squareAvailable ? '<div class="square notranslate"><h3>Pay by card (Square)</h3><p class="or-card">Card authorization is available within 7 days before the trip.</p><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Place hold securely</button><p class="processor-note">Processed by Square. Your card details never touch our server.</p></div>' : '';
+  const cardWindowNote = isTranslation ? "Card authorization is available within 7 days before the service date." : "Card authorization is available within 7 days before the trip.";
+  const squareBlock = squareAvailable ? '<div class="square notranslate"><h3>Pay by card (Square)</h3><p class="or-card">' + escapeHtml(cardWindowNote) + '</p><p id="square-status">Secure card form loading…</p><div id="square-card-container"></div><button id="square-pay" disabled>Place hold securely</button><p class="processor-note">Processed by Square. Your card details never touch our server.</p></div>' : '';
   const paymentOptionsClass = squareAvailable ? "payment-options" : "payment-options paypal-only";
-  const formBody = `<main class="auth-page">${shellTop}<h1>Secure Your Booking</h1><div class="eyebrow">NO CHARGE TODAY</div><p class="lead">${paymentLead}</p><div class="order-card">${orderRows}</div><section class="next"><h2>What happens next</h2><ul class="check-list"><li>Join the ${escapeHtml(tripNoun)} as scheduled and we release the full hold the same day. No payment is taken.</li><li>If ${escapeHtml(cancellationActor)} for weather or sea conditions, we release it in full.</li><li>Only a late cancellation or no-show may be charged, up to the hold amount, per our cancellation policy.</li></ul><p class="fine-print">${supportNote}</p><p class="fine-print">After release, your bank may take a few days to remove the pending hold.</p></section><label class="agree"><input id="agree" type="checkbox" data-legacy-policy-copy="I agree to the hold and to the booking details sent to me by email (dates, meeting point, participants and cancellation terms)."><span>I agree to the hold and to the booking details sent to me by email (dates, meeting point, participants and cancellation terms).</span></label><section class="pay-block"><h2>Pay securely</h2><div class="${paymentOptionsClass}"><div class="pay-option"><h3>PayPal authorization</h3><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><p class="processor-note">Processed by PayPal. Your card details never touch our server.</p></div>${squareBlock}</div><div id="paypal-status" class="status" hidden></div><div id="status" class="status" hidden></div></section><section class="trust-card"><p>Every trip is run by a licensed local captain or guide we work with regularly.</p><p>Booking & English support: Wan · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main><textarea id="authorize-config" hidden>${escapeHtml(JSON.stringify({...cfg, squareAvailable}))}</textarea><script src="/assets/authorize-page.js" defer></script>`;
+  const formBody = `<main class="auth-page">${shellTop}<h1>${isTranslation ? escapeHtml(brand.title) : "Secure Your Booking"}</h1><div class="eyebrow">NO CHARGE TODAY</div><p class="lead">${paymentLead}</p><div class="order-card">${orderRows}</div><section class="next"><h2>What happens next</h2><ul class="check-list">${nextSteps}</ul><p class="fine-print">${supportNote}</p><p class="fine-print">After release, your bank may take a few days to remove the pending hold.</p></section>${serviceTerms}<label class="agree"><input id="agree" type="checkbox" data-legacy-policy-copy="I agree to the hold and to the booking details sent to me by email (dates, meeting point, participants and cancellation terms)."><span>${escapeHtml(agreementLabel)}</span></label><section class="pay-block"><h2>Pay securely</h2><div class="${paymentOptionsClass}"><div class="pay-option"><h3>PayPal authorization</h3><div id="paypal-buttons" class="notranslate"></div><div id="paypal-card-buttons" class="notranslate"></div><p class="processor-note">Processed by PayPal. Your card details never touch our server.</p></div>${squareBlock}</div><div id="paypal-status" class="status" hidden></div><div id="status" class="status" hidden></div></section><section class="trust-card"><p>${escapeHtml(trustNote)}</p><p>Booking & English support: Wan · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p>CATALINA JAPAN K.K. · Est. 2015 · 3-25-2 Maejima, Naha, Okinawa, Japan</p></section><footer class="footer">© CATALINA JAPAN K.K. · Okinawa Private Tour</footer></main><textarea id="authorize-config" hidden>${escapeHtml(JSON.stringify({...cfg, squareAvailable}))}</textarea><script src="/assets/authorize-page.js${isTranslation ? "?v=interpretation-20261025" : ""}" defer></script>`;
   const formBodyWithShell = formBody.replace('<main class="auth-page">', '<main class="auth-page"><section class="auth-shell">').replace('</footer></main>', '</footer></section></main>');
   const body = status === "ORDER_CREATED" ? formBodyWithShell : statusBody;
-  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Secure your booking · ${escapeHtml(brand.name)}</title><style>${pageCss}</style></head><body>${body}</body></html>`, { status: 200, headers: {
+  return html(`<!doctype html><html lang="en" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${isTranslation ? escapeHtml(brand.title) : `Secure your booking · ${escapeHtml(brand.name)}`}</title><style>${pageCss}</style></head><body>${body}</body></html>`, { status: 200, headers: {
     "content-security-policy-report-only": customerReportOnlyHeaders()
   } });
 }
@@ -1627,7 +1664,7 @@ function adminPage() {
   <h1>PayPal Authorizations</h1>
   <p>Authorized cards are not paid. Capture only for No Show, customer cancellation, or agreed cancellation-fee cases.</p>
   <p><input id="token" type="password" placeholder="Admin token"> <button id="load">Load</button></p>
-  <div class="row"><h2>New authorization order</h2><p class="warn">PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。</p><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label>Trip date（出团日期） <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>End time JST <select id="new-end-time"><option value="18:00">18:00 default</option><option value="12:00">12:00 morning tour</option></select></label> <label>Hold amount JPY（船费+渔具） <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><div id="create-check" class="check-panel">选择出团日期后显示 PayPal / Square 可用窗口。</div><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
+  <div class="row"><h2>New authorization order</h2><p class="warn">PayPal 授权 29 天有效，请在出团前 28 天内发链接；出团 7 天内可加 Square。</p><p><select id="new-brand"><option value="fishing">Fishing</option><option value="snorkel">Snorkel</option><option value="translation">翻译同行 / Accompanying Interpretation</option></select> <input id="new-activity" placeholder="e.g. Private Fishing Charter (full day)"> <label><span id="new-date-label">Trip date（出团日期）</span> <input id="new-date" type="date" title="Date of the trip, not a payment deadline"></label> <label>End time JST <select id="new-end-time"><option value="18:00">18:00 default</option><option value="12:00">12:00 morning tour</option></select></label> <label><span id="new-amount-label">Hold amount JPY（船费+渔具）</span> <input id="new-amount" inputmode="numeric" placeholder="Hold amount JPY（船费+渔具）"></label></p><div id="create-check" class="check-panel">选择出团日期后显示 PayPal / Square 可用窗口。</div><p><input id="new-guest-name" placeholder="Guest name (optional)"> <input id="new-guest-email" type="email" placeholder="Guest email (optional)"> <button id="create">Create link</button></p><div id="new-result"></div></div>
   <div id="list"></div>
 </main>
 <script>
@@ -1645,6 +1682,17 @@ async function createOrder(){
 function daysUntil(value){ if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value||'')) return null; const now=new Date(); const today=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()); return Math.ceil((Date.parse(value+'T00:00:00Z')-today)/86400000); }
 function addDays(value,days){const d=new Date(value+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10);}
 function updateCreateWindow(){const value=document.getElementById('new-date').value;const days=daysUntil(value);let hint=document.getElementById('square-date-hint');if(!hint){hint=document.createElement('small');hint.id='square-date-hint';hint.className='warn';document.getElementById('new-date').parentElement.appendChild(hint)}const create=document.getElementById('create');const panel=document.getElementById('create-check');const paypalEligible=days!==null&&days<=28;const squareEligible=days!==null&&days<=7;create.disabled=days!==null&&days>28;hint.textContent=days!==null&&days>28?'PayPal 授权 29 天有效，请在出团前 28 天内发链接。':days!==null&&days>7?'当前只能发 PayPal；出团 7 天内可加 Square。':'';panel.innerHTML=days===null?'选择出团日期后显示 PayPal / Square 可用窗口。':'<b>CHECK</b><br>PayPal Eligible: '+(paypalEligible?'YES':'NO')+' · 可用起始日 '+esc(addDays(value,-28))+' · 授权 29 天<br>Square Eligible: '+(squareEligible?'YES':'NO')+' · 可用起始日 '+esc(addDays(value,-7))+' · 授权按 provider delayed_until<br>推荐方式: '+(squareEligible?'PayPal 优先；7 天内也可加 Square':'PayPal only');}
+function updateBrandLabels(){
+  const isTranslation=document.getElementById('new-brand').value==='translation';
+  document.getElementById('new-activity').placeholder=isTranslation?'e.g. Accompanying Interpretation':'e.g. Private Fishing Charter (full day)';
+  document.getElementById('new-date-label').textContent=isTranslation?'Service date（服务日期）':'Trip date（出团日期）';
+  document.getElementById('new-date').title=isTranslation?'Date of the service, not a payment deadline':'Date of the trip, not a payment deadline';
+  const amountLabel=isTranslation?'Hold amount JPY（翻译服务预授权金额）':'Hold amount JPY（船费+渔具）';
+  document.getElementById('new-amount-label').textContent=amountLabel;
+  document.getElementById('new-amount').placeholder=amountLabel;
+}
+document.getElementById('new-brand').addEventListener('change',updateBrandLabels);
+updateBrandLabels();
 document.getElementById('new-date').addEventListener('change',updateCreateWindow);
 document.getElementById('new-end-time').addEventListener('change',updateCreateWindow);
 async function load(){

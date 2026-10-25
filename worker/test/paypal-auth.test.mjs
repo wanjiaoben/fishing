@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import vm from "node:vm";
 import { handleRequest, customerPage, adminPage } from "../src/index.js";
 import { AUTHORIZE_PAGE_SCRIPT } from "../src/authorize-page.js";
 import { WORKER_ADMIN_PATHS, WORKER_PUBLIC_PATHS, WORKER_ROUTE_DOMAINS } from "../src/routes.js";
@@ -66,6 +67,198 @@ function daysFromToday(days) {
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
+
+test("admin offers accompanying interpretation and persists its brand without capturing", async (t) => {
+  const page = await (await adminPage()).text();
+  assert.match(page, /<option value="translation">翻译同行 \/ Accompanying Interpretation<\/option>/);
+  assert.match(page, /Service date（服务日期）/);
+  assert.match(page, /翻译服务预授权金额/);
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    requests.push({ url: String(url), init });
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "test-token" });
+    if (String(url).endsWith("/v2/checkout/orders")) return Response.json({ id: "ORDER-TRANSLATION", status: "CREATED" });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const e = env();
+  const response = await handleRequest(new Request("https://fishing.test/api/admin/orders", {
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer admin-token" },
+    body: JSON.stringify({ brand: "translation", activity: "Accompanying Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY" })
+  }), e);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).brand, "translation");
+  const insert = e.DB.calls.find(call => /INSERT INTO paypal_authorizations/.test(call.sql));
+  assert.equal(insert.values[2], "translation");
+  assert.equal(insert.values[11], "translation-auth-v2026-10-25-v2");
+  const order = requests.find(call => call.url.endsWith("/v2/checkout/orders"));
+  assert.equal(JSON.parse(order.init.body).intent, "AUTHORIZE");
+  assert.equal(requests.length, 2, "only token and AUTHORIZE order requests are made");
+});
+
+test("interpretation short and legacy URLs show approved terms and preserve payment windows", async () => {
+  for (const days of [3, 14]) {
+    const row = { paypal_order_id: "ORDER-TRANSLATION", short_code: "INT123", brand: "translation", activity: "Accompanying Interpretation", activity_date: daysFromToday(days), amount: 22000, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20" };
+    for (const url of ["https://activity.nice.okinawa/p/INT123", "https://fishing.nice.okinawa/payment/authorize?order=ORDER-TRANSLATION"]) {
+      const e = env({ rows: { byOrder: row, byShortCode: row } });
+      const response = await handleRequest(new Request(url), e);
+      const page = await response.text();
+      assert.equal(response.status, 200);
+      assert.match(page, /Accompanying Interpretation/);
+      assert.match(page, /<h1>Accompanying Interpretation — Card Pre-Authorization<\/h1>/);
+      assert.match(page, /This is a temporary card hold\. No payment will be charged at this stage\./);
+      assert.match(page, /within one month of the scheduled service date/);
+      assert.match(page, /weather or other circumstances beyond reasonable control/);
+      assert.match(page, /actual service duration and expenses incurred/);
+      assert.match(page, /may differ from the pre-authorized amount/);
+      assert.match(page, /receipt of the cash payment has been confirmed/);
+      assert.match(page, /To the extent permitted by applicable law, you agree not to claim damages of any kind/);
+      assert.match(page, /Please fully understand and confirm all important amounts, terms and contractual matters before making your own decisions/);
+      assert.match(page, /I have read and agree to these Service Terms/);
+      assert.ok(page.indexOf('id="interpretation-service-terms"') < page.indexOf('id="agree"'));
+      assert.ok(page.indexOf('id="agree"') < page.indexOf('id="paypal-buttons"'));
+      assert.match(page, /id="agree"/);
+      assert.match(page, /id="paypal-buttons" class="notranslate"/);
+      assert.equal(page.includes('id="square-card-container"'), days <= 7);
+      assert.doesNotMatch(page, /captain|gear rental|Snorkel gear|sea conditions|Join the trip|release the full hold the same day/i);
+      assert.equal(e.DB.calls.some(call => call.run), false, "rendering never changes an authorization");
+    }
+  }
+});
+
+test("interpretation authorized page keeps cash receipt as release condition", async () => {
+  const row = { paypal_order_id: "ORDER-TRANSLATION", brand: "translation", activity: "Accompanying Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", authorization_status: "AUTHORIZED" };
+  const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TRANSLATION"), env({ rows: { byOrder: row } }))).text();
+  assert.match(page, /receipt of the cash payment has been confirmed/);
+  assert.match(page, /actual service duration and expenses incurred/);
+  assert.doesNotMatch(page, /After the trip|released the same day|id="paypal-buttons"/);
+});
+
+test("interpretation consent and exact order policy version are required by both providers", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => { throw new Error("unaccepted terms reached provider"); });
+  for (const path of ["/api/paypal/authorize-order", "/api/square/create-payment"]) {
+    for (const consent of [{}, { accepted_policy: false }, { accepted_policy: true, policy_version: "stale-version" }]) {
+      const e = env({ rows: { byOrder: {
+        id: "auth-terms", paypal_order_id: "ORDER-TERMS", brand: "translation", activity_date: daysFromToday(3),
+        authorization_status: "ORDER_CREATED", policy_version: "translation-auth-v2026-10-25-v2"
+      } } });
+      const response = await handleRequest(new Request(`https://worker.test${path}`, {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ order_id: "ORDER-TERMS", source_id: "cnon:mock", ...consent })
+      }), e);
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, "POLICY_AGREEMENT_REQUIRED");
+      assert.equal(e.DB.calls.some(call => call.run), false, "no writes before agreement");
+    }
+  }
+});
+
+test("accepted interpretation terms are recorded with their order version", async (t) => {
+  t.mock.method(globalThis, "fetch", async url => {
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "mock-token" });
+    if (String(url).endsWith("/v2/checkout/orders/ORDER-TERMS/authorize")) return Response.json({
+      status: "COMPLETED", purchase_units: [{ payments: { authorizations: [{ id: "AUTH-TERMS", status: "CREATED" }] } }]
+    });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const version = "translation-auth-v2026-10-25-v2";
+  const e = env({ rows: { byOrder: { id: "auth-terms", paypal_order_id: "ORDER-TERMS", brand: "translation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: version } } });
+  const waits = [];
+  const response = await handleRequest(new Request("https://worker.test/api/paypal/authorize-order", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-TERMS", accepted_policy: true, policy_version: version })
+  }), e, { waitUntil(task) { waits.push(task); } });
+  await Promise.all(waits);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).status, "AUTHORIZED");
+  const agreement = e.DB.calls.find(call => /INSERT OR IGNORE INTO payment_policy_agreements/.test(call.sql));
+  assert.ok(agreement?.run);
+  assert.ok(agreement.values.includes(version));
+});
+
+test("PayPal and Square client paths stop until the service terms checkbox is checked", async () => {
+  const row = { paypal_order_id: "ORDER-TERMS", brand: "translation", activity: "Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", policy_version: "translation-auth-v2026-10-25-v2" };
+  const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TERMS"), env({ rows: { byOrder: row } }))).text();
+  const configText = page.match(/<textarea id="authorize-config" hidden>([\s\S]*?)<\/textarea>/)[1]
+    .replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+  const scripts = [];
+  const agreement = { checked: false };
+  const status = { hidden: true, textContent: "" };
+  let paypalOptions, squareClick, tokenizations = 0, requests = 0;
+  const button = { disabled: true, addEventListener(event, handler) { squareClick = handler; } };
+  const nodes = { "authorize-config": { textContent: configText }, agree: agreement, status, "square-status": { textContent: "" }, "square-pay": button };
+  const document = {
+    body: { innerHTML: "" }, head: { appendChild(script) { scripts.push(script); } },
+    getElementById(id) { return nodes[id] || null; },
+    querySelector() { return { classList: { add() {} }, scrollIntoView() {} }; }, createElement() { return {}; }
+  };
+  const square = { payments() { return { async card() { return { async attach() {}, async tokenize() { tokenizations++; return { status: "OK", token: "cnon:mock" }; } }; } }; } };
+  vm.runInNewContext(AUTHORIZE_PAGE_SCRIPT, {
+    document, location: { search: "" }, URLSearchParams, console, window: { Square: square },
+    setTimeout() { return 1; }, clearTimeout() {},
+    paypal: { FUNDING: { PAYPAL: "paypal" }, Buttons(options) { paypalOptions = options; return { render() {} }; } },
+    fetch: async (url, init) => {
+      requests++;
+      assert.equal(url, "/api/square/create-payment");
+      assert.equal(JSON.parse(init.body).accepted_policy, true);
+      assert.equal(JSON.parse(init.body).policy_version, row.policy_version);
+      return { ok: true, json: async () => ({ ok: true }) };
+    }
+  });
+  scripts[0].onload();
+  await scripts[1].onload();
+  let rejected = 0, resolved = 0;
+  const actions = { reject() { rejected++; }, resolve() { resolved++; } };
+  paypalOptions.onClick({}, actions);
+  await squareClick();
+  assert.equal(rejected, 1);
+  assert.equal(resolved, 0);
+  assert.equal(tokenizations, 0);
+  assert.equal(requests, 0);
+  assert.match(status.textContent, /Service Terms/);
+  agreement.checked = true;
+  paypalOptions.onClick({}, actions);
+  await squareClick();
+  assert.equal(resolved, 1);
+  assert.equal(tokenizations, 1);
+  assert.equal(requests, 1);
+});
+
+test("live client confirmation uses interpretation settlement terms after PayPal approval", async () => {
+  const row = { paypal_order_id: "ORDER-TRANSLATION", brand: "translation", activity: "Interpretation <test>", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", policy_version: "fishing-paypal-auth-v2026-08-20" };
+  const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TRANSLATION"), env({ rows: { byOrder: row } }))).text();
+  assert.match(page, /authorize-page\.js\?v=interpretation-20261025/);
+  const configText = page.match(/<textarea id="authorize-config" hidden>([\s\S]*?)<\/textarea>/)[1]
+    .replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+  const scripts = [];
+  let approval;
+  const document = {
+    body: { innerHTML: "" },
+    head: { appendChild(script) { scripts.push(script); } },
+    getElementById(id) {
+      if (id === "authorize-config") return { textContent: configText };
+      if (id === "agree") return { checked: true };
+      return null;
+    },
+    querySelector() { return null; },
+    createElement() { return {}; }
+  };
+  vm.runInNewContext(AUTHORIZE_PAGE_SCRIPT, {
+    document, location: { search: "" }, URLSearchParams, console,
+    setTimeout() { return 1; }, clearTimeout() {},
+    paypal: { FUNDING: { PAYPAL: "paypal" }, Buttons(options) { approval = options.onApprove; return { render() {} }; } },
+    fetch: async (url, init) => {
+      assert.equal(url, "/api/paypal/authorize-order");
+      assert.equal(JSON.parse(init.body).order_id, "ORDER-TRANSLATION");
+      return { ok: true, json: async () => ({ ok: true }) };
+    }
+  });
+  scripts[0].onload();
+  await approval({ orderID: "ORDER-TRANSLATION" });
+  assert.match(document.body.innerHTML, /receipt of the cash payment has been confirmed/);
+  assert.match(document.body.innerHTML, /actual service duration and expenses incurred/);
+  assert.match(document.body.innerHTML, /Interpretation &lt;test&gt;/);
+  assert.doesNotMatch(document.body.innerHTML, /After the trip|released the same day/);
+});
 
 test("production keeps both customer short-link routes", () => {
   const toml = fs.readFileSync(new URL("../../wrangler.production.toml", import.meta.url), "utf8");
@@ -482,6 +675,62 @@ test("authorization notification is audited and does not block payment when Rese
   assert.equal(response.status, 200);
   assert.equal((await response.json()).status, "AUTHORIZED");
   assert.ok(e.DB.calls.some(call => call.sql.includes("payment_audit_log") && call.values.includes("NOTIFY_AUTHORIZED")));
+});
+
+test("empty authorization route probes reject before database, provider or email access", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => { throw new Error("empty probe reached external service"); });
+  const e = env({ env: { DB: { prepare() { throw new Error("empty probe reached database"); } } } });
+  for (const [path, error] of [
+    ["/api/paypal/authorize-order", "ORDER_ID_REQUIRED"],
+    ["/api/square/create-payment", "ORDER_ID_AND_SOURCE_ID_REQUIRED"]
+  ]) {
+    const response = await handleRequest(new Request(`https://worker.test${path}`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: "{}"
+    }), e, { waitUntil() { throw new Error("empty probe queued background task"); } });
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { ok: false, error });
+  }
+});
+
+test("interpretation email uses approved cancellation line while older brands keep their links", async (t) => {
+  const messages = [];
+  t.mock.method(globalThis, "fetch", async (url, init = {}) => {
+    const target = String(url);
+    if (target.includes("connect.squareupsandbox.com/v2/payments")) {
+      return Response.json({ payment: { id: "SQ-MOCK", status: "APPROVED", created_at: "2026-10-25T00:00:00Z" } });
+    }
+    if (target === "https://api.resend.com/emails") {
+      messages.push(JSON.parse(init.body));
+      return Response.json({ id: "mock-email-id" });
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  for (const brand of ["translation", "fishing", "snorkel"]) {
+    messages.length = 0;
+    const row = {
+      id: `auth-email-${brand}`, paypal_order_id: `ORDER-EMAIL-${brand}`, short_code: "MOCK01",
+      brand, activity: "Test service", activity_date: daysFromToday(3), amount: 22000, currency: "JPY",
+      guest_email: "delivered@resend.dev", authorization_status: "ORDER_CREATED",
+      policy_version: "fishing-paypal-auth-v2026-08-20"
+    };
+    const waits = [];
+    const response = await handleRequest(new Request("https://worker.test/api/square/create-payment", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ order_id: row.paypal_order_id, source_id: "cnon:mock", accepted_policy: true, policy_version: row.policy_version })
+    }), env({ env: { RESEND_API_KEY: "mock-key" }, rows: { byOrder: row } }), { waitUntil(task) { waits.push(task); } });
+    assert.equal(response.status, 200);
+    await Promise.all(waits);
+    const customerMessages = messages.filter(message => message.to?.[0] === "delivered@resend.dev");
+    assert.equal(customerMessages.length, 1);
+    const text = customerMessages[0].text;
+    if (brand === "translation") {
+      assert.match(text, /^Cancellation terms: Please refer to your confirmation email\.$/m);
+      assert.doesNotMatch(text, /fishing\.nice\.okinawa|snorkel\.nice\.okinawa/);
+    } else {
+      const expected = brand === "snorkel" ? "https://snorkel.nice.okinawa/#how-booking-works" : "https://fishing.nice.okinawa/#booking";
+      assert.ok(text.includes(`Cancellation policy: ${expected}`));
+    }
+  }
 });
 
 test("customer authorization email failures (500, timeout, invalid key) do not fail authorization and notify info", async (t) => {

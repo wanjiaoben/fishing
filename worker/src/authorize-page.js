@@ -18,13 +18,14 @@ export const AUTHORIZE_PAGE_SCRIPT = `(() => {
   };
   const ensureAgreement = () => {
     if (!agreement || agreement.checked) return true;
-    show("Please agree to the hold and the cancellation policy first.");
+    show(cfg.agreementMessage || "Please agree to the hold and the cancellation policy first.");
     return false;
   };
   const showConfirmation = () => {
     const ref = cfg.shortCode || cfg.orderId || "";
+    const settlementNote = cfg.settlementNote ? '<li>' + escapeHtml(cfg.settlementNote) + '</li>' : '';
     document.title = "Hold placed — we'll be in touch shortly";
-    document.body.innerHTML = '<main class="auth-page"><section class="auth-shell confirmation-card"><h1>Hold placed ✓ — we\\'ll be in touch shortly</h1><p>We\\'ve placed a temporary hold of ' + escapeHtml(holdAmount()) + ' on your card for ' + escapeHtml(cfg.activity) + ' on ' + escapeHtml(cfg.activityDate) + '. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We\\'ll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you\\'ve completed this step — it helps us move faster.</li><li>Once everything is confirmed, you\\'ll receive our confirmation email. That email is your booking.</li><li>After the trip, the hold is released the same day (your bank may take a few days to show it).</li></ul><p class="booking-ref">Booking reference ' + escapeHtml(ref) + ' · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section></main>';
+    document.body.innerHTML = '<main class="auth-page"><section class="auth-shell confirmation-card"><h1>Hold placed ✓ — we\\'ll be in touch shortly</h1><p>We\\'ve placed a temporary hold of ' + escapeHtml(holdAmount()) + ' on your card for ' + escapeHtml(cfg.activity) + ' on ' + escapeHtml(cfg.activityDate) + '. Nothing has been charged.</p><h2>What happens next:</h2><ul><li>We\\'ll contact you shortly to double-check the details.</li><li>Please also send us a quick message to say you\\'ve completed this step — it helps us move faster.</li><li>Once everything is confirmed, you\\'ll receive our confirmation email. That email is your booking.</li><li>' + escapeHtml(cfg.releaseNote || "After the trip, the hold is released the same day (your bank may take a few days to show it).") + '</li>' + settlementNote + '</ul><p class="booking-ref">Booking reference ' + escapeHtml(ref) + ' · WhatsApp +81 70-8952-3968 · info@nice.okinawa</p><p class="safe-close">This page is safe to close.</p></section></main>';
   };
   if (debugBox) {
     debugBox.id = "client-error-debug";
