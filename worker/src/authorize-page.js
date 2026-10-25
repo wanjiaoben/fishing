@@ -18,7 +18,7 @@ export const AUTHORIZE_PAGE_SCRIPT = `(() => {
   };
   const ensureAgreement = () => {
     if (!agreement || agreement.checked) return true;
-    show("Please agree to the hold and the cancellation policy first.");
+    show(cfg.agreementMessage || "Please agree to the hold and the cancellation policy first.");
     return false;
   };
   const showConfirmation = () => {

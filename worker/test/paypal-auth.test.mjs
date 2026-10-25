@@ -89,6 +89,7 @@ test("admin offers accompanying interpretation and persists its brand without ca
   assert.equal((await response.json()).brand, "translation");
   const insert = e.DB.calls.find(call => /INSERT INTO paypal_authorizations/.test(call.sql));
   assert.equal(insert.values[2], "translation");
+  assert.equal(insert.values[11], "translation-auth-v2026-10-25-v1");
   const order = requests.find(call => call.url.endsWith("/v2/checkout/orders"));
   assert.equal(JSON.parse(order.init.body).intent, "AUTHORIZE");
   assert.equal(requests.length, 2, "only token and AUTHORIZE order requests are made");
@@ -110,6 +111,12 @@ test("interpretation short and legacy URLs show approved terms and preserve paym
       assert.match(page, /actual service duration and expenses incurred/);
       assert.match(page, /may differ from the pre-authorized amount/);
       assert.match(page, /receipt of the cash payment has been confirmed/);
+      assert.match(page, /To the extent permitted by applicable law, you agree not to claim damages of any kind/);
+      assert.match(page, /only after fully understanding and confirming them/);
+      assert.match(page, /By checking the box below and proceeding with payment or card pre-authorization/);
+      assert.match(page, /I have read and agree to the Accompanying Interpretation Service Terms above/);
+      assert.ok(page.indexOf('id="interpretation-service-terms"') < page.indexOf('id="agree"'));
+      assert.ok(page.indexOf('id="agree"') < page.indexOf('id="paypal-buttons"'));
       assert.match(page, /id="agree"/);
       assert.match(page, /id="paypal-buttons" class="notranslate"/);
       assert.equal(page.includes('id="square-card-container"'), days <= 7);
@@ -125,6 +132,96 @@ test("interpretation authorized page keeps cash receipt as release condition", a
   assert.match(page, /receipt of the cash payment has been confirmed/);
   assert.match(page, /actual service duration and expenses incurred/);
   assert.doesNotMatch(page, /After the trip|released the same day|id="paypal-buttons"/);
+});
+
+test("interpretation consent and exact order policy version are required by both providers", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => { throw new Error("unaccepted terms reached provider"); });
+  for (const path of ["/api/paypal/authorize-order", "/api/square/create-payment"]) {
+    for (const consent of [{}, { accepted_policy: false }, { accepted_policy: true, policy_version: "stale-version" }]) {
+      const e = env({ rows: { byOrder: {
+        id: "auth-terms", paypal_order_id: "ORDER-TERMS", brand: "translation", activity_date: daysFromToday(3),
+        authorization_status: "ORDER_CREATED", policy_version: "translation-auth-v2026-10-25-v1"
+      } } });
+      const response = await handleRequest(new Request(`https://worker.test${path}`, {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ order_id: "ORDER-TERMS", source_id: "cnon:mock", ...consent })
+      }), e);
+      assert.equal(response.status, 400);
+      assert.equal((await response.json()).error, "POLICY_AGREEMENT_REQUIRED");
+      assert.equal(e.DB.calls.some(call => call.run), false, "no writes before agreement");
+    }
+  }
+});
+
+test("accepted interpretation terms are recorded with their order version", async (t) => {
+  t.mock.method(globalThis, "fetch", async url => {
+    if (String(url).endsWith("/v1/oauth2/token")) return Response.json({ access_token: "mock-token" });
+    if (String(url).endsWith("/v2/checkout/orders/ORDER-TERMS/authorize")) return Response.json({
+      status: "COMPLETED", purchase_units: [{ payments: { authorizations: [{ id: "AUTH-TERMS", status: "CREATED" }] } }]
+    });
+    throw new Error(`unexpected fetch ${url}`);
+  });
+  const version = "translation-auth-v2026-10-25-v1";
+  const e = env({ rows: { byOrder: { id: "auth-terms", paypal_order_id: "ORDER-TERMS", brand: "translation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", authorization_status: "ORDER_CREATED", policy_version: version } } });
+  const waits = [];
+  const response = await handleRequest(new Request("https://worker.test/api/paypal/authorize-order", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ order_id: "ORDER-TERMS", accepted_policy: true, policy_version: version })
+  }), e, { waitUntil(task) { waits.push(task); } });
+  await Promise.all(waits);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).status, "AUTHORIZED");
+  const agreement = e.DB.calls.find(call => /INSERT OR IGNORE INTO payment_policy_agreements/.test(call.sql));
+  assert.ok(agreement?.run);
+  assert.ok(agreement.values.includes(version));
+});
+
+test("PayPal and Square client paths stop until the service terms checkbox is checked", async () => {
+  const row = { paypal_order_id: "ORDER-TERMS", brand: "translation", activity: "Interpretation", activity_date: daysFromToday(3), amount: 22000, currency: "JPY", policy_version: "translation-auth-v2026-10-25-v1" };
+  const page = await (await handleRequest(new Request("https://activity.nice.okinawa/payment/authorize?order=ORDER-TERMS"), env({ rows: { byOrder: row } }))).text();
+  const configText = page.match(/<textarea id="authorize-config" hidden>([\s\S]*?)<\/textarea>/)[1]
+    .replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+  const scripts = [];
+  const agreement = { checked: false };
+  const status = { hidden: true, textContent: "" };
+  let paypalOptions, squareClick, tokenizations = 0, requests = 0;
+  const button = { disabled: true, addEventListener(event, handler) { squareClick = handler; } };
+  const nodes = { "authorize-config": { textContent: configText }, agree: agreement, status, "square-status": { textContent: "" }, "square-pay": button };
+  const document = {
+    body: { innerHTML: "" }, head: { appendChild(script) { scripts.push(script); } },
+    getElementById(id) { return nodes[id] || null; },
+    querySelector() { return { classList: { add() {} }, scrollIntoView() {} }; }, createElement() { return {}; }
+  };
+  const square = { payments() { return { async card() { return { async attach() {}, async tokenize() { tokenizations++; return { status: "OK", token: "cnon:mock" }; } }; } }; } };
+  vm.runInNewContext(AUTHORIZE_PAGE_SCRIPT, {
+    document, location: { search: "" }, URLSearchParams, console, window: { Square: square },
+    setTimeout() { return 1; }, clearTimeout() {},
+    paypal: { FUNDING: { PAYPAL: "paypal" }, Buttons(options) { paypalOptions = options; return { render() {} }; } },
+    fetch: async (url, init) => {
+      requests++;
+      assert.equal(url, "/api/square/create-payment");
+      assert.equal(JSON.parse(init.body).accepted_policy, true);
+      assert.equal(JSON.parse(init.body).policy_version, row.policy_version);
+      return { ok: true, json: async () => ({ ok: true }) };
+    }
+  });
+  scripts[0].onload();
+  await scripts[1].onload();
+  let rejected = 0, resolved = 0;
+  const actions = { reject() { rejected++; }, resolve() { resolved++; } };
+  paypalOptions.onClick({}, actions);
+  await squareClick();
+  assert.equal(rejected, 1);
+  assert.equal(resolved, 0);
+  assert.equal(tokenizations, 0);
+  assert.equal(requests, 0);
+  assert.match(status.textContent, /Service Terms/);
+  agreement.checked = true;
+  paypalOptions.onClick({}, actions);
+  await squareClick();
+  assert.equal(resolved, 1);
+  assert.equal(tokenizations, 1);
+  assert.equal(requests, 1);
 });
 
 test("live client confirmation uses interpretation settlement terms after PayPal approval", async () => {
