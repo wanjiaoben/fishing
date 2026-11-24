@@ -33,3 +33,6 @@ M1025-01 上线阻塞更正：用户已多次授权上线；实际缺公网支�
 - 候选只修改 index.html、新增 travel-news/index.html 及记录；旧页面和台风提示完整保留。
 - 仍待 Wan 在 Review 验收；未合并或部署。对学习、支付、预授权三项零影响：无相关文件变更。
 - 自测：插槽外字节守恒、六语切换、正文链接、移动端；回滚为撤销本任务提交。
+
+
+HB-358 / BR-2026-046 (2026-11-24): four-language marine-weather advisory candidate; main article plus fishing/snorkel existing news cards only. Publication pending Wan Review. No payment, entitlement, booking, or production data changes.
