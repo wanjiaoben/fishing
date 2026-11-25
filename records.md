@@ -196,3 +196,6 @@
 
 
 HB-358 / BR-2026-046 (2026-11-24): four-language marine-weather advisory candidate; main article plus fishing/snorkel existing news cards only. Publication pending Wan Review. No payment, entitlement, booking, or production data changes.
+
+
+HB-374 (2026-11-25): news shelf follows page language, preserves manual choice per browsing session, falls back to English then original Chinese; article data unchanged. Preview candidate only, not published.
