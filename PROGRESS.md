@@ -41,3 +41,5 @@ HB-358 / BR-2026-046 (2026-11-24): four-language marine-weather advisory candida
 HB-374 (2026-11-25): news shelf follows page language, preserves manual choice per browsing session, falls back to English then original Chinese; article data unchanged. Preview candidate only, not published.
 
 HB-389 / BR-2026-053 (2026-11-26)：仅新增当日海况新闻卡，四语链主站，ko/th沿现有英文回退；旧卡及组件逻辑保留。
+
+HB-417 / BR-2026-057 (2026-11-27)：仅新增当日海况新闻卡，四语链主站，ko/th沿现有英文回退；旧卡及组件逻辑保留。
